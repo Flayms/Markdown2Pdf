@@ -1,0 +1,27 @@
+name: CI
+on: [workflow_dispatch]
+env:
+  # Specifies dotnet SDK Version
+  DOTNET_VERSION: '6.0.x'
+  
+jobs:
+  ci:
+    name: ci-job
+    runs-on: ubuntu-latest
+    steps:
+    # Checks out the source code at the latest commit
+    - uses: actions/checkout@v3
+    # Installs the .NET SDK on the build machine
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+    # Installs any NuGet packages required.
+    - name: Install dependencies
+      run: dotnet restore
+    # Builds the project
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+    # Runs any tests in the project
+    #- name: Test
+    #  run: dotnet test --no-restore --verbosity normal
