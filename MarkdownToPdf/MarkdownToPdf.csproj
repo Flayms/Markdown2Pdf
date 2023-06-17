@@ -4,7 +4,26 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>default</LangVersion>
     <Nullable>enable</Nullable>
+    <Version>0.0.1</Version>
+    <Description>Library for converting Markdown to PDF.</Description>
+    <PackageProjectUrl>https://github.com/Flayms/MarkdownToPdf</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>md;markdown;pdf;markdown2pdf;markdowntopdf;library</PackageTags>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageId>Markdown2Pdf</PackageId>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Markdig" Version="0.31.0" />
