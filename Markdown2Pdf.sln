@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MarkdownToPdf", "MarkdownToPdf\MarkdownToPdf.csproj", "{F5F6DA0C-8935-4835-A2F1-AE334AAF50C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Markdown2Pdf", "Markdown2Pdf\Markdown2Pdf.csproj", "{F5F6DA0C-8935-4835-A2F1-AE334AAF50C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
