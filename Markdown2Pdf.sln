@@ -5,6 +5,8 @@ VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Markdown2Pdf", "Markdown2Pdf\Markdown2Pdf.csproj", "{F5F6DA0C-8935-4835-A2F1-AE334AAF50C4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Markdown2Pdf.Demo", "Markdown2Pdf.Demo\Markdown2Pdf.Demo.csproj", "{56611B59-7A16-49C6-983D-16334CC3CB7A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{F5F6DA0C-8935-4835-A2F1-AE334AAF50C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5F6DA0C-8935-4835-A2F1-AE334AAF50C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5F6DA0C-8935-4835-A2F1-AE334AAF50C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56611B59-7A16-49C6-983D-16334CC3CB7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56611B59-7A16-49C6-983D-16334CC3CB7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56611B59-7A16-49C6-983D-16334CC3CB7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56611B59-7A16-49C6-983D-16334CC3CB7A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,6 @@
-﻿namespace MarkdownToPdf; 
+﻿namespace Markdown2Pdf; 
 
-public class MarkdownToPdfSettings {
+public class Markdown2PdfSettings {
   //todo: font-name
   //todo: font-size
   //todo: option for generating table of contents

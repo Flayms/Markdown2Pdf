@@ -5,35 +5,36 @@ using PuppeteerSharp;
 using PuppeteerSharp.Media;
 using System;
 
-namespace MarkdownToPdf;
+namespace Markdown2Pdf;
 
-public class MarkdownToPdfConverter {
+public class Markdown2PdfConverter {
 
-  public MarkdownToPdfSettings Settings { get; }
+  public Markdown2PdfSettings Settings { get; }
 
-  public MarkdownToPdfConverter(MarkdownToPdfSettings? settings = null) {
-
-    this.Settings = settings ?? new MarkdownToPdfSettings();
+  public Markdown2PdfConverter(Markdown2PdfSettings? settings = null) {
+    this.Settings = settings ?? new Markdown2PdfSettings();
   }
 
-  public FileInfo Convert(string markdownFilePath, string outputFilePath) {
-    if (!File.Exists(markdownFilePath))
-      throw new FileNotFoundException();
+  public FileInfo Convert(FileInfo markdownFile) => new FileInfo(this.Convert(markdownFile.FullName));
 
-    return this.Convert(new FileInfo(markdownFilePath), new FileInfo(outputFilePath));
+  public void Convert(FileInfo markdownFile, FileInfo outputFile) => this.Convert(markdownFile.FullName, outputFile.FullName);
+
+  public string Convert(string markdownFilePath) {
+    var outputFilePath = Path.GetFileNameWithoutExtension(markdownFilePath) + ".pdf";
+    this.Convert(markdownFilePath, outputFilePath);
+
+    return outputFilePath;
   }
 
-  public FileInfo Convert(FileInfo markdownFile, FileInfo outputFile) {
-    var markdownContent = File.ReadAllText(markdownFile.FullName);
+  public void Convert(string markdownFilePath, string outputFilePath) {
+    var markdownContent = File.ReadAllText(markdownFilePath);
 
     var htmlFile = this._GenerateHtml(markdownContent);
-    var task = this._GeneratePdf(htmlFile, outputFile, Path.GetFileNameWithoutExtension(markdownFile.Name));
+    var task = this._GeneratePdf(htmlFile, outputFilePath, Path.GetFileNameWithoutExtension(markdownFilePath));
     task.Wait();
+  }
 
-    return outputFile;
-  } 
-
-  private FileInfo _GenerateHtml(string markdownContent) {
+  private string _GenerateHtml(string markdownContent) {
     //todo: decide on how to handle pipeline better
     var pipelineBuilder = new MarkdownPipelineBuilder()
       .UseDiagrams();
@@ -52,14 +53,14 @@ public class MarkdownToPdfConverter {
     var wrappedContent = $"<!DOCTYPE html><html><head>{string.Join("\r\n", scripts)}</head><body>{htmlContent}</body></html>";
 
     //todo: only for debug
-    var htmlFile = new FileInfo("converted.html");
-    File.WriteAllText(htmlFile.FullName, wrappedContent);
+    var htmlPath = Path.GetFullPath("converted.html");
+    File.WriteAllText(htmlPath, wrappedContent);
 
-    return htmlFile;
+    return htmlPath;
   }
 
   //todo: just work with paths instead of fileInfos
-  private async Task _GeneratePdf(FileInfo htmlFile, FileInfo outputFile, string title) {
+  private async Task _GeneratePdf(string htmlFilePath, string outputFilePath, string title) {
     var launchOptions = new LaunchOptions {
       Headless = true,
       Args = new[] {
@@ -79,7 +80,7 @@ public class MarkdownToPdfConverter {
     var page = await browser.NewPageAsync();
 
     //todo: take this as parameter
-    await page.GoToAsync(htmlFile.FullName);
+    await page.GoToAsync(htmlFilePath);
     //todo: wait for event instead
     await Task.Delay(3000);
 
@@ -121,7 +122,7 @@ public class MarkdownToPdfConverter {
     }
 
     await page.EmulateMediaTypeAsync(MediaType.Screen);
-    await page.PdfAsync(outputFile.FullName, pdfOptions);
+    await page.PdfAsync(outputFilePath, pdfOptions);
   }
 
 }
