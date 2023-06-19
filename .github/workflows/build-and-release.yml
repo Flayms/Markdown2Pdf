@@ -42,4 +42,4 @@ jobs:
     
     # Push nuget-package to nuget.rog
     - name: Push
-      run: dotnet nuget push Markdown2Pdf.${{ env.Nuget_Version }}.nupkg -k ${{ secrets.NUGET_API_KEY }}
+      run: dotnet nuget push -s Markdown2Pdf/bin/Release/Markdown2Pdf.${{ env.Nuget_Version }}.nupkg -k ${{ secrets.NUGET_API_KEY }}
