@@ -1,9 +1,9 @@
-name: CI
+name: build-and-release
 on: [workflow_dispatch]
 env:
   # Specifies dotnet SDK Version
   DOTNET_VERSION: '6.0.x'
-  
+
 jobs:
   ci:
     name: ci-job
@@ -11,17 +11,35 @@ jobs:
     steps:
     # Checks out the source code at the latest commit
     - uses: actions/checkout@v3
+
+    # Load version-name from .csproj in different enviornment variables (env.Tag_Name + env.Release_Name + env.Nuget_Version)
+    - name: Receive Version
+      run: python ".github/workflows/receive-version.py"
+    
     # Installs the .NET SDK on the build machine
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
+        
     # Installs any NuGet packages required.
     - name: Install dependencies
       run: dotnet restore
+      
     # Builds the project
     - name: Build
       run: dotnet build --configuration Release --no-restore
+      
     # Runs any tests in the project
-    #- name: Test
-    #  run: dotnet test --no-restore --verbosity normal
+    - name: Test
+      run: dotnet test --configuration Release --no-restore --verbosity normal
+    
+    # TODO: Create Github Tag + Release
+
+    # Create nuget-package
+    - name: Pack
+      run: dotnet pack --configuration Release --no-restore
+    
+    # Push nuget-package to nuget.rog
+    - name: Push
+      run: dotnet nuget push Markdown2Pdf.${{ env.Nuget_Version }}.nupkg -k ${{ secrets.NUGET_API_KEY }}
