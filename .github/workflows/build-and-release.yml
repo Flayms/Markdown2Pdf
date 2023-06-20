@@ -42,4 +42,4 @@ jobs:
     
     # Push nuget-package to nuget.org
     - name: Push
-      run: dotnet nuget push Markdown2Pdf/bin/Release/Markdown2Pdf.${{ env.Nuget_Version }}.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+      run: dotnet nuget push Markdown2Pdf/bin/Release/Markdown2Pdf.${{ env.Nuget_Version }}.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json  --skip-duplicate
