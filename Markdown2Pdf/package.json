@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "katex": "^0.16.7",
+    "mermaid": "^10.2.3"
+  }
+}

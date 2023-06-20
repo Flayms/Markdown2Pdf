@@ -1,33 +1,50 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>default</LangVersion>
-    <Nullable>enable</Nullable>
-    <Version>0.2.1</Version>
-    <Description>Library for converting Markdown to PDF.</Description>
-    <PackageProjectUrl>https://github.com/Flayms/Markdown2Pdf</PackageProjectUrl>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageTags>md;markdown;pdf;markdown2pdf;markdowntopdf;library</PackageTags>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <PackageId>Markdown2Pdf</PackageId>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<LangVersion>default</LangVersion>
+		<Nullable>enable</Nullable>
+		<Version>0.2.1</Version>
+		<Description>Library for converting Markdown to PDF.</Description>
+		<PackageProjectUrl>https://github.com/Flayms/Markdown2Pdf</PackageProjectUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageTags>md;markdown;pdf;markdown2pdf;markdowntopdf;library</PackageTags>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<PackageId>Markdown2Pdf</PackageId>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Include="..\LICENSE">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Include="..\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\LICENSE">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Markdig" Version="0.31.0" />
-    <PackageReference Include="PuppeteerSharp" Version="10.0.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Markdig" Version="0.31.0" />
+		<PackageReference Include="PuppeteerSharp" Version="10.1.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="node_modules\**">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="wwwroot\ContentTemplate.html">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
+	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+		<Exec Command="npm i mermaid@10.2.3" />
+		<Exec Command="npm i katex@0.16.7" />
+	</Target>
 
 </Project>

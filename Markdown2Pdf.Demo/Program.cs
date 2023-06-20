@@ -1,5 +1,4 @@
 ﻿using Markdown2Pdf;
-
 var settings = new Markdown2PdfSettings {
    HeaderUrl = "header.html",
    FooterUrl = "footer.html",
@@ -13,4 +12,4 @@ var settings = new Markdown2PdfSettings {
 };
 
 var converter = new Markdown2PdfConverter(settings);
-converter.Convert("README.md");
+_ = converter.Convert("README.md");
