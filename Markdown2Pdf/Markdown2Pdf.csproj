@@ -4,15 +4,21 @@
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<LangVersion>default</LangVersion>
 		<Nullable>enable</Nullable>
-		<Version>0.2.1</Version>
+		<Version>0.2.2</Version>
 		<Description>Library for converting Markdown to PDF.</Description>
 		<PackageProjectUrl>https://github.com/Flayms/Markdown2Pdf</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageTags>md;markdown;pdf;markdown2pdf;markdowntopdf;library</PackageTags>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 		<PackageId>Markdown2Pdf</PackageId>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="wwwroot\ContentTemplate.html">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </EmbeddedResource>
+	</ItemGroup>
 
 	<ItemGroup>
 		<None Include="..\LICENSE">
@@ -29,22 +35,5 @@
 		<PackageReference Include="Markdig" Version="0.31.0" />
 		<PackageReference Include="PuppeteerSharp" Version="10.1.0" />
 	</ItemGroup>
-
-	<ItemGroup>
-		<Content Include="node_modules\**">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Update="wwwroot\ContentTemplate.html">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	</ItemGroup>
-
-	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-		<Exec Command="npm i mermaid@10.2.3" />
-		<Exec Command="npm i katex@0.16.7" />
-	</Target>
 
 </Project>

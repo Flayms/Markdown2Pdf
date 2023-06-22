@@ -12,6 +12,14 @@
 # Markdown2Pdf
 .NET library for converting Markdown to PDF. Uses [Markdig](https://github.com/xoofx/markdig) for converting markdown to html and then [Puppeteer Sharp](https://github.com/hardkoded/puppeteer-sharp) to convert that output to PDF. For a cross-platform console-application checkout [Markdown2Pdf.Console](https://github.com/Flayms/Markdown2Pdf.Console).
 
+## Setup
+
+This library uses *npm* packages. To install those packages you can run the script *Init.ps1*.
+
+> **Note:** For this you need to have an installed *npm* + added to `PATH`.
+
+Alternatively you can also install the packages from the script manually.
+
 ## Usage
 
 ```c#
@@ -23,5 +31,3 @@ converter.Convert("README.md");
 
 * Supports Latex-Math rendered with [KaTeX](https://github.com/KaTeX/KaTeX)
 * Supports [Mermaid](https://github.com/mermaid-js/mermaid) diagrams
-
-> Note: Markdown2Pdf installs these JS-Libraries over a prebuild-event using npm

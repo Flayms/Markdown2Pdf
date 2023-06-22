@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using PuppeteerSharp;
 using PuppeteerSharp.Media;
 using System;
+using System.Reflection;
+using System.Linq;
 
 namespace Markdown2Pdf;
 
@@ -46,14 +48,25 @@ public class Markdown2PdfConverter {
     //todo: code-color markup
 
     //working with node-modules in c# is quite messy..
-    var currentLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetAssembly(typeof(Markdown2PdfConverter)).Location);
-    var templateHtml = File.ReadAllText(Path.Combine(currentLocation, "wwwroot/ContentTemplate.html"));
+    var assembly = Assembly.GetAssembly(typeof(Markdown2PdfConverter));
+    var currentLocation = Path.GetDirectoryName(assembly.Location);
+    var templateHtmlResource = assembly.GetManifestResourceNames().Single(n => n.EndsWith("ContentTemplate.html"));
+    //var templateHtml = File.ReadAllText(Path.Combine(currentLocation, "wwwroot/ContentTemplate.html"));
+
+    string templateHtml;
+
+    using (Stream stream = assembly.GetManifestResourceStream(templateHtmlResource))
+    using (StreamReader reader = new StreamReader(stream)) {
+      templateHtml = reader.ReadToEnd();
+    }
+    
     //todo: create cleaner solution
     var filledHtml = templateHtml.Replace("TEMP", htmlContent);
     //todo: also not that great
+    //todo: make project work without node as well
     filledHtml = filledHtml.Replace("../node_modules", Path.Combine(currentLocation, "node_modules"));
 
-    //todo: only for debug
+    //todo: only for debug //todo: make temp-file
     var htmlPath = Path.GetFullPath("converted.html");
     File.WriteAllText(htmlPath, filledHtml);
 
@@ -62,7 +75,8 @@ public class Markdown2PdfConverter {
 
   //todo: just work with paths instead of fileInfos
   private async Task _GeneratePdfAsync(string htmlFilePath, string outputFilePath, string title) {
-    var browser = await _CreateBrowserAsync();
+    //todo: doesn't dispose chromium properly...
+    using var browser = await _CreateBrowserAsync();
     var page = await browser.NewPageAsync();
 
     //todo: take this as parameter
