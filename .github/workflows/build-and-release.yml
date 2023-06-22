@@ -1,3 +1,5 @@
+# This workflow tests, builds and releases the project on github and nuget.org
+
 name: build-and-release
 on: [workflow_dispatch]
 env:
@@ -35,6 +37,34 @@ jobs:
       run: dotnet test --configuration Release --no-restore --verbosity normal
     
     # TODO: Create Github Tag + Release
+
+    # Create Release Log
+    # Need to fetch, otherwise doesn't know last commits
+    - name: Git Fetch
+      shell: bash
+      run: git fetch --depth=500
+
+    - name: create release-notes.md
+      run: bash ".github/workflows/create-release-notes.sh" "${{ github.repository }}" ${{ env.Tag_Name }}
+      
+    - name: show release log file
+      run: cat "${{ github.workspace }}\release-notes.md"
+      
+    - name: workspace directory
+      shell: bash
+      run: echo "${{ github.workspace }}\release-notes.md"
+
+    - name: list files
+      run: ls
+
+    # Create Release
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: "${{ env.Tag_Name }}"
+        name: "${{ env.Release_Name }}"
+        body_path: "${{ github.workspace }}\\release-notes.md"
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     # Create nuget-package
     - name: Pack
