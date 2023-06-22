@@ -10,6 +10,11 @@ jobs:
   ci:
     name: build-and-release-job
     runs-on: ubuntu-latest
+
+    # Need write permission for creating release-notes file
+    permissions:
+      contents: write
+
     steps:
     # Checks out the source code at the latest commit
     - uses: actions/checkout@v3
@@ -44,18 +49,11 @@ jobs:
       shell: bash
       run: git fetch --depth=500
 
-    - name: create release-notes.md
-      run: bash ".github/workflows/create-release-notes.sh" "${{ github.repository }}" ${{ env.Tag_Name }}
+    - name: Create release-notes
+      run: bash ".github/workflows/create-release-notes.sh" "${{ github.repository }}" ${{ env.Tag_Name }} "${{ github.workspace }}\release-notes.md"
       
-    - name: show release log file
-      run: cat "${{ github.workspace }}\release-notes.md"
-      
-    - name: workspace directory
-      shell: bash
-      run: echo "${{ github.workspace }}\release-notes.md"
-
-    - name: list files
-      run: ls
+    - name: Show release-notes
+      run: cat "${{ github.workspace }}\release-notes.md"   
 
     # Create Release
     - name: Release

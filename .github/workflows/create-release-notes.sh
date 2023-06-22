@@ -2,8 +2,9 @@
 
 OWNER_AND_REPO_NAME=$1
 CURRENT_TAG=$2
+FILE_NAME=$3
+
 LAST_TAG=$(git describe --tags --abbrev=0)
-FILE_NAME=release-notes.md
 
 echo "Creating $FILE_NAME"
 
