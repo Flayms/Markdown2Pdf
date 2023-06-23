@@ -64,7 +64,15 @@ public class Markdown2PdfConverter {
     var filledHtml = templateHtml.Replace("TEMP", htmlContent);
     //todo: also not that great
     //todo: make project work without node as well
-    filledHtml = filledHtml.Replace("../node_modules", Path.Combine(currentLocation, "node_modules"));
+    //todo: option for global or setable package path...
+    var nodeModulePath = Path.Combine(currentLocation, "node_modules");
+    if (!Directory.Exists(nodeModulePath)) {
+      Console.WriteLine($"Warning: could not locate node_modules at \"{nodeModulePath}\""); //todo: better logger
+
+      //todo: now use either remote or no modules all together..
+    }
+
+    filledHtml = filledHtml.Replace("../node_modules", nodeModulePath);
 
     //todo: only for debug //todo: make temp-file
     var htmlPath = Path.GetFullPath("converted.html");
