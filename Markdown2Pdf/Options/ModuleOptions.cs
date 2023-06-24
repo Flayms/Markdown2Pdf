@@ -1,4 +1,7 @@
 ﻿namespace Markdown2Pdf.Options;
+
+//todo: tests
+//todo: create plan on how to upgrade to never version
 public class ModuleOptions {
   public ModuleLocation ModuleLocation { get;}
 

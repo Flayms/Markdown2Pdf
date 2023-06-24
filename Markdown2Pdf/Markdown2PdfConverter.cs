@@ -8,6 +8,8 @@ using System.Reflection;
 using System.Linq;
 using Markdown2Pdf.Options;
 using Markdown2Pdf.Helper;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 namespace Markdown2Pdf;
 
@@ -16,13 +18,29 @@ public class Markdown2PdfConverter {
   public Markdown2PdfOptions Options { get; }
   private string? _globalModulePath;
 
+  //todo: readonly dic
+  //todo: better way to keep versions in sync
+  //todo: implement
+  private readonly Dictionary<string, string> _packageLocations = new() {
+    {"katex",  "https://cdn.jsdelivr.net/npm/katex@0.16.8" },
+    {"mermaid",  "https://cdn.jsdelivr.net/npm/mermaid@10.2.3" }
+  };
+
   public Markdown2PdfConverter(Markdown2PdfOptions? options = null) {
     this.Options = options ?? new Markdown2PdfOptions();
 
     //todo: maybe not good to do this here
     //load global module path
+    //todo: also check custom paths
     if (this.Options.ModuleOptions.ModuleLocation == ModuleLocation.Global) {
+      //todo: better error handling for cmd command
       var result = CommandLineHelper.RunCommand("npm list -g");
+      var globalModulePath = Path.Combine(Regex.Split(result, "\r\n|\r|\n").First(), "node_modules");
+
+      if (!Directory.Exists(globalModulePath))
+        throw new ArgumentException($"Could not locate node_modules at \"{globalModulePath}\"");
+
+      this._globalModulePath = globalModulePath;
     }
   }
 
@@ -49,7 +67,7 @@ public class Markdown2PdfConverter {
     //todo: decide on how to handle pipeline better
     var pipelineBuilder = new MarkdownPipelineBuilder()
       .UseDiagrams();
-      //.UseSyntaxHighlighting();
+    //.UseSyntaxHighlighting();
     var pipeline = pipelineBuilder.Build();
     var htmlContent = Markdown.ToHtml(markdownContent, pipeline);
 
@@ -68,7 +86,7 @@ public class Markdown2PdfConverter {
     using (StreamReader reader = new StreamReader(stream)) {
       templateHtml = reader.ReadToEnd();
     }
-    
+
     //todo: create cleaner solution
     var filledHtml = templateHtml.Replace("TEMP", htmlContent);
     //todo: also not that great

@@ -14,8 +14,10 @@ public class CommandLineHelper {
     var processStartInfo = new ProcessStartInfo() {
       FileName = "cmd",
       RedirectStandardOutput = true,
-      RedirectStandardInput = true,
-      WorkingDirectory = workingDirectory
+      CreateNoWindow = true,
+      RedirectStandardError = true,
+      Arguments = $"/c {commandToRun}",
+      WorkingDirectory = workingDirectory,
     };
 
     var process = Process.Start(processStartInfo);
@@ -23,7 +25,6 @@ public class CommandLineHelper {
     if (process == null)
       throw new Exception("Process should not be null.");
 
-    process.StandardInput.WriteLine($"{commandToRun} & exit");
     process.WaitForExit();
 
     var output = process.StandardOutput.ReadToEnd();
