@@ -1,7 +1,7 @@
-﻿namespace Markdown2Pdf; 
+﻿namespace Markdown2Pdf.Options;
 
 /// <summary>
-/// Margin values with units for the sides of the document.
+/// Margin values with units.
 /// </summary>
 public class MarginOptions {
   public string? Top { get; set; }

@@ -6,15 +6,24 @@ using PuppeteerSharp.Media;
 using System;
 using System.Reflection;
 using System.Linq;
+using Markdown2Pdf.Options;
+using Markdown2Pdf.Helper;
 
 namespace Markdown2Pdf;
 
 public class Markdown2PdfConverter {
 
-  public Markdown2PdfSettings Settings { get; }
+  public Markdown2PdfOptions Options { get; }
+  private string? _globalModulePath;
 
-  public Markdown2PdfConverter(Markdown2PdfSettings? settings = null) {
-    this.Settings = settings ?? new Markdown2PdfSettings();
+  public Markdown2PdfConverter(Markdown2PdfOptions? options = null) {
+    this.Options = options ?? new Markdown2PdfOptions();
+
+    //todo: maybe not good to do this here
+    //load global module path
+    if (this.Options.ModuleOptions.ModuleLocation == ModuleLocation.Global) {
+      var result = CommandLineHelper.RunCommand("npm list -g");
+    }
   }
 
   public FileInfo Convert(FileInfo markdownFile) => new FileInfo(this.Convert(markdownFile.FullName));
@@ -93,13 +102,13 @@ public class Markdown2PdfConverter {
     await Task.Delay(3000);
 
     var marginOptions = new PuppeteerSharp.Media.MarginOptions();
-    if (this.Settings.MarginOptions != null) {
+    if (this.Options.MarginOptions != null) {
       //todo: remove double initialization
       marginOptions = new PuppeteerSharp.Media.MarginOptions {
-        Top = this.Settings.MarginOptions.Top,
-        Bottom = this.Settings.MarginOptions.Bottom,
-        Left = this.Settings.MarginOptions.Left,
-        Right = this.Settings.MarginOptions.Right,
+        Top = this.Options.MarginOptions.Top,
+        Bottom = this.Options.MarginOptions.Bottom,
+        Left = this.Options.MarginOptions.Left,
+        Right = this.Options.MarginOptions.Right,
       };
     }
 
@@ -112,8 +121,8 @@ public class Markdown2PdfConverter {
 
     //todo: error handling
     //todo: default header is super small
-    if (this.Settings.HeaderUrl != null) {
-      var headerContent = File.ReadAllText(this.Settings.HeaderUrl);
+    if (this.Options.HeaderUrl != null) {
+      var headerContent = File.ReadAllText(this.Options.HeaderUrl);
 
       //todo: super hacky, rather replace class content
       //todo: create setting and only use fileName as fallback
@@ -122,8 +131,8 @@ public class Markdown2PdfConverter {
       pdfOptions.DisplayHeaderFooter = true;
     }
 
-    if (this.Settings.FooterUrl != null) {
-      var footerContent = File.ReadAllText(this.Settings.FooterUrl);
+    if (this.Options.FooterUrl != null) {
+      var footerContent = File.ReadAllText(this.Options.FooterUrl);
       footerContent = footerContent.Replace("title", title);
       pdfOptions.FooterTemplate = footerContent;
       pdfOptions.DisplayHeaderFooter = true;
@@ -141,12 +150,12 @@ public class Markdown2PdfConverter {
       },
     };
 
-    if (this.Settings.ChromePath == null) {
+    if (this.Options.ChromePath == null) {
       using var browserFetcher = new BrowserFetcher();
       Console.WriteLine("Downloading chromium...");
       await browserFetcher.DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
     } else
-      launchOptions.ExecutablePath = this.Settings.ChromePath;
+      launchOptions.ExecutablePath = this.Options.ChromePath;
 
     return await Puppeteer.LaunchAsync(launchOptions);
   }
