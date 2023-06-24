@@ -10,6 +10,7 @@ public class CommandLineHelper {
     if (string.IsNullOrEmpty(workingDirectory))
       workingDirectory = Directory.GetDirectoryRoot(Directory.GetCurrentDirectory());
 
+    //todo: probably doesnt work on linux, macos
     var processStartInfo = new ProcessStartInfo() {
       FileName = "cmd",
       RedirectStandardOutput = true,
