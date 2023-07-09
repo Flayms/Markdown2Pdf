@@ -25,5 +25,8 @@ public class Markdown2PdfOptions {
   /// </summary>
   public string? ChromePath { get; set; }
 
+  /// <summary>
+  /// Options that decide from where to load additional modules. Default: <see cref="ModuleOptions.Global"/>.
+  /// </summary>
   public ModuleOptions ModuleOptions { get; set; } = ModuleOptions.Global;
 }

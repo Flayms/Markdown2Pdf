@@ -7,8 +7,6 @@ using System;
 using System.Reflection;
 using System.Linq;
 using Markdown2Pdf.Options;
-using Markdown2Pdf.Helper;
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
 
 namespace Markdown2Pdf;
@@ -16,33 +14,43 @@ namespace Markdown2Pdf;
 public class Markdown2PdfConverter {
 
   public Markdown2PdfOptions Options { get; }
-  private string? _globalModulePath;
 
-  //todo: readonly dic
+  //todo: one instead of 2 dics
   //todo: better way to keep versions in sync
   //todo: implement
-  private readonly Dictionary<string, string> _packageLocations = new() {
-    {"katex",  "https://cdn.jsdelivr.net/npm/katex@0.16.8" },
-    {"mermaid",  "https://cdn.jsdelivr.net/npm/mermaid@10.2.3" }
+  private readonly IReadOnlyDictionary<string, string> _packageLocationsWeb = new Dictionary<string, string>() {
+    {"katexPath",  "https://cdn.jsdelivr.net/npm/katex@0.16.8" },
+    {"mermaidPath",  "https://cdn.jsdelivr.net/npm/mermaid@10.2.3" }
+  };
+
+  //the first half of the path gets added in the constructor, depending on the user-settings
+  private readonly IReadOnlyDictionary<string, string> _packageLocationsLocal = new Dictionary<string, string>() {
+    {"katexPath",  "katex" },
+    {"mermaidPath",  "mermaid" }
   };
 
   public Markdown2PdfConverter(Markdown2PdfOptions? options = null) {
     this.Options = options ?? new Markdown2PdfOptions();
 
-    //todo: maybe not good to do this here
-    //load global module path
-    //todo: also check custom paths
-    if (this.Options.ModuleOptions.ModuleLocation == ModuleLocation.Global) {
-      //todo: better error handling for cmd command
-      var result = CommandLineHelper.RunCommand("npm list -g");
-      var globalModulePath = Path.Combine(Regex.Split(result, "\r\n|\r|\n").First(), "node_modules");
+    var moduleOptions = this.Options.ModuleOptions;
 
-      if (!Directory.Exists(globalModulePath))
-        throw new ArgumentException($"Could not locate node_modules at \"{globalModulePath}\"");
+    //adjust local dictionary paths
+    if (moduleOptions.ModuleLocation != ModuleLocation.Remote) {
+      var path = moduleOptions.ModulePath!;
 
-      this._globalModulePath = globalModulePath;
+      var updatedDic = new Dictionary<string, string>();
+
+      foreach (var kvp in this._packageLocationsLocal) {
+        var key = kvp.Key;
+        var value = Path.Combine(path, kvp.Value);
+        updatedDic[key] = value;
+      }
+
+      this._packageLocationsLocal = updatedDic;
     }
   }
+
+  
 
   public FileInfo Convert(FileInfo markdownFile) => new FileInfo(this.Convert(markdownFile.FullName));
 
@@ -87,19 +95,23 @@ public class Markdown2PdfConverter {
       templateHtml = reader.ReadToEnd();
     }
 
-    //todo: create cleaner solution
-    var filledHtml = templateHtml.Replace("TEMP", htmlContent);
-    //todo: also not that great
-    //todo: make project work without node as well
-    //todo: option for global or setable package path...
-    var nodeModulePath = Path.Combine(currentLocation, "node_modules");
-    if (!Directory.Exists(nodeModulePath)) {
-      Console.WriteLine($"Warning: could not locate node_modules at \"{nodeModulePath}\""); //todo: better logger
+    var templateModel = new Dictionary<string, string>();
 
-      //todo: now use either remote or no modules all together..
+    //load correct module paths
+    if (this.Options.ModuleOptions.ModuleLocation == ModuleLocation.Remote) {
+      foreach (var kvp in this._packageLocationsWeb)
+        templateModel.Add(kvp.Key, kvp.Value);
+    }
+    else {
+      foreach (var kvp in this._packageLocationsLocal)
+        templateModel.Add(kvp.Key, kvp.Value);
     }
 
-    filledHtml = filledHtml.Replace("../node_modules", nodeModulePath);
+    templateModel.Add("body", htmlContent);
+
+    //todo: make project work without node as well
+    var filledHtml = TemplateFiller.FillTemplate(templateHtml, templateModel);
+
 
     //todo: only for debug //todo: make temp-file
     var htmlPath = Path.GetFullPath("converted.html");
