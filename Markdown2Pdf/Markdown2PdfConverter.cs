@@ -73,10 +73,11 @@ public class Markdown2PdfConverter {
 
   private string _GenerateHtml(string markdownContent) {
     //todo: decide on how to handle pipeline better
-    var pipelineBuilder = new MarkdownPipelineBuilder()
-      .UseDiagrams();
+    var pipeline = new MarkdownPipelineBuilder()
+      .UseAdvancedExtensions()
+      .UseDiagrams()
+      .Build();
     //.UseSyntaxHighlighting();
-    var pipeline = pipelineBuilder.Build();
     var htmlContent = Markdown.ToHtml(markdownContent, pipeline);
 
     //todo: support more plugins

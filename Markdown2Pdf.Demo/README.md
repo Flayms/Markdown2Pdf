@@ -17,6 +17,10 @@ C -->|Three| F[fa:fa-car Car]
 
 # Aures ille bacis si
 
+|Hello|World|
+|---|---|
+|Number 1|Number 2|
+
 ## Dilexit salientis inbellibus color
 
 Lorem markdownum sic adamanteis aberant causam. Angues omnia fortes, ignem

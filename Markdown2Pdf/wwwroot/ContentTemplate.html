@@ -5,7 +5,24 @@
     <script defer src="@(katexPath)/dist/katex.min.js"></script>
     <script defer src="@(katexPath)/dist/contrib/auto-render.min.js"
             onload="renderMathInElement(document.body);"></script>
-    <script  src="@(mermaidPath)/dist/mermaid.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            renderMathInElement(document.body, {
+                // customised options
+                // • auto-render specific keys, e.g.:
+                delimiters: [
+                    { left: '$$', right: '$$', display: true },
+                    { left: '$', right: '$', display: false },
+                    { left: '\\(', right: '\\)', display: false },
+                    { left: '\\[', right: '\\]', display: true }
+                ],
+                // • rendering keys, e.g.:
+                throwOnError: false
+            });
+        });
+    </script>
+
+    <script src="@(mermaidPath)/dist/mermaid.min.js"></script>
 </head>
 <body>
     @(body)
