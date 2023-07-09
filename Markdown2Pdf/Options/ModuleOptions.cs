@@ -30,7 +30,7 @@ public class ModuleOptions {
   public static ModuleOptions Remote => new(ModuleLocation.Remote);
 
   /// <summary>
-  /// Loads the node_modules from the systems global npm node_module directory.
+  /// Loads the node_modules from the systems global npm node_module directory (needs npm installed and in path).
   /// </summary>
   public static ModuleOptions Global => new(ModuleLocation.Global, _LoadGlobalModulePath());
 

@@ -8,17 +8,8 @@
   </a>
 </p>
 
-
 # Markdown2Pdf
 .NET library for converting Markdown to PDF. Uses [Markdig](https://github.com/xoofx/markdig) for converting markdown to html and then [Puppeteer Sharp](https://github.com/hardkoded/puppeteer-sharp) to convert that output to PDF. For a cross-platform console-application checkout [Markdown2Pdf.Console](https://github.com/Flayms/Markdown2Pdf.Console).
-
-## Setup
-
-This library uses *npm* packages. To install those packages you can run the script *Init.ps1*.
-
-> **Note:** For this you need to have an installed *npm* + added to `PATH`.
-
-Alternatively you can also install the packages from the script manually.
 
 ## Usage
 
@@ -27,7 +18,17 @@ var converter = new Markdown2PdfConverter();
 converter.Convert("README.md");
 ```
 
-## Features
+## Modules
 
-* Supports Latex-Math rendered with [KaTeX](https://github.com/KaTeX/KaTeX)
-* Supports [Mermaid](https://github.com/mermaid-js/mermaid) diagrams
+This library uses node_modules packages.
+By default they're loaded over https://cdn.jsdelivr.net.
+You can also use a local installation of them by running the script `Init.ps1` and setting `Markdown2PdfOptions.ModuleOptions` to `ModuleOptions.Global`.
+
+> **Note:** For this you need to have *npm* installed and added to `PATH`.
+
+Alternatively you can also install the packages from the script manually and configure a custom installation path with `ModuleOptions.FromLocalPath()`.
+
+### Used Modules
+
+* [KaTeX](https://github.com/KaTeX/KaTeX): Latex-Math rendering
+* [Mermaid](https://github.com/mermaid-js/mermaid):  diagrams
