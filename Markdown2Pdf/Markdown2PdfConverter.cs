@@ -6,16 +6,51 @@ using PuppeteerSharp.Media;
 using System;
 using System.Reflection;
 using System.Linq;
+using Markdown2Pdf.Options;
+using System.Collections.Generic;
 
 namespace Markdown2Pdf;
 
 public class Markdown2PdfConverter {
 
-  public Markdown2PdfSettings Settings { get; }
+  public Markdown2PdfOptions Options { get; }
 
-  public Markdown2PdfConverter(Markdown2PdfSettings? settings = null) {
-    this.Settings = settings ?? new Markdown2PdfSettings();
+  //todo: one instead of 2 dics
+  //todo: better way to keep versions in sync
+  //todo: implement
+  private readonly IReadOnlyDictionary<string, string> _packageLocationsWeb = new Dictionary<string, string>() {
+    {"katexPath",  "https://cdn.jsdelivr.net/npm/katex@0.16.8" },
+    {"mermaidPath",  "https://cdn.jsdelivr.net/npm/mermaid@10.2.3" }
+  };
+
+  //the first half of the path gets added in the constructor, depending on the user-settings
+  private readonly IReadOnlyDictionary<string, string> _packageLocationsLocal = new Dictionary<string, string>() {
+    {"katexPath",  "katex" },
+    {"mermaidPath",  "mermaid" }
+  };
+
+  public Markdown2PdfConverter(Markdown2PdfOptions? options = null) {
+    this.Options = options ?? new Markdown2PdfOptions();
+
+    var moduleOptions = this.Options.ModuleOptions;
+
+    //adjust local dictionary paths
+    if (moduleOptions.ModuleLocation != ModuleLocation.Remote) {
+      var path = moduleOptions.ModulePath!;
+
+      var updatedDic = new Dictionary<string, string>();
+
+      foreach (var kvp in this._packageLocationsLocal) {
+        var key = kvp.Key;
+        var value = Path.Combine(path, kvp.Value);
+        updatedDic[key] = value;
+      }
+
+      this._packageLocationsLocal = updatedDic;
+    }
   }
+
+  
 
   public FileInfo Convert(FileInfo markdownFile) => new FileInfo(this.Convert(markdownFile.FullName));
 
@@ -40,7 +75,7 @@ public class Markdown2PdfConverter {
     //todo: decide on how to handle pipeline better
     var pipelineBuilder = new MarkdownPipelineBuilder()
       .UseDiagrams();
-      //.UseSyntaxHighlighting();
+    //.UseSyntaxHighlighting();
     var pipeline = pipelineBuilder.Build();
     var htmlContent = Markdown.ToHtml(markdownContent, pipeline);
 
@@ -59,20 +94,24 @@ public class Markdown2PdfConverter {
     using (StreamReader reader = new StreamReader(stream)) {
       templateHtml = reader.ReadToEnd();
     }
-    
-    //todo: create cleaner solution
-    var filledHtml = templateHtml.Replace("TEMP", htmlContent);
-    //todo: also not that great
-    //todo: make project work without node as well
-    //todo: option for global or setable package path...
-    var nodeModulePath = Path.Combine(currentLocation, "node_modules");
-    if (!Directory.Exists(nodeModulePath)) {
-      Console.WriteLine($"Warning: could not locate node_modules at \"{nodeModulePath}\""); //todo: better logger
 
-      //todo: now use either remote or no modules all together..
+    var templateModel = new Dictionary<string, string>();
+
+    //load correct module paths
+    if (this.Options.ModuleOptions.ModuleLocation == ModuleLocation.Remote) {
+      foreach (var kvp in this._packageLocationsWeb)
+        templateModel.Add(kvp.Key, kvp.Value);
+    }
+    else {
+      foreach (var kvp in this._packageLocationsLocal)
+        templateModel.Add(kvp.Key, kvp.Value);
     }
 
-    filledHtml = filledHtml.Replace("../node_modules", nodeModulePath);
+    templateModel.Add("body", htmlContent);
+
+    //todo: make project work without node as well
+    var filledHtml = TemplateFiller.FillTemplate(templateHtml, templateModel);
+
 
     //todo: only for debug //todo: make temp-file
     var htmlPath = Path.GetFullPath("converted.html");
@@ -93,13 +132,13 @@ public class Markdown2PdfConverter {
     await Task.Delay(3000);
 
     var marginOptions = new PuppeteerSharp.Media.MarginOptions();
-    if (this.Settings.MarginOptions != null) {
+    if (this.Options.MarginOptions != null) {
       //todo: remove double initialization
       marginOptions = new PuppeteerSharp.Media.MarginOptions {
-        Top = this.Settings.MarginOptions.Top,
-        Bottom = this.Settings.MarginOptions.Bottom,
-        Left = this.Settings.MarginOptions.Left,
-        Right = this.Settings.MarginOptions.Right,
+        Top = this.Options.MarginOptions.Top,
+        Bottom = this.Options.MarginOptions.Bottom,
+        Left = this.Options.MarginOptions.Left,
+        Right = this.Options.MarginOptions.Right,
       };
     }
 
@@ -112,8 +151,8 @@ public class Markdown2PdfConverter {
 
     //todo: error handling
     //todo: default header is super small
-    if (this.Settings.HeaderUrl != null) {
-      var headerContent = File.ReadAllText(this.Settings.HeaderUrl);
+    if (this.Options.HeaderUrl != null) {
+      var headerContent = File.ReadAllText(this.Options.HeaderUrl);
 
       //todo: super hacky, rather replace class content
       //todo: create setting and only use fileName as fallback
@@ -122,8 +161,8 @@ public class Markdown2PdfConverter {
       pdfOptions.DisplayHeaderFooter = true;
     }
 
-    if (this.Settings.FooterUrl != null) {
-      var footerContent = File.ReadAllText(this.Settings.FooterUrl);
+    if (this.Options.FooterUrl != null) {
+      var footerContent = File.ReadAllText(this.Options.FooterUrl);
       footerContent = footerContent.Replace("title", title);
       pdfOptions.FooterTemplate = footerContent;
       pdfOptions.DisplayHeaderFooter = true;
@@ -141,12 +180,12 @@ public class Markdown2PdfConverter {
       },
     };
 
-    if (this.Settings.ChromePath == null) {
+    if (this.Options.ChromePath == null) {
       using var browserFetcher = new BrowserFetcher();
       Console.WriteLine("Downloading chromium...");
       await browserFetcher.DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
     } else
-      launchOptions.ExecutablePath = this.Settings.ChromePath;
+      launchOptions.ExecutablePath = this.Options.ChromePath;
 
     return await Puppeteer.LaunchAsync(launchOptions);
   }
