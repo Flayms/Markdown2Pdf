@@ -29,4 +29,9 @@ public class Markdown2PdfOptions {
   /// Options that decide from where to load additional modules. Default: <see cref="ModuleOptions.Remote"/>.
   /// </summary>
   public ModuleOptions ModuleOptions { get; set; } = ModuleOptions.Remote;
+
+  /// <summary>
+  /// <see langword="true"/> if the created html should not be deleted.
+  /// </summary>
+  public bool KeepHtml { get; set; }
 }
