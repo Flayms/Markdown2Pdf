@@ -127,9 +127,7 @@ public class Markdown2PdfConverter {
     using var browser = await this._CreateBrowserAsync();
     var page = await browser.NewPageAsync();
 
-    await page.GoToAsync(htmlFilePath);
-    //todo: wait for event instead
-    await Task.Delay(3000);
+    await page.GoToAsync(htmlFilePath, WaitUntilNavigation.Networkidle2);
 
     var marginOptions = new PuppeteerSharp.Media.MarginOptions();
     if (this.Options.MarginOptions != null) {
