@@ -30,5 +30,5 @@ Alternatively you can also install the packages from the script manually and con
 
 ### Used Modules
 
-* [KaTeX](https://github.com/KaTeX/KaTeX): Latex-Math rendering
+* [MathJax](https://github.com/mathjax/MathJax): Latex-Math rendering
 * [Mermaid](https://github.com/mermaid-js/mermaid):  diagrams
