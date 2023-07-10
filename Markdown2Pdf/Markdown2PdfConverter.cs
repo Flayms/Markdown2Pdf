@@ -19,13 +19,13 @@ public class Markdown2PdfConverter {
   //todo: better way to keep versions in sync
   //todo: implement
   private readonly IReadOnlyDictionary<string, string> _packageLocationsWeb = new Dictionary<string, string>() {
-    {"katexPath",  "https://cdn.jsdelivr.net/npm/katex@0.16.8" },
+    {"mathjaxPath",  "https://cdn.jsdelivr.net/npm/mathjax@3" },
     {"mermaidPath",  "https://cdn.jsdelivr.net/npm/mermaid@10.2.3" }
   };
 
   //the first half of the path gets added in the constructor, depending on the user-settings
   private readonly IReadOnlyDictionary<string, string> _packageLocationsLocal = new Dictionary<string, string>() {
-    {"katexPath",  "katex" },
+    {"mathjaxPath",  "mathjax" },
     {"mermaidPath",  "mermaid" }
   };
 
@@ -50,14 +50,14 @@ public class Markdown2PdfConverter {
     }
   }
 
-  
-
   public FileInfo Convert(FileInfo markdownFile) => new FileInfo(this.Convert(markdownFile.FullName));
 
   public void Convert(FileInfo markdownFile, FileInfo outputFile) => this.Convert(markdownFile.FullName, outputFile.FullName);
 
   public string Convert(string markdownFilePath) {
-    var outputFilePath = Path.GetFileNameWithoutExtension(markdownFilePath) + ".pdf";
+    var markdownDir = Path.GetDirectoryName(markdownFilePath);
+    var outputFileName = Path.GetFileNameWithoutExtension(markdownFilePath) + ".pdf";
+    var outputFilePath = Path.Combine(markdownDir, outputFileName);
     this.Convert(markdownFilePath, outputFilePath);
 
     return outputFilePath;
@@ -66,27 +66,35 @@ public class Markdown2PdfConverter {
   public void Convert(string markdownFilePath, string outputFilePath) {
     var markdownContent = File.ReadAllText(markdownFilePath);
 
-    var htmlFile = this._GenerateHtml(markdownContent);
-    var task = this._GeneratePdfAsync(htmlFile, outputFilePath, Path.GetFileNameWithoutExtension(markdownFilePath));
+    var html = this._GenerateHtml(markdownContent);
+
+    //todo: make temp-file
+    var markdownDir = Path.GetDirectoryName(markdownFilePath);
+    var htmlPath = Path.Combine(markdownDir, "converted.html");
+    File.WriteAllText(htmlPath, html);
+
+    var task = this._GeneratePdfAsync(htmlPath, outputFilePath, Path.GetFileNameWithoutExtension(markdownFilePath));
     task.Wait();
+
+    if (!this.Options.KeepHtml)
+      File.Delete(htmlPath);
   }
 
   private string _GenerateHtml(string markdownContent) {
     //todo: decide on how to handle pipeline better
-    var pipelineBuilder = new MarkdownPipelineBuilder()
-      .UseDiagrams();
+    var pipeline = new MarkdownPipelineBuilder()
+      .UseAdvancedExtensions()
+      .UseDiagrams()
+      .Build();
     //.UseSyntaxHighlighting();
-    var pipeline = pipelineBuilder.Build();
     var htmlContent = Markdown.ToHtml(markdownContent, pipeline);
 
     //todo: support more plugins
     //todo: code-color markup
 
-    //working with node-modules in c# is quite messy..
     var assembly = Assembly.GetAssembly(typeof(Markdown2PdfConverter));
     var currentLocation = Path.GetDirectoryName(assembly.Location);
     var templateHtmlResource = assembly.GetManifestResourceNames().Single(n => n.EndsWith("ContentTemplate.html"));
-    //var templateHtml = File.ReadAllText(Path.Combine(currentLocation, "wwwroot/ContentTemplate.html"));
 
     string templateHtml;
 
@@ -95,6 +103,7 @@ public class Markdown2PdfConverter {
       templateHtml = reader.ReadToEnd();
     }
 
+    //create model for templating html
     var templateModel = new Dictionary<string, string>();
 
     //load correct module paths
@@ -110,26 +119,15 @@ public class Markdown2PdfConverter {
     templateModel.Add("body", htmlContent);
 
     //todo: make project work without node as well
-    var filledHtml = TemplateFiller.FillTemplate(templateHtml, templateModel);
-
-
-    //todo: only for debug //todo: make temp-file
-    var htmlPath = Path.GetFullPath("converted.html");
-    File.WriteAllText(htmlPath, filledHtml);
-
-    return htmlPath;
+    return TemplateFiller.FillTemplate(templateHtml, templateModel);
   }
 
-  //todo: just work with paths instead of fileInfos
   private async Task _GeneratePdfAsync(string htmlFilePath, string outputFilePath, string title) {
     //todo: doesn't dispose chromium properly...
-    using var browser = await _CreateBrowserAsync();
+    using var browser = await this._CreateBrowserAsync();
     var page = await browser.NewPageAsync();
 
-    //todo: take this as parameter
-    await page.GoToAsync(htmlFilePath);
-    //todo: wait for event instead
-    await Task.Delay(3000);
+    await page.GoToAsync(htmlFilePath, WaitUntilNavigation.Networkidle2);
 
     var marginOptions = new PuppeteerSharp.Media.MarginOptions();
     if (this.Options.MarginOptions != null) {

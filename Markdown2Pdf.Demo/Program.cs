@@ -10,8 +10,9 @@ var options = new Markdown2PdfOptions {
      Bottom ="50px",
      Left = "50px",
      Right = "50px"
-   }
+   },
+   KeepHtml = true,
 };
 
 var converter = new Markdown2PdfConverter(options);
-_ = converter.Convert("README.md");
+_ = converter.Convert(Path.Combine(Directory.GetCurrentDirectory(), "README.md"));

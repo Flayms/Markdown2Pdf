@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "katex": "^0.16.7",
+    "mathjax": "^3.2.2",
     "mermaid": "^10.2.3"
   }
 }
