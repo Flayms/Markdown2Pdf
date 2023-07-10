@@ -19,13 +19,13 @@ public class Markdown2PdfConverter {
   //todo: better way to keep versions in sync
   //todo: implement
   private readonly IReadOnlyDictionary<string, string> _packageLocationsWeb = new Dictionary<string, string>() {
-    {"katexPath",  "https://cdn.jsdelivr.net/npm/katex@0.16.8" },
+    {"mathjaxPath",  "https://cdn.jsdelivr.net/npm/mathjax@3" },
     {"mermaidPath",  "https://cdn.jsdelivr.net/npm/mermaid@10.2.3" }
   };
 
   //the first half of the path gets added in the constructor, depending on the user-settings
   private readonly IReadOnlyDictionary<string, string> _packageLocationsLocal = new Dictionary<string, string>() {
-    {"katexPath",  "katex" },
+    {"mathjaxPath",  "mathjax" },
     {"mermaidPath",  "mermaid" }
   };
 
@@ -49,8 +49,6 @@ public class Markdown2PdfConverter {
       this._packageLocationsLocal = updatedDic;
     }
   }
-
-  
 
   public FileInfo Convert(FileInfo markdownFile) => new FileInfo(this.Convert(markdownFile.FullName));
 
