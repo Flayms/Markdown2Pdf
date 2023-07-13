@@ -7,7 +7,7 @@ namespace Markdown2Pdf;
 internal class TemplateFiller {
 
   //matches groups like @(myToken)
-  private static readonly Regex _TOKEN_REGEX = new Regex(@"(?<token>@\(.*\))",
+  private static readonly Regex _TOKEN_REGEX = new (@"(?<token>@\(.*\))",
     RegexOptions.Compiled |RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture);
 
   public static string FillTemplate(string template, Dictionary<string, string> model) {
