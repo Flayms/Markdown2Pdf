@@ -4,7 +4,7 @@
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<LangVersion>default</LangVersion>
 		<Nullable>enable</Nullable>
-		<Version>0.3.1</Version>
+		<Version>0.3.2</Version>
 		<Description>Library for converting Markdown to PDF.</Description>
 		<PackageProjectUrl>https://github.com/Flayms/Markdown2Pdf</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -12,6 +12,10 @@
 		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 		<PackageId>Markdown2Pdf</PackageId>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -22,6 +22,7 @@ converter.Convert("README.md");
 
 This library uses node_modules packages.
 By default they're loaded over https://cdn.jsdelivr.net.
+
 You can also use a local installation of them by running the script `Init.ps1` and setting `Markdown2PdfOptions.ModuleOptions` to `ModuleOptions.Global`.
 
 > **Note:** For this you need to have *npm* installed and added to `PATH`.
@@ -32,3 +33,11 @@ Alternatively you can also install the packages from the script manually and con
 
 * [MathJax](https://github.com/mathjax/MathJax): Latex-Math rendering
 * [Mermaid](https://github.com/mermaid-js/mermaid):  diagrams
+
+## Options
+
+* Custom Html-Header
+* Custom Html-Footer
+* Page-Margins
+* Module loading from different sources
+* Keeping the temp html
