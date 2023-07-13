@@ -1,10 +1,7 @@
 # This workflow builds and tests the project
 
 name: test
-on:
-  push:
-    branches:
-      - main
+on: push
 env:
   # Specifies dotnet SDK Version
   DOTNET_VERSION: '6.0.x'
@@ -12,7 +9,7 @@ env:
 jobs:
   ci:
     name: test-job
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     # Checks out the source code at the latest commit
