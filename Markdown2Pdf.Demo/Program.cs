@@ -15,4 +15,4 @@ var options = new Markdown2PdfOptions {
 };
 
 var converter = new Markdown2PdfConverter(options);
-_ = converter.Convert(Path.Combine(Directory.GetCurrentDirectory(), "README.md"));
+_ = converter.Convert("README.md");

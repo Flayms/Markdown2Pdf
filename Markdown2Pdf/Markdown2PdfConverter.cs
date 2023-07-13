@@ -11,8 +11,14 @@ using System.Collections.Generic;
 
 namespace Markdown2Pdf;
 
+/// <summary>
+/// Use this to parse markdown to PDF.
+/// </summary>
 public class Markdown2PdfConverter {
 
+  /// <summary>
+  /// All the options this converter uses for generating the PDF.
+  /// </summary>
   public Markdown2PdfOptions Options { get; }
 
   //todo: one instead of 2 dics
@@ -29,7 +35,11 @@ public class Markdown2PdfConverter {
     {"mermaidPath",  "mermaid" }
   };
 
-  public Markdown2PdfConverter(Markdown2PdfOptions? options = null) {
+  /// <summary>
+  /// Instantiate a new <see cref="Markdown2PdfConverter"/>.
+  /// </summary>
+  /// <param name="options">Optional options to specify how to convert the markdown.</param>
+  public Markdown2PdfConverter(Markdown2PdfOptions? options = default) {
     this.Options = options ?? new Markdown2PdfOptions();
 
     var moduleOptions = this.Options.ModuleOptions;
@@ -50,10 +60,21 @@ public class Markdown2PdfConverter {
     }
   }
 
+  /// <inheritdoc cref="Convert(FileInfo, FileInfo)"/>
+  /// <remarks>The PDF will be saved in the same location as the markdown file with the naming convention "markdownFileName.pdf".</remarks>
+  /// <returns>The newly created PDF-file.</returns>
   public FileInfo Convert(FileInfo markdownFile) => new FileInfo(this.Convert(markdownFile.FullName));
 
+  /// <summary>
+  /// Converts the given markdown-file to PDF.
+  /// </summary>
+  /// <param name="markdownFile"><see cref="FileInfo"/> containing the markdown.</param>
+  /// <param name="outputFile"><see cref="FileInfo"/> for saving the generated PDF.</param>
   public void Convert(FileInfo markdownFile, FileInfo outputFile) => this.Convert(markdownFile.FullName, outputFile.FullName);
 
+  /// <inheritdoc cref="Convert(string, string)"/>
+  /// <remarks>The PDF will be saved in the same location as the markdown file with the naming convention "markdownFileName.pdf".</remarks>
+  /// <returns>Filepath to the generated pdf.</returns>
   public string Convert(string markdownFilePath) {
     var markdownDir = Path.GetDirectoryName(markdownFilePath);
     var outputFileName = Path.GetFileNameWithoutExtension(markdownFilePath) + ".pdf";
@@ -63,7 +84,16 @@ public class Markdown2PdfConverter {
     return outputFilePath;
   }
 
+  /// <summary>
+  /// Converts the given markdown-file to PDF.
+  /// </summary>
+  /// <param name="markdownFilePath">Path to the markdown file.</param>
+  /// <param name="outputFilePath">File path for saving the PDF to.</param>
+  /// <remarks>The PDF will be saved in the same location as the markdown file with the naming convention "markdownFileName.pdf".</remarks>
   public void Convert(string markdownFilePath, string outputFilePath) {
+    markdownFilePath = Path.GetFullPath(markdownFilePath);
+    outputFilePath = Path.GetFullPath(outputFilePath);
+
     var markdownContent = File.ReadAllText(markdownFilePath);
 
     var html = this._GenerateHtml(markdownContent);
@@ -118,12 +148,10 @@ public class Markdown2PdfConverter {
 
     templateModel.Add("body", htmlContent);
 
-    //todo: make project work without node as well
     return TemplateFiller.FillTemplate(templateHtml, templateModel);
   }
 
   private async Task _GeneratePdfAsync(string htmlFilePath, string outputFilePath, string title) {
-    //todo: doesn't dispose chromium properly...
     using var browser = await this._CreateBrowserAsync();
     var page = await browser.NewPageAsync();
 
