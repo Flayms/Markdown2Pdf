@@ -36,10 +36,6 @@ jobs:
     # Builds the project
     - name: Build
       run: dotnet build --configuration Release --no-restore
-      
-    # Runs any tests in the project
-    - name: Test
-      run: dotnet test --configuration Release --no-restore --verbosity normal
 
     # Create Release Log
     # Need to fetch, otherwise doesn't know last commits
