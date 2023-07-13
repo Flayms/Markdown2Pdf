@@ -40,8 +40,6 @@ jobs:
     # Runs any tests in the project
     - name: Test
       run: dotnet test --configuration Release --no-restore --verbosity normal
-    
-    # TODO: Create Github Tag + Release
 
     # Create Release Log
     # Need to fetch, otherwise doesn't know last commits
