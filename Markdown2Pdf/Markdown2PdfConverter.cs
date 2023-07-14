@@ -45,7 +45,8 @@ public class Markdown2PdfConverter {
     var moduleOptions = this.Options.ModuleOptions;
 
     //adjust local dictionary paths
-    if (moduleOptions.ModuleLocation != ModuleLocation.Remote) {
+    if (moduleOptions.ModuleLocation == ModuleLocation.Custom
+      || moduleOptions.ModuleLocation == ModuleLocation.Global) {
       var path = moduleOptions.ModulePath!;
 
       var updatedDic = new Dictionary<string, string>();
@@ -124,12 +125,17 @@ public class Markdown2PdfConverter {
 
     var assembly = Assembly.GetAssembly(typeof(Markdown2PdfConverter));
     var currentLocation = Path.GetDirectoryName(assembly.Location);
+
+    var templateName = this.Options.ModuleOptions == ModuleOptions.None
+      ? "ContentTemplate_NoScripts.html"
+      : "ContentTemplate.html";
+
     var templateHtmlResource = assembly.GetManifestResourceNames().Single(n => n.EndsWith("ContentTemplate.html"));
 
     string templateHtml;
 
-    using (Stream stream = assembly.GetManifestResourceStream(templateHtmlResource))
-    using (StreamReader reader = new StreamReader(stream)) {
+    using (var stream = assembly.GetManifestResourceStream(templateHtmlResource))
+    using (var reader = new StreamReader(stream)) {
       templateHtml = reader.ReadToEnd();
     }
 

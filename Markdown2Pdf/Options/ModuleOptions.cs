@@ -14,6 +14,10 @@ namespace Markdown2Pdf.Options;
 /// Options that decide from where to load additional modules.
 /// </summary>
 public class ModuleOptions {
+
+  /// <summary>
+  /// Provides information from where to load modules.
+  /// </summary>
   public ModuleLocation ModuleLocation { get;}
 
   public string? ModulePath { get; }
@@ -22,6 +26,11 @@ public class ModuleOptions {
     this.ModuleLocation = moduleLocation;
     ModulePath = modulePath;
   }
+
+  /// <summary>
+  /// Don't load any additional modules.
+  /// </summary>
+  public static ModuleOptions None => new ModuleOptions(ModuleLocation.None);
 
   /// <summary>
   /// Loads the node_modules over remote http-requests.
@@ -52,8 +61,17 @@ public class ModuleOptions {
   public static ModuleOptions FromLocalPath(string modulePath) => new(ModuleLocation.Custom, modulePath);
 }
 
+/// <inheritdoc cref="ModuleOptions.ModuleLocation"/>
 public enum ModuleLocation {
+  /// <inheritdoc cref="ModuleOptions.None"/>
+  None = 0,
+
+  /// <inheritdoc cref="ModuleOptions.Remote"/>
   Remote,
+
+  /// <inheritdoc cref="ModuleOptions.Global"/>
   Global,
+
+  /// <inheritdoc cref="ModuleOptions.FromLocalPath(string)"/>
   Custom
 }

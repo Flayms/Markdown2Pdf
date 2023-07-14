@@ -4,6 +4,17 @@ This is a demo of all the Markdown2Pdf features.
 
 ## Common Markdown Functionality
 
+# h1 Heading
+## h2 Heading
+### h3 Heading
+#### h4 Heading
+##### h5 Heading
+###### h6 Heading
+
+### Horizontal Rules
+
+----------
+
 * This
 * is
     * my
@@ -26,8 +37,6 @@ And a new paragraph with `code`.
 |My|Table|
 |---|---|
 |Hello|World!|
-
-----------
 
 Code blocks:  
 
