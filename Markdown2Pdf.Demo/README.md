@@ -54,13 +54,12 @@ $\displaystyle \sum_{k=0}^{n}=\frac{i}{k}$
 
 $$\sum_{k=0}^{n}=\frac{i}{k}$$
 
-$A=
-\begin{pmatrix}
-3 & 4 \\\
+$A=\begin{pmatrix}
+3 & 4 \\
 1 & 2
 \end{pmatrix}$
 
-$\color{green}Color \color{blue}\text{ works}$
+Latex $\color{green}Color \color{blue}\text{ works}$
 
 ### In a Table
 
@@ -68,8 +67,7 @@ $\color{green}Color \color{blue}\text{ works}$
 |---|---|
 |CNF|$(A \lor \neg B \lor C) \land (\neg A \lor B  \lor C)$|
 |Binomal coefficient|$$ \binom{n}{k} = \frac{n!}{k!(n-k)!}$$|
-|Matrix|$\begin{pmatrix}-3 & 4 \\1 & -2\end{pmatrix}$
-|
+|Matrix|$\begin{pmatrix}-3 & 4 \\1 & -2\end{pmatrix}$|
 
 ```mermaid
 graph TD
