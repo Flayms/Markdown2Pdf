@@ -21,18 +21,10 @@ public class Markdown2PdfConverter {
   /// </summary>
   public Markdown2PdfOptions Options { get; }
 
-  //todo: one instead of 2 dics
-  //todo: better way to keep versions in sync
-  //todo: implement
-  private readonly IReadOnlyDictionary<string, string> _packageLocationsWeb = new Dictionary<string, string>() {
-    {"mathjaxPath",  "https://cdn.jsdelivr.net/npm/mathjax@3" },
-    {"mermaidPath",  "https://cdn.jsdelivr.net/npm/mermaid@10.2.3" }
-  };
-
-  //the first half of the path gets added in the constructor, depending on the user-settings
-  private readonly IReadOnlyDictionary<string, string> _packageLocationsLocal = new Dictionary<string, string>() {
-    {"mathjaxPath",  "mathjax" },
-    {"mermaidPath",  "mermaid" }
+  private readonly IReadOnlyDictionary<string, (string, string)> _packagelocationMapping = new Dictionary<string, (string, string)>() {
+    {"mathjax",  ("https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js", "mathjax/es5/tex-mml-chtml.js") },
+    {"mermaid",  ("https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js", "mermaid/dist/mermaid.min.js") },
+    {"github-markdown-css", ("https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css", "github-markdown-css/github-markdown.css")}
   };
 
   /// <summary>
@@ -49,15 +41,15 @@ public class Markdown2PdfConverter {
       || moduleOptions.ModuleLocation == ModuleLocation.Global) {
       var path = moduleOptions.ModulePath!;
 
-      var updatedDic = new Dictionary<string, string>();
+      var updatedDic = new Dictionary<string, (string, string)>();
 
-      foreach (var kvp in this._packageLocationsLocal) {
+      foreach (var kvp in this._packagelocationMapping) {
         var key = kvp.Key;
-        var value = Path.Combine(path, kvp.Value);
-        updatedDic[key] = value;
+        var updatedModulePath = Path.Combine(path, kvp.Value.Item2);
+        updatedDic[key] = new (kvp.Value.Item1, updatedModulePath);
       }
 
-      this._packageLocationsLocal = updatedDic;
+      this._packagelocationMapping = updatedDic;
     }
   }
 
@@ -143,14 +135,10 @@ public class Markdown2PdfConverter {
     var templateModel = new Dictionary<string, string>();
 
     //load correct module paths
-    if (this.Options.ModuleOptions.ModuleLocation == ModuleLocation.Remote) {
-      foreach (var kvp in this._packageLocationsWeb)
-        templateModel.Add(kvp.Key, kvp.Value);
-    }
-    else {
-      foreach (var kvp in this._packageLocationsLocal)
-        templateModel.Add(kvp.Key, kvp.Value);
-    }
+    var isRemote = this.Options.ModuleOptions.ModuleLocation == ModuleLocation.Remote;
+
+    foreach (var kvp in this._packagelocationMapping)
+      templateModel.Add(kvp.Key, isRemote ? kvp.Value.Item1 : kvp.Value.Item2);
 
     templateModel.Add("body", htmlContent);
 
