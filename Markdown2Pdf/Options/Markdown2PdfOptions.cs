@@ -4,6 +4,7 @@ public class Markdown2PdfOptions {
   //todo: font-name
   //todo: font-size
   //todo: option for generating table of contents
+  //todo: light theme, dark theme
 
   /// <summary>
   /// Path to an html-file to use as the document-header.

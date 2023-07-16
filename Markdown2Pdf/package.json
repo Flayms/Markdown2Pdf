@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "github-markdown-css": "^5.2.0",
     "mathjax": "^3.2.2",
     "mermaid": "^10.2.3"
   }

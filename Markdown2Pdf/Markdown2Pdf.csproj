@@ -19,6 +19,14 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="wwwroot\ContentTemplate_NoScripts.html" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="wwwroot\ContentTemplate_NoScripts.html" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <EmbeddedResource Include="wwwroot\ContentTemplate.html">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </EmbeddedResource>
