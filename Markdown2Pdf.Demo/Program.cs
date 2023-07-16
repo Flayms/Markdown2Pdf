@@ -2,8 +2,8 @@
 using Markdown2Pdf.Options;
 
 var options = new Markdown2PdfOptions {
-   HeaderUrl = "header.html",
-   FooterUrl = "footer.html",
+  HeaderUrl = "header.html",
+  FooterUrl = "footer.html",
 
    MarginOptions = new MarginOptions {
      Top = "80px",
