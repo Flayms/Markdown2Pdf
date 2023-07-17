@@ -19,6 +19,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<InternalsVisibleTo Include="Markdown2Pdf.Tests" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <None Remove="wwwroot\ContentTemplate_NoScripts.html" />
 	</ItemGroup>
 

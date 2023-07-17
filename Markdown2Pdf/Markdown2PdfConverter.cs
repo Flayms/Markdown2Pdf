@@ -103,7 +103,7 @@ public class Markdown2PdfConverter {
       File.Delete(htmlPath);
   }
 
-  private string _GenerateHtml(string markdownContent) {
+  internal string _GenerateHtml(string markdownContent) {
     //todo: decide on how to handle pipeline better
     var pipeline = new MarkdownPipelineBuilder()
       .UseAdvancedExtensions()
@@ -127,9 +127,8 @@ public class Markdown2PdfConverter {
     string templateHtml;
 
     using (var stream = assembly.GetManifestResourceStream(templateHtmlResource))
-    using (var reader = new StreamReader(stream)) {
+    using (var reader = new StreamReader(stream))
       templateHtml = reader.ReadToEnd();
-    }
 
     //create model for templating html
     var templateModel = new Dictionary<string, string>();
@@ -194,16 +193,17 @@ public class Markdown2PdfConverter {
 
   private async Task<IBrowser> _CreateBrowserAsync() {
     var launchOptions = new LaunchOptions {
-      Headless = true,
-      Args = new[] {
-        "--no-sandbox" //todo: check why this is needed
-      },
+      Headless = true
     };
 
     if (this.Options.ChromePath == null) {
       using var browserFetcher = new BrowserFetcher();
-      Console.WriteLine("Downloading chromium...");
-      await browserFetcher.DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
+      var localRevs = browserFetcher.LocalRevisions();
+
+      if (!localRevs.Contains(BrowserFetcher.DefaultChromiumRevision)) {
+        Console.WriteLine("Downloading chromium...");
+        await browserFetcher.DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
+      }
     } else
       launchOptions.ExecutablePath = this.Options.ChromePath;
 
