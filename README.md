@@ -20,6 +20,29 @@ var converter = new Markdown2PdfConverter();
 converter.Convert("README.md");
 ```
 
+## Options
+
+To further specify the conversion process you can pass `Markdown2PdfOptions` to the converter:
+
+```c#
+var options = var options = new Markdown2PdfOptions {
+  HeaderUrl = "header.html",
+  FooterUrl = "footer.html",
+  DocumentTitle = "Example PDF",
+};
+var converter = new Markdown2PdfConverter(options);
+```
+
+|Option|Description|
+|---|---|
+|`HeaderUrl`|Path to an html-file to use as the document-header.|
+|`FooterUrl`|Path to an html-file to use as the document-footer.|
+|`DocumentTitle`|The title of this document. Can be injected into the header / footer by adding the class `document-title` to the element.|
+|`MarginOptions`|Css-margins for the sides of the document.|
+|`ChromePath`|Path to chrome or chromium executable or self-downloads it if `null`.|
+|`ModuleOptions`|Options that decide from where to load additional modules. Default: `ModuleOptions.Remote`.|
+|`KeepHtml`|`true` if the created html should not be deleted.|
+
 ## Modules
 
 This library uses node_modules packages.
@@ -34,12 +57,5 @@ Alternatively you can also install the packages from the script manually and con
 ### Used Modules
 
 * [MathJax](https://github.com/mathjax/MathJax): Latex-Math rendering
-* [Mermaid](https://github.com/mermaid-js/mermaid):  diagrams
-
-## Options
-
-* Custom Html-Header
-* Custom Html-Footer
-* Page-Margins
-* Module loading from different sources
-* Keeping the temp html
+* [Mermaid](https://github.com/mermaid-js/mermaid): Diagrams
+* [github-markdown-css](https://github.com/sindresorhus/github-markdown-css): Styling
