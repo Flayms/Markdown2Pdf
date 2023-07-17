@@ -5,6 +5,7 @@ using System.Diagnostics;
 var options = new Markdown2PdfOptions {
   HeaderUrl = "header.html",
   FooterUrl = "footer.html",
+  DocumentTitle = "Example PDF",
 
    MarginOptions = new MarginOptions {
      Top = "80px",

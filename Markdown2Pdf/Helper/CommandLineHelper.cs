@@ -4,7 +4,7 @@ using System;
 
 namespace Markdown2Pdf.Helper;
 
-public class CommandLineHelper {
+internal class CommandLineHelper {
 
   public static string RunCommand(string commandToRun, string? workingDirectory = null) {
     if (string.IsNullOrEmpty(workingDirectory))
