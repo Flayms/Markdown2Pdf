@@ -35,8 +35,8 @@ var converter = new Markdown2PdfConverter(options);
 
 |Option|Description|
 |---|---|
-|`HeaderUrl`|Path to an html-file to use as the document-header.|
-|`FooterUrl`|Path to an html-file to use as the document-footer.|
+|`HeaderUrl`|Path to an html-file to use as the document-header. Allows the classes `date`, `title`, `document-title`, `url`, `pageNumber` and `totalPages` for injection.|
+|`FooterUrl`|Path to an html-file to use as the document-footer. Allows the classes `date`, `title`, `document-title`, `url`, `pageNumber` and `totalPages` for injection.|
 |`DocumentTitle`|The title of this document. Can be injected into the header / footer by adding the class `document-title` to the element.|
 |`MarginOptions`|Css-margins for the sides of the document.|
 |`ChromePath`|Path to chrome or chromium executable or self-downloads it if `null`.|
