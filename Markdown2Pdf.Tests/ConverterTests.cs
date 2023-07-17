@@ -8,7 +8,7 @@ public class Tests {
   public void Setup() => _tempDir.Create();
 
   [Test]
-  public void TestGenerallFunctionality() {
+  public void TestGeneralFunctionality() {
     //setup
     var content = "*Hello* **World!**";
     var markdownFile = Path.Combine(_tempDir.FullName, "markdown.md");
@@ -22,6 +22,22 @@ public class Tests {
 
     //assert
     Assert.That(File.Exists(pdfPath));
+  }
+
+  [Test]
+  [TestCase("", "class=\"markdown-body\"")]
+  [TestCase("", "<script id=")]
+  [TestCase("", "<link rel=\"stylesheet\" href=")]
+  [TestCase("*Hello* **World!**", "<p><em>Hello</em> <strong>World!</strong></p>")]
+  public void TestConversionToHtml(string markdown, string expectedHtmlPart) {
+    //setup
+    var converter = new Markdown2PdfConverter();
+
+    //execute
+    var html = converter._GenerateHtml(markdown);
+
+    //assert
+    Assert.That(html, Does.Contain(expectedHtmlPart));
   }
 
   [TearDown]

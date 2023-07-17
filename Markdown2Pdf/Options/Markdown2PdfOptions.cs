@@ -17,6 +17,11 @@ public class Markdown2PdfOptions {
   public string? FooterUrl { get; set; }
 
   /// <summary>
+  /// The title of this document. Can be injected into the header / footer by adding the class <c>document-title</c> to the element.
+  /// </summary>
+  public string? DocumentTitle { get; set; }
+
+  /// <summary>
   /// Css-margins for the sides of the document.
   /// </summary>
   public MarginOptions? MarginOptions { get; set; }

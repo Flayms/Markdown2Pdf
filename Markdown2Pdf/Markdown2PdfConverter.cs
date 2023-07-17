@@ -8,6 +8,8 @@ using System.Reflection;
 using System.Linq;
 using Markdown2Pdf.Options;
 using System.Collections.Generic;
+using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace Markdown2Pdf;
 
@@ -22,10 +24,12 @@ public class Markdown2PdfConverter {
   public Markdown2PdfOptions Options { get; }
 
   private readonly IReadOnlyDictionary<string, (string, string)> _packagelocationMapping = new Dictionary<string, (string, string)>() {
-    {"mathjax",  ("https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js", "mathjax/es5/tex-mml-chtml.js") },
-    {"mermaid",  ("https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js", "mermaid/dist/mermaid.min.js") },
+    {"mathjax", ("https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js", "mathjax/es5/tex-mml-chtml.js") },
+    {"mermaid", ("https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js", "mermaid/dist/mermaid.min.js") },
     {"github-markdown-css", ("https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css", "github-markdown-css/github-markdown.css")}
   };
+
+  private const string _DOCUMENT_TITLE_CLASS = "document-title";
 
   /// <summary>
   /// Instantiate a new <see cref="Markdown2PdfConverter"/>.
@@ -56,7 +60,7 @@ public class Markdown2PdfConverter {
   /// <inheritdoc cref="Convert(FileInfo, FileInfo)"/>
   /// <remarks>The PDF will be saved in the same location as the markdown file with the naming convention "markdownFileName.pdf".</remarks>
   /// <returns>The newly created PDF-file.</returns>
-  public FileInfo Convert(FileInfo markdownFile) => new FileInfo(this.Convert(markdownFile.FullName));
+  public FileInfo Convert(FileInfo markdownFile) => new (this.Convert(markdownFile.FullName));
 
   /// <summary>
   /// Converts the given markdown-file to PDF.
@@ -96,14 +100,14 @@ public class Markdown2PdfConverter {
     var htmlPath = Path.Combine(markdownDir, "converted.html");
     File.WriteAllText(htmlPath, html);
 
-    var task = this._GeneratePdfAsync(htmlPath, outputFilePath, Path.GetFileNameWithoutExtension(markdownFilePath));
+    var task = this._GeneratePdfAsync(htmlPath, outputFilePath);
     task.Wait();
 
     if (!this.Options.KeepHtml)
       File.Delete(htmlPath);
   }
 
-  private string _GenerateHtml(string markdownContent) {
+  internal string _GenerateHtml(string markdownContent) {
     //todo: decide on how to handle pipeline better
     var pipeline = new MarkdownPipelineBuilder()
       .UseAdvancedExtensions()
@@ -127,9 +131,8 @@ public class Markdown2PdfConverter {
     string templateHtml;
 
     using (var stream = assembly.GetManifestResourceStream(templateHtmlResource))
-    using (var reader = new StreamReader(stream)) {
+    using (var reader = new StreamReader(stream))
       templateHtml = reader.ReadToEnd();
-    }
 
     //create model for templating html
     var templateModel = new Dictionary<string, string>();
@@ -145,11 +148,11 @@ public class Markdown2PdfConverter {
     return TemplateFiller.FillTemplate(templateHtml, templateModel);
   }
 
-  private async Task _GeneratePdfAsync(string htmlFilePath, string outputFilePath, string title) {
+  private async Task _GeneratePdfAsync(string htmlFilePath, string outputFilePath) {
     using var browser = await this._CreateBrowserAsync();
     var page = await browser.NewPageAsync();
 
-    await page.GoToAsync(htmlFilePath, WaitUntilNavigation.Networkidle2);
+    await page.GoToAsync("file:///" + htmlFilePath, WaitUntilNavigation.Networkidle2);
 
     var marginOptions = new PuppeteerSharp.Media.MarginOptions();
     if (this.Options.MarginOptions != null) {
@@ -169,41 +172,53 @@ public class Markdown2PdfConverter {
       MarginOptions = marginOptions
     };
 
-    //todo: error handling
     //todo: default header is super small
-    if (this.Options.HeaderUrl != null) {
-      var headerContent = File.ReadAllText(this.Options.HeaderUrl);
+    if (this.Options.HeaderUrl != null)
+      pdfOptions.HeaderTemplate = this._SetupHeaderFooter(File.ReadAllText(this.Options.HeaderUrl), pdfOptions);
 
-      //todo: super hacky, rather replace class content
-      //todo: create setting and only use fileName as fallback
-      headerContent = headerContent.Replace("title", title);
-      pdfOptions.HeaderTemplate = headerContent;
-      pdfOptions.DisplayHeaderFooter = true;
-    }
-
-    if (this.Options.FooterUrl != null) {
-      var footerContent = File.ReadAllText(this.Options.FooterUrl);
-      footerContent = footerContent.Replace("title", title);
-      pdfOptions.FooterTemplate = footerContent;
-      pdfOptions.DisplayHeaderFooter = true;
-    }
+    if (this.Options.FooterUrl != null)
+      pdfOptions.FooterTemplate = this._SetupHeaderFooter(File.ReadAllText(this.Options.FooterUrl), pdfOptions);
 
     await page.EmulateMediaTypeAsync(MediaType.Screen);
     await page.PdfAsync(outputFilePath, pdfOptions);
   }
 
+  private string _SetupHeaderFooter(string html, PdfOptions pdfOptions) {
+    pdfOptions.DisplayHeaderFooter = true;
+
+    if (this.Options.DocumentTitle == null)
+      return html;
+
+    //todo: document this
+    //need to wrap bc html could have multiple roots
+    var htmlWrapped = $"<root>{html}</root>";
+    var xDocument = XDocument.Parse(htmlWrapped);
+    var titleElements = xDocument.XPathSelectElements($"//*[contains(@class, '{_DOCUMENT_TITLE_CLASS}')]");
+    foreach ( var titleElement in titleElements )
+      titleElement.Value = this.Options.DocumentTitle;
+
+    var resultHtml = xDocument.ToString();
+
+    //remove helper wrap
+    var lines = resultHtml.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+    resultHtml = string.Join(Environment.NewLine, lines.Take(lines.Length - 1).Skip(1));
+
+    return resultHtml;
+  }
+
   private async Task<IBrowser> _CreateBrowserAsync() {
     var launchOptions = new LaunchOptions {
-      Headless = true,
-      Args = new[] {
-        "--no-sandbox" //todo: check why this is needed
-      },
+      Headless = true
     };
 
     if (this.Options.ChromePath == null) {
       using var browserFetcher = new BrowserFetcher();
-      Console.WriteLine("Downloading chromium...");
-      await browserFetcher.DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
+      var localRevs = browserFetcher.LocalRevisions();
+
+      if (!localRevs.Contains(BrowserFetcher.DefaultChromiumRevision)) {
+        Console.WriteLine("Downloading chromium...");
+        await browserFetcher.DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
+      }
     } else
       launchOptions.ExecutablePath = this.Options.ChromePath;
 

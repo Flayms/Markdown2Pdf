@@ -9,7 +9,7 @@ env:
 jobs:
   ci:
     name: test-job
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
     # Checks out the source code at the latest commit

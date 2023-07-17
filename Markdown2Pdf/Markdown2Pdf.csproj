@@ -4,7 +4,7 @@
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<LangVersion>default</LangVersion>
 		<Nullable>enable</Nullable>
-		<Version>0.3.4</Version>
+		<Version>0.4.0</Version>
 		<Description>Library for converting Markdown to PDF.</Description>
 		<PackageProjectUrl>https://github.com/Flayms/Markdown2Pdf</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -17,6 +17,10 @@
 	<PropertyGroup>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="Markdown2Pdf.Tests" />
+	</ItemGroup>
 
 	<ItemGroup>
 	  <None Remove="wwwroot\ContentTemplate_NoScripts.html" />
