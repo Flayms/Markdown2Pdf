@@ -1,5 +1,6 @@
 ﻿using Markdown2Pdf;
 using Markdown2Pdf.Options;
+using System.Diagnostics;
 
 var options = new Markdown2PdfOptions {
   HeaderUrl = "header.html",
@@ -15,4 +16,7 @@ var options = new Markdown2PdfOptions {
 };
 
 var converter = new Markdown2PdfConverter(options);
-_ = converter.Convert("README.md");
+var resultPath = converter.Convert("README.md");
+
+//todo: make this work on linux too
+Process.Start("cmd", $"/c start {resultPath}");
