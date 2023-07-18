@@ -189,6 +189,7 @@ public class Markdown2PdfConverter {
     var pdfOptions = new PdfOptions {
       //todo: make this settable
       Format = PaperFormat.A4,
+      PrintBackground = true, //todo: background doesnt work for margins
       MarginOptions = marginOptions
     };
 
