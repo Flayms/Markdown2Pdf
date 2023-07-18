@@ -10,6 +10,7 @@ using Markdown2Pdf.Options;
 using System.Collections.Generic;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Markdown2Pdf.Models;
 
 namespace Markdown2Pdf;
 
@@ -23,13 +24,22 @@ public class Markdown2PdfConverter {
   /// </summary>
   public Markdown2PdfOptions Options { get; }
 
-  private readonly IReadOnlyDictionary<string, (string, string)> _packagelocationMapping = new Dictionary<string, (string, string)>() {
-    {"mathjax", ("https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js", "mathjax/es5/tex-mml-chtml.js") },
-    {"mermaid", ("https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js", "mermaid/dist/mermaid.min.js") },
-    {"github-markdown-css", ("https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css", "github-markdown-css/github-markdown.css")}
+  private readonly IReadOnlyDictionary<string, ModuleInformation> _packagelocationMapping = new Dictionary<string, ModuleInformation>() {
+    {"mathjax", new ("https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js", "mathjax/es5/tex-mml-chtml.js") },
+    {"mermaid", new ("https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js", "mermaid/dist/mermaid.min.js") }
   };
 
+  private readonly IReadOnlyDictionary<ThemeType, ModuleInformation> _themeSourceMapping = new Dictionary<ThemeType, ModuleInformation>() {
+    {ThemeType.Github, new("https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css", "github-markdown-css/github-markdown.css") },
+    {ThemeType.Latex, new("https://latex.now.sh/style.css", "latex.css/style.min.css") },
+  };
+
+  private const string _STYLE_KEY = "stylePath";
+  private const string _BODY_KEY = "body";
   private const string _DOCUMENT_TITLE_CLASS = "document-title";
+  private const string _HTML_FILE_NAME = "converted.html";
+  private const string _TEMPLATE_WITH_SCRIPTS = "ContentTemplate.html";
+  private const string _TEMPLATE_NO_SCRIPTS = "ContentTemplate_NoScripts.html";
 
   /// <summary>
   /// Instantiate a new <see cref="Markdown2PdfConverter"/>.
@@ -45,16 +55,21 @@ public class Markdown2PdfConverter {
       || moduleOptions.ModuleLocation == ModuleLocation.Global) {
       var path = moduleOptions.ModulePath!;
 
-      var updatedDic = new Dictionary<string, (string, string)>();
-
-      foreach (var kvp in this._packagelocationMapping) {
-        var key = kvp.Key;
-        var updatedModulePath = Path.Combine(path, kvp.Value.Item2);
-        updatedDic[key] = new (kvp.Value.Item1, updatedModulePath);
-      }
-
-      this._packagelocationMapping = updatedDic;
+      this._packagelocationMapping = this._UpdateDic(this._packagelocationMapping, path);
+      this._themeSourceMapping = this._UpdateDic(this._themeSourceMapping, path);
     }
+  }
+
+  private IReadOnlyDictionary<TKey, ModuleInformation> _UpdateDic<TKey>(IReadOnlyDictionary<TKey, ModuleInformation> dicToUpdate, string path) {
+    var updatedLocationMapping = new Dictionary<TKey, ModuleInformation>();
+
+    foreach (var kvp in dicToUpdate) {
+      var key = kvp.Key;
+      var absoluteNodePath = Path.Combine(path, kvp.Value.NodePath);
+      updatedLocationMapping[key] = new(kvp.Value.RemotePath, absoluteNodePath);
+    }
+
+    return updatedLocationMapping;
   }
 
   /// <inheritdoc cref="Convert(FileInfo, FileInfo)"/>
@@ -97,7 +112,7 @@ public class Markdown2PdfConverter {
 
     //todo: make temp-file
     var markdownDir = Path.GetDirectoryName(markdownFilePath);
-    var htmlPath = Path.Combine(markdownDir, "converted.html");
+    var htmlPath = Path.Combine(markdownDir, _HTML_FILE_NAME);
     File.WriteAllText(htmlPath, html);
 
     var task = this._GeneratePdfAsync(htmlPath, outputFilePath);
@@ -123,8 +138,8 @@ public class Markdown2PdfConverter {
     var currentLocation = Path.GetDirectoryName(assembly.Location);
 
     var templateName = this.Options.ModuleOptions == ModuleOptions.None
-      ? "ContentTemplate_NoScripts.html"
-      : "ContentTemplate.html";
+      ? _TEMPLATE_NO_SCRIPTS
+      : _TEMPLATE_WITH_SCRIPTS;
 
     var templateHtmlResource = assembly.GetManifestResourceNames().Single(n => n.EndsWith("ContentTemplate.html"));
 
@@ -141,9 +156,15 @@ public class Markdown2PdfConverter {
     var isRemote = this.Options.ModuleOptions.ModuleLocation == ModuleLocation.Remote;
 
     foreach (var kvp in this._packagelocationMapping)
-      templateModel.Add(kvp.Key, isRemote ? kvp.Value.Item1 : kvp.Value.Item2);
+      templateModel.Add(kvp.Key, isRemote ? kvp.Value.RemotePath : kvp.Value.NodePath);
 
-    templateModel.Add("body", htmlContent);
+    var theme = this.Options.Theme.Type;
+    if (theme == ThemeType.Github || theme == ThemeType.Latex) {
+      var value = this._themeSourceMapping[theme];
+      templateModel.Add(_STYLE_KEY, isRemote ? value.RemotePath : value.NodePath);
+    }
+
+    templateModel.Add(_BODY_KEY, htmlContent);
 
     return TemplateFiller.FillTemplate(templateHtml, templateModel);
   }
@@ -168,7 +189,7 @@ public class Markdown2PdfConverter {
     var pdfOptions = new PdfOptions {
       //todo: make this settable
       Format = PaperFormat.A4,
-      PrintBackground = true,
+      PrintBackground = true, //todo: background doesnt work for margins
       MarginOptions = marginOptions
     };
 

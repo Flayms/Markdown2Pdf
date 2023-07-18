@@ -1,4 +1,4 @@
-﻿# ![Logo](md2pdf.png) Markdown2Pdf.Demo
+﻿# <img src="md2pdf.png" alt="Logo" Width=64px/> Markdown2Pdf.Demo
 
 This is a demo of all the Markdown2Pdf features.
 

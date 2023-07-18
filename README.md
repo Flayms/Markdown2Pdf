@@ -8,10 +8,16 @@
   </a>
 </p>
 
-# Markdown2Pdf
+<h1 align="center"> Markdown2Pdf</h1>
+
+<p align="center">
+  <img src="./assets/md2pdf.svg" alt="Logo" Width=128px/>
+  <br>
+</p>
+
 .NET library for converting Markdown to PDF. Uses [Markdig](https://github.com/xoofx/markdig) for converting markdown to html and then [Puppeteer Sharp](https://github.com/hardkoded/puppeteer-sharp) to convert that output to PDF. For a cross-platform console-application checkout [Markdown2Pdf.Console](https://github.com/Flayms/Markdown2Pdf.Console).
 
-A demo can be found [here!](./img/demo.pdf)
+A demo can be found [here!](./assets/demo.pdf)
 
 ## Usage
 
@@ -35,18 +41,19 @@ var converter = new Markdown2PdfConverter(options);
 
 |Option|Description|
 |---|---|
-|`HeaderUrl`|Path to an html-file to use as the document-header.|
-|`FooterUrl`|Path to an html-file to use as the document-footer.|
+|`HeaderUrl`|Path to an html-file to use as the document-header. Allows the classes `date`, `title`, `document-title`, `url`, `pageNumber` and `totalPages` for injection.|
+|`FooterUrl`|Path to an html-file to use as the document-footer. Allows the classes `date`, `title`, `document-title`, `url`, `pageNumber` and `totalPages` for injection.|
 |`DocumentTitle`|The title of this document. Can be injected into the header / footer by adding the class `document-title` to the element.|
-|`MarginOptions`|Css-margins for the sides of the document.|
 |`ChromePath`|Path to chrome or chromium executable or self-downloads it if `null`.|
-|`ModuleOptions`|Options that decide from where to load additional modules. Default: `ModuleOptions.Remote`.|
 |`KeepHtml`|`true` if the created html should not be deleted.|
+|`MarginOptions`|Css-margins for the sides of the document.|
+|`ModuleOptions`|Options that decide from where to load additional modules. Default: `ModuleOptions.Remote`.|
+|`Theme`|The styling to apply to the document. Default: `Theme.Github`.|
 
 ## Modules
 
 This library uses node_modules packages.
-By default they're loaded over https://cdn.jsdelivr.net.
+By default they're loaded over a CDN like https://cdn.jsdelivr.net.
 
 You can also use a local installation of them by running the script `Init.ps1` and setting `Markdown2PdfOptions.ModuleOptions` to `ModuleOptions.Global`.
 

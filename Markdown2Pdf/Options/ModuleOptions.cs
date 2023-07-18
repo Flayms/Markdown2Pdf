@@ -20,7 +20,7 @@ public class ModuleOptions {
   /// </summary>
   public ModuleLocation ModuleLocation { get;}
 
-  public string? ModulePath { get; }
+  public string? ModulePath { get; } //todo: hide this by inheritance instead of null
 
   private ModuleOptions(ModuleLocation moduleLocation, string? modulePath = null) {
     this.ModuleLocation = moduleLocation;
