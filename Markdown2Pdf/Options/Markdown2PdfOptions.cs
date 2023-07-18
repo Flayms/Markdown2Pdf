@@ -22,14 +22,19 @@ public class Markdown2PdfOptions {
   public string? DocumentTitle { get; set; }
 
   /// <summary>
-  /// Css-margins for the sides of the document.
-  /// </summary>
-  public MarginOptions? MarginOptions { get; set; }
-
-  /// <summary>
   /// Path to chrome or chromium executable or self-downloads it if <see langword="null"/>.
   /// </summary>
   public string? ChromePath { get; set; }
+
+  /// <summary>
+  /// <see langword="true"/> if the created html should not be deleted.
+  /// </summary>
+  public bool KeepHtml { get; set; }
+
+  /// <summary>
+  /// Css-margins for the sides of the document.
+  /// </summary>
+  public MarginOptions? MarginOptions { get; set; }
 
   /// <summary>
   /// Options that decide from where to load additional modules. Default: <see cref="ModuleOptions.Remote"/>.
@@ -37,7 +42,7 @@ public class Markdown2PdfOptions {
   public ModuleOptions ModuleOptions { get; set; } = ModuleOptions.Remote;
 
   /// <summary>
-  /// <see langword="true"/> if the created html should not be deleted.
+  /// The styling to apply to the document. Default: <see cref="Theme.Github"/>.
   /// </summary>
-  public bool KeepHtml { get; set; }
+  public Theme Theme { get; set; } = Theme.Github;
 }

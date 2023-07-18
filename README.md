@@ -44,15 +44,16 @@ var converter = new Markdown2PdfConverter(options);
 |`HeaderUrl`|Path to an html-file to use as the document-header. Allows the classes `date`, `title`, `document-title`, `url`, `pageNumber` and `totalPages` for injection.|
 |`FooterUrl`|Path to an html-file to use as the document-footer. Allows the classes `date`, `title`, `document-title`, `url`, `pageNumber` and `totalPages` for injection.|
 |`DocumentTitle`|The title of this document. Can be injected into the header / footer by adding the class `document-title` to the element.|
-|`MarginOptions`|Css-margins for the sides of the document.|
 |`ChromePath`|Path to chrome or chromium executable or self-downloads it if `null`.|
-|`ModuleOptions`|Options that decide from where to load additional modules. Default: `ModuleOptions.Remote`.|
 |`KeepHtml`|`true` if the created html should not be deleted.|
+|`MarginOptions`|Css-margins for the sides of the document.|
+|`ModuleOptions`|Options that decide from where to load additional modules. Default: `ModuleOptions.Remote`.|
+|`Theme`|The styling to apply to the document. Default: `Theme.Github`.|
 
 ## Modules
 
 This library uses node_modules packages.
-By default they're loaded over https://cdn.jsdelivr.net.
+By default they're loaded over a CDN like https://cdn.jsdelivr.net.
 
 You can also use a local installation of them by running the script `Init.ps1` and setting `Markdown2PdfOptions.ModuleOptions` to `ModuleOptions.Global`.
 
