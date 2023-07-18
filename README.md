@@ -8,7 +8,13 @@
   </a>
 </p>
 
-# Markdown2Pdf
+<h1 align="center"> Markdown2Pdf</h1>
+
+<p align="center">
+  <img src="./img/md2pdf.svg" alt="Logo" Width=128px/>
+  <br>
+</p>
+
 .NET library for converting Markdown to PDF. Uses [Markdig](https://github.com/xoofx/markdig) for converting markdown to html and then [Puppeteer Sharp](https://github.com/hardkoded/puppeteer-sharp) to convert that output to PDF. For a cross-platform console-application checkout [Markdown2Pdf.Console](https://github.com/Flayms/Markdown2Pdf.Console).
 
 A demo can be found [here!](./img/demo.pdf)
