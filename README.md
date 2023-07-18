@@ -65,4 +65,5 @@ Alternatively you can also install the packages from the script manually and con
 
 * [MathJax](https://github.com/mathjax/MathJax): Latex-Math rendering
 * [Mermaid](https://github.com/mermaid-js/mermaid): Diagrams
-* [github-markdown-css](https://github.com/sindresorhus/github-markdown-css): Styling
+* [github-markdown-css](https://github.com/sindresorhus/github-markdown-css): Github-Theme
+* [latex-css](https://github.com/vincentdoerig/latex-css): Latex-Theme
