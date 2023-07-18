@@ -7,9 +7,6 @@ var options = new Markdown2PdfOptions {
   FooterUrl = "footer.html",
   DocumentTitle = "Example PDF",
 
-  ModuleOptions = ModuleOptions.Remote,
-  Theme = Theme.Latex,
-
    MarginOptions = new MarginOptions {
      Top = "80px",
      Bottom ="50px",
