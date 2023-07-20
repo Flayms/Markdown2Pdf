@@ -5,7 +5,7 @@
 	<stop offset="100%" stop-color="#e83535" />
 </linearGradient>
 
-<rect width="256" height="256" rx="15" fill="url(#Gradient1)" />
+<rect width="256" height="256" rx="30" fill="url(#Gradient1)" />
 
 <g fill="white">
       <g transform="translate(44, -20) scale(1.2)">
