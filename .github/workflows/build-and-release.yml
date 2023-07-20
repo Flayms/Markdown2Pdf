@@ -18,6 +18,8 @@ jobs:
     steps:
     # Checks out the source code at the latest commit
     - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
 
     # Load version-name from .csproj in different enviornment variables (env.Tag_Name + env.Release_Name + env.Nuget_Version)
     - name: Receive Version
