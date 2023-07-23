@@ -18,10 +18,12 @@ jobs:
     steps:
     # Checks out the source code at the latest commit
     - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
 
-    # Load version-name from .csproj in different enviornment variables (env.Tag_Name + env.Release_Name + env.Nuget_Version)
-    - name: Receive Version
-      run: python ".github/workflows/receive-version.py"
+    # Create new version from commits and write to enviornment variables (env.Tag_Name + env.Release_Name + env.Nuget_Version)
+    - name: Create Version
+      run: bash ".github/workflows/create-next-version.sh" 
     
     # Installs the .NET SDK on the build machine
     - name: Setup .NET
@@ -60,7 +62,7 @@ jobs:
 
     # Create nuget-package
     - name: Pack
-      run: dotnet pack --configuration Release --no-restore
+      run: dotnet pack --configuration Release --no-restore /p:Version=${{ env.Nuget_Version }}
     
     # Push nuget-package to nuget.org
     - name: Push
