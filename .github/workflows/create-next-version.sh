@@ -1,15 +1,12 @@
 #!/bin/bash
 
-# example-regex:          ^(\w.)+(\(.*\))?!*
-# breaking changes-regex: ^(\w.)+(\(.*\))?!:
-
 FILE_NAME=$1
-LAST_TAG=$(git describe --tags --abbrev=0)
+LAST_TAG=$(git ls-remote --tags --sort=committerdate | grep -o 'v.*' | sort -r | head -1)
 
 MAJOR_INDEX=0
 MINOR_INDEX=1
 PATCH_INDEX=2
-INDEX_TO_INCREASE=$MAJOR_INDEX
+INDEX_TO_INCREASE=$PATCH_INDEX
 
 echo "Last Tag: $LAST_TAG"
 
@@ -17,7 +14,7 @@ echo "Last Tag: $LAST_TAG"
 git log $LAST_TAG..HEAD --no-merges --oneline > $FILE_NAME
 
 echo "Created file '$FILE_NAME' with following content:"
-echo "$(<$FILE_NAME)"git
+echo "$(<$FILE_NAME)"
 echo "----"
 
 # loop over each commit to determine new version
@@ -90,7 +87,17 @@ if [[ $INDEX_TO_INCREASE = $PATCH_INDEX ]]; then
   let "PATCH=PATCH+1"
 fi
 
-NEXT_TAG="v$MAJOR.$MINOR.$PATCH"
+VERSION_NAME="$MAJOR.$MINOR.$PATCH"
+TAG_NAME="v$NEXT_VERSION"
+RELEASE_NAME="Version $TAG_NAME"
 
-# Informational Output
-echo "Next Tag: $NEXT_TAG"
+# informational output
+echo "Tag_Name:      $TAG_NAME"
+echo "Release_Name:  $RELEASE_NAME"
+echo "Nuget_Version: $VERSION_NAME"
+
+# write to github enviornment variables
+TEST_VALUE="Hello Variable!"
+echo "Tag_Name=$TAG_NAME" >> $GITHUB_ENV
+echo "Release_Name=$RELEASE_NAME" >> $GITHUB_ENV
+echo "Nuget_Version=$VERSION_NAME" >> $GITHUB_ENV
