@@ -14,10 +14,11 @@ var options = new Markdown2PdfOptions {
      Right = "50px"
    },
    KeepHtml = true,
+   IsLandscape = true,
 };
 
 var converter = new Markdown2PdfConverter(options);
 var resultPath = converter.Convert("README.md");
 
 //todo: make this work on linux too
-Process.Start("cmd", $"/c start {resultPath}");
+Process.Start("cmd", $"/c start \"{resultPath}\"");

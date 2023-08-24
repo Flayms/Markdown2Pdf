@@ -111,7 +111,7 @@ Latex $\color{green}Color \color{blue}\text{ works}$
 |Name|Struktur|
 |---|---|
 |CNF|$(A \lor \neg B \lor C) \land (\neg A \lor B  \lor C)$|
-|Binomal coefficient|$$ \binom{n}{k} = \frac{n!}{k!(n-k)!}$$|
+|Binomal coefficient|$$\binom{n}{k} = \frac{n!}{k!(n-k)!}$$|
 |Matrix|$\begin{pmatrix}-3 & 4 \\1 & -2\end{pmatrix}$|
 
 ## Mermaid Graphs

@@ -1,10 +1,22 @@
-﻿namespace Markdown2Pdf.Options;
+﻿using PuppeteerSharp.Media;
+
+namespace Markdown2Pdf.Options;
 
 public class Markdown2PdfOptions {
   //todo: font-name
   //todo: font-size
   //todo: option for generating table of contents
   //todo: light theme, dark theme
+
+  /// <summary>
+  /// Options that decide from where to load additional modules. Default: <see cref="ModuleOptions.Remote"/>.
+  /// </summary>
+  public ModuleOptions ModuleOptions { get; set; } = ModuleOptions.Remote;
+
+  /// <summary>
+  /// The styling to apply to the document. Default: <see cref="Theme.Github"/>.
+  /// </summary>
+  public Theme Theme { get; set; } = Theme.Github;
 
   /// <summary>
   /// Path to an html-file to use as the document-header.
@@ -27,7 +39,7 @@ public class Markdown2PdfOptions {
   public string? ChromePath { get; set; }
 
   /// <summary>
-  /// <see langword="true"/> if the created html should not be deleted.
+  /// Doesn't delete the html-file used for the PDF if this is set to <see langword="true"/>. Default: <see langword="false"/>.
   /// </summary>
   public bool KeepHtml { get; set; }
 
@@ -37,12 +49,13 @@ public class Markdown2PdfOptions {
   public MarginOptions? MarginOptions { get; set; }
 
   /// <summary>
-  /// Options that decide from where to load additional modules. Default: <see cref="ModuleOptions.Remote"/>.
+  /// Paper orientation. Default: <see langword="false"/>.
   /// </summary>
-  public ModuleOptions ModuleOptions { get; set; } = ModuleOptions.Remote;
+  public bool IsLandscape { get; set; }
+
 
   /// <summary>
-  /// The styling to apply to the document. Default: <see cref="Theme.Github"/>.
+  /// The paper format for the PDF.
   /// </summary>
-  public Theme Theme { get; set; } = Theme.Github;
+  public PaperFormat Format { get; set; } = PaperFormat.A4;
 }

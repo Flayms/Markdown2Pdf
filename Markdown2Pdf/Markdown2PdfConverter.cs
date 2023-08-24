@@ -172,33 +172,35 @@ public class Markdown2PdfConverter {
   private async Task _GeneratePdfAsync(string htmlFilePath, string outputFilePath) {
     using var browser = await this._CreateBrowserAsync();
     var page = await browser.NewPageAsync();
+    var options = this.Options;
+    var margins = options.MarginOptions;
 
     await page.GoToAsync("file:///" + htmlFilePath, WaitUntilNavigation.Networkidle2);
 
-    var marginOptions = new PuppeteerSharp.Media.MarginOptions();
-    if (this.Options.MarginOptions != null) {
+    var puppeteerMargins = new PuppeteerSharp.Media.MarginOptions();
+    if (margins != null) {
       //todo: remove double initialization
-      marginOptions = new PuppeteerSharp.Media.MarginOptions {
-        Top = this.Options.MarginOptions.Top,
-        Bottom = this.Options.MarginOptions.Bottom,
-        Left = this.Options.MarginOptions.Left,
-        Right = this.Options.MarginOptions.Right,
+      puppeteerMargins = new PuppeteerSharp.Media.MarginOptions {
+        Top = margins.Top,
+        Bottom = margins.Bottom,
+        Left = margins.Left,
+        Right = margins.Right,
       };
     }
 
     var pdfOptions = new PdfOptions {
-      //todo: make this settable
-      Format = PaperFormat.A4,
+      Format = options.Format,
+      Landscape = options.IsLandscape,
       PrintBackground = true, //todo: background doesnt work for margins
-      MarginOptions = marginOptions
+      MarginOptions = puppeteerMargins
     };
 
     //todo: default header is super small
-    if (this.Options.HeaderUrl != null)
-      pdfOptions.HeaderTemplate = this._SetupHeaderFooter(File.ReadAllText(this.Options.HeaderUrl), pdfOptions);
+    if (options.HeaderUrl != null)
+      pdfOptions.HeaderTemplate = this._SetupHeaderFooter(File.ReadAllText(options.HeaderUrl), pdfOptions);
 
-    if (this.Options.FooterUrl != null)
-      pdfOptions.FooterTemplate = this._SetupHeaderFooter(File.ReadAllText(this.Options.FooterUrl), pdfOptions);
+    if (options.FooterUrl != null)
+      pdfOptions.FooterTemplate = this._SetupHeaderFooter(File.ReadAllText(options.FooterUrl), pdfOptions);
 
     await page.EmulateMediaTypeAsync(MediaType.Screen);
     await page.PdfAsync(outputFilePath, pdfOptions);
