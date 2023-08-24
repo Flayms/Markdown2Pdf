@@ -55,7 +55,7 @@ public class ModuleOptions {
   }
 
   /// <summary>
-  /// Loads the node_modules from the given (local) path.
+  /// Loads the node_modules from the given (local) npm directory.
   /// </summary>
   /// <param name="modulePath">The path to the node_module directory.</param>
   public static ModuleOptions FromLocalPath(string modulePath) => new(ModuleLocation.Custom, modulePath);

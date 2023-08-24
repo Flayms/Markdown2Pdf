@@ -37,7 +37,6 @@ public class Markdown2PdfConverter {
   private const string _STYLE_KEY = "stylePath";
   private const string _BODY_KEY = "body";
   private const string _DOCUMENT_TITLE_CLASS = "document-title";
-  private const string _HTML_FILE_NAME = "converted.html";
   private const string _TEMPLATE_WITH_SCRIPTS = "ContentTemplate.html";
   private const string _TEMPLATE_NO_SCRIPTS = "ContentTemplate_NoScripts.html";
 
@@ -112,7 +111,8 @@ public class Markdown2PdfConverter {
 
     //todo: make temp-file
     var markdownDir = Path.GetDirectoryName(markdownFilePath);
-    var htmlPath = Path.Combine(markdownDir, _HTML_FILE_NAME);
+    var markdownFileName = Path.GetFileNameWithoutExtension(markdownFilePath) + ".html";
+    var htmlPath = Path.Combine(markdownDir, markdownFileName);
     File.WriteAllText(htmlPath, html);
 
     var task = this._GeneratePdfAsync(htmlPath, outputFilePath);

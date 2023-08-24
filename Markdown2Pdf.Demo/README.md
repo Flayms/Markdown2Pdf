@@ -97,10 +97,12 @@ $\displaystyle \sum_{k=0}^{n}=\frac{i}{k}$
 
 $$\sum_{k=0}^{n}=\frac{i}{k}$$
 
-$A=\begin{pmatrix}
+$$
+A=\begin{pmatrix}
 3 & 4 \\
 1 & 2
-\end{pmatrix}$
+\end{pmatrix}
+$$
 
 Latex $\color{green}Color \color{blue}\text{ works}$
 
