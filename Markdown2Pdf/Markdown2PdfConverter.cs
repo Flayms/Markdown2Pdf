@@ -74,23 +74,23 @@ public class Markdown2PdfConverter {
   /// <inheritdoc cref="Convert(FileInfo, FileInfo)"/>
   /// <remarks>The PDF will be saved in the same location as the markdown file with the naming convention "markdownFileName.pdf".</remarks>
   /// <returns>The newly created PDF-file.</returns>
-  public FileInfo Convert(FileInfo markdownFile) => new (this.Convert(markdownFile.FullName));
+  public async Task<FileInfo> Convert(FileInfo markdownFile) => new ( await this.Convert(markdownFile.FullName));
 
   /// <summary>
   /// Converts the given markdown-file to PDF.
   /// </summary>
   /// <param name="markdownFile"><see cref="FileInfo"/> containing the markdown.</param>
   /// <param name="outputFile"><see cref="FileInfo"/> for saving the generated PDF.</param>
-  public void Convert(FileInfo markdownFile, FileInfo outputFile) => this.Convert(markdownFile.FullName, outputFile.FullName);
+  public async Task Convert(FileInfo markdownFile, FileInfo outputFile) => await this.Convert(markdownFile.FullName, outputFile.FullName);
 
   /// <inheritdoc cref="Convert(string, string)"/>
   /// <remarks>The PDF will be saved in the same location as the markdown file with the naming convention "markdownFileName.pdf".</remarks>
   /// <returns>Filepath to the generated pdf.</returns>
-  public string Convert(string markdownFilePath) {
+  public async Task<string> Convert(string markdownFilePath) {
     var markdownDir = Path.GetDirectoryName(markdownFilePath);
     var outputFileName = Path.GetFileNameWithoutExtension(markdownFilePath) + ".pdf";
     var outputFilePath = Path.Combine(markdownDir, outputFileName);
-    this.Convert(markdownFilePath, outputFilePath);
+    await this.Convert(markdownFilePath, outputFilePath);
 
     return outputFilePath;
   }
@@ -101,7 +101,7 @@ public class Markdown2PdfConverter {
   /// <param name="markdownFilePath">Path to the markdown file.</param>
   /// <param name="outputFilePath">File path for saving the PDF to.</param>
   /// <remarks>The PDF will be saved in the same location as the markdown file with the naming convention "markdownFileName.pdf".</remarks>
-  public void Convert(string markdownFilePath, string outputFilePath) {
+  public async Task Convert(string markdownFilePath, string outputFilePath) {
     markdownFilePath = Path.GetFullPath(markdownFilePath);
     outputFilePath = Path.GetFullPath(outputFilePath);
 
@@ -115,8 +115,7 @@ public class Markdown2PdfConverter {
     var htmlPath = Path.Combine(markdownDir, markdownFileName);
     File.WriteAllText(htmlPath, html);
 
-    var task = this._GeneratePdfAsync(htmlPath, outputFilePath);
-    task.Wait();
+    await this._GeneratePdfAsync(htmlPath, outputFilePath);
 
     if (!this.Options.KeepHtml)
       File.Delete(htmlPath);
@@ -217,7 +216,7 @@ public class Markdown2PdfConverter {
     var htmlWrapped = $"<root>{html}</root>";
     var xDocument = XDocument.Parse(htmlWrapped);
     var titleElements = xDocument.XPathSelectElements($"//*[contains(@class, '{_DOCUMENT_TITLE_CLASS}')]");
-    foreach ( var titleElement in titleElements )
+    foreach (var titleElement in titleElements)
       titleElement.Value = this.Options.DocumentTitle;
 
     var resultHtml = xDocument.ToString();

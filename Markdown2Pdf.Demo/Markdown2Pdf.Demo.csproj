@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Markdown2Pdf.Tests\Markdown2Pdf.Tests.csproj" />
     <ProjectReference Include="..\Markdown2Pdf\Markdown2Pdf.csproj" />
   </ItemGroup>
 

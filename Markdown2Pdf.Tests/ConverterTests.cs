@@ -8,7 +8,7 @@ public class Tests {
   public void Setup() => _tempDir.Create();
 
   [Test]
-  public void TestGeneralFunctionality() {
+  public async Task TestGeneralFunctionality() {
     //setup
     var content = "*Hello* **World!**";
     var markdownFile = Path.Combine(_tempDir.FullName, "markdown.md");
@@ -18,7 +18,7 @@ public class Tests {
     var converter = new Markdown2PdfConverter();
 
     //execute
-    var pdfPath = converter.Convert(markdownFile);
+    var pdfPath = await converter.Convert(markdownFile);
 
     //assert
     Assert.That(File.Exists(pdfPath));
