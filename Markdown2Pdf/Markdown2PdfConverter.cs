@@ -4,13 +4,13 @@ using System.Threading.Tasks;
 using PuppeteerSharp;
 using PuppeteerSharp.Media;
 using System;
-using System.Reflection;
 using System.Linq;
 using Markdown2Pdf.Options;
 using System.Collections.Generic;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Markdown2Pdf.Models;
+using Markdown2Pdf.Services;
 
 namespace Markdown2Pdf;
 
@@ -34,11 +34,14 @@ public class Markdown2PdfConverter {
     {ThemeType.Latex, new("https://latex.now.sh/style.css", "latex.css/style.min.css") },
   };
 
+  private readonly EmbeddedResourceService _embeddedResourceService = new EmbeddedResourceService();
+
   private const string _STYLE_KEY = "stylePath";
   private const string _BODY_KEY = "body";
   private const string _DOCUMENT_TITLE_CLASS = "document-title";
-  private const string _TEMPLATE_WITH_SCRIPTS = "ContentTemplate.html";
-  private const string _TEMPLATE_NO_SCRIPTS = "ContentTemplate_NoScripts.html";
+  private const string _TEMPLATE_WITH_SCRIPTS_FILE_NAME = "ContentTemplate.html";
+  private const string _TEMPLATE_NO_SCRIPTS_FILE_NAME = "ContentTemplate_NoScripts.html";
+  private const string _HEADER_FOOTER_STYLES_FILE_NAME = "Header-Footer-Styles.html";
 
   /// <summary>
   /// Instantiate a new <see cref="Markdown2PdfConverter"/>.
@@ -74,23 +77,23 @@ public class Markdown2PdfConverter {
   /// <inheritdoc cref="Convert(FileInfo, FileInfo)"/>
   /// <remarks>The PDF will be saved in the same location as the markdown file with the naming convention "markdownFileName.pdf".</remarks>
   /// <returns>The newly created PDF-file.</returns>
-  public FileInfo Convert(FileInfo markdownFile) => new (this.Convert(markdownFile.FullName));
+  public async Task<FileInfo> Convert(FileInfo markdownFile) => new ( await this.Convert(markdownFile.FullName));
 
   /// <summary>
   /// Converts the given markdown-file to PDF.
   /// </summary>
   /// <param name="markdownFile"><see cref="FileInfo"/> containing the markdown.</param>
   /// <param name="outputFile"><see cref="FileInfo"/> for saving the generated PDF.</param>
-  public void Convert(FileInfo markdownFile, FileInfo outputFile) => this.Convert(markdownFile.FullName, outputFile.FullName);
+  public async Task Convert(FileInfo markdownFile, FileInfo outputFile) => await this.Convert(markdownFile.FullName, outputFile.FullName);
 
   /// <inheritdoc cref="Convert(string, string)"/>
   /// <remarks>The PDF will be saved in the same location as the markdown file with the naming convention "markdownFileName.pdf".</remarks>
   /// <returns>Filepath to the generated pdf.</returns>
-  public string Convert(string markdownFilePath) {
+  public async Task<string> Convert(string markdownFilePath) {
     var markdownDir = Path.GetDirectoryName(markdownFilePath);
     var outputFileName = Path.GetFileNameWithoutExtension(markdownFilePath) + ".pdf";
     var outputFilePath = Path.Combine(markdownDir, outputFileName);
-    this.Convert(markdownFilePath, outputFilePath);
+    await this.Convert(markdownFilePath, outputFilePath);
 
     return outputFilePath;
   }
@@ -101,7 +104,7 @@ public class Markdown2PdfConverter {
   /// <param name="markdownFilePath">Path to the markdown file.</param>
   /// <param name="outputFilePath">File path for saving the PDF to.</param>
   /// <remarks>The PDF will be saved in the same location as the markdown file with the naming convention "markdownFileName.pdf".</remarks>
-  public void Convert(string markdownFilePath, string outputFilePath) {
+  public async Task Convert(string markdownFilePath, string outputFilePath) {
     markdownFilePath = Path.GetFullPath(markdownFilePath);
     outputFilePath = Path.GetFullPath(outputFilePath);
 
@@ -115,8 +118,7 @@ public class Markdown2PdfConverter {
     var htmlPath = Path.Combine(markdownDir, markdownFileName);
     File.WriteAllText(htmlPath, html);
 
-    var task = this._GeneratePdfAsync(htmlPath, outputFilePath);
-    task.Wait();
+    await this._GeneratePdfAsync(htmlPath, outputFilePath);
 
     if (!this.Options.KeepHtml)
       File.Delete(htmlPath);
@@ -124,30 +126,21 @@ public class Markdown2PdfConverter {
 
   internal string _GenerateHtml(string markdownContent) {
     //todo: decide on how to handle pipeline better
+    //todo: support more plugins
+    //todo: code-color markup
     var pipeline = new MarkdownPipelineBuilder()
       .UseAdvancedExtensions()
       .UseDiagrams()
       .Build();
     //.UseSyntaxHighlighting();
+
     var htmlContent = Markdown.ToHtml(markdownContent, pipeline);
 
-    //todo: support more plugins
-    //todo: code-color markup
-
-    var assembly = Assembly.GetAssembly(typeof(Markdown2PdfConverter));
-    var currentLocation = Path.GetDirectoryName(assembly.Location);
-
     var templateName = this.Options.ModuleOptions == ModuleOptions.None
-      ? _TEMPLATE_NO_SCRIPTS
-      : _TEMPLATE_WITH_SCRIPTS;
+      ? _TEMPLATE_NO_SCRIPTS_FILE_NAME
+      : _TEMPLATE_WITH_SCRIPTS_FILE_NAME;
 
-    var templateHtmlResource = assembly.GetManifestResourceNames().Single(n => n.EndsWith("ContentTemplate.html"));
-
-    string templateHtml;
-
-    using (var stream = assembly.GetManifestResourceStream(templateHtmlResource))
-    using (var reader = new StreamReader(stream))
-      templateHtml = reader.ReadToEnd();
+    var templateHtml = this._embeddedResourceService.GetResourceContent(templateName);
 
     //create model for templating html
     var templateModel = new Dictionary<string, string>();
@@ -172,41 +165,57 @@ public class Markdown2PdfConverter {
   private async Task _GeneratePdfAsync(string htmlFilePath, string outputFilePath) {
     using var browser = await this._CreateBrowserAsync();
     var page = await browser.NewPageAsync();
+    var options = this.Options;
+    var margins = options.MarginOptions;
 
     await page.GoToAsync("file:///" + htmlFilePath, WaitUntilNavigation.Networkidle2);
 
-    var marginOptions = new PuppeteerSharp.Media.MarginOptions();
-    if (this.Options.MarginOptions != null) {
+    var puppeteerMargins = new PuppeteerSharp.Media.MarginOptions();
+    if (margins != null) {
       //todo: remove double initialization
-      marginOptions = new PuppeteerSharp.Media.MarginOptions {
-        Top = this.Options.MarginOptions.Top,
-        Bottom = this.Options.MarginOptions.Bottom,
-        Left = this.Options.MarginOptions.Left,
-        Right = this.Options.MarginOptions.Right,
+      puppeteerMargins = new PuppeteerSharp.Media.MarginOptions {
+        Top = margins.Top,
+        Bottom = margins.Bottom,
+        Left = margins.Left,
+        Right = margins.Right,
       };
     }
 
     var pdfOptions = new PdfOptions {
-      //todo: make this settable
-      Format = PaperFormat.A4,
+      Format = options.Format,
+      Landscape = options.IsLandscape,
       PrintBackground = true, //todo: background doesnt work for margins
-      MarginOptions = marginOptions
+      MarginOptions = puppeteerMargins
     };
 
-    //todo: default header is super small
-    if (this.Options.HeaderUrl != null)
-      pdfOptions.HeaderTemplate = this._SetupHeaderFooter(File.ReadAllText(this.Options.HeaderUrl), pdfOptions);
+    var hasHeaderFooterStylesAdded = false;
 
-    if (this.Options.FooterUrl != null)
-      pdfOptions.FooterTemplate = this._SetupHeaderFooter(File.ReadAllText(this.Options.FooterUrl), pdfOptions);
+    //todo: default header is super small
+    if (options.HeaderHtml != null) {
+      pdfOptions.DisplayHeaderFooter = true;
+      var html = this._FillHeaderFooterDocumentTitleClass(options.HeaderHtml);
+      pdfOptions.HeaderTemplate = this._AddHeaderFooterStylesToHtml(html);
+      hasHeaderFooterStylesAdded = true;
+    }
+
+    if (options.FooterHtml != null) {
+      pdfOptions.DisplayHeaderFooter = true;
+      var html = this._FillHeaderFooterDocumentTitleClass(options.FooterHtml);
+      pdfOptions.FooterTemplate = !hasHeaderFooterStylesAdded ? this._AddHeaderFooterStylesToHtml(html) : html;
+    }
 
     await page.EmulateMediaTypeAsync(MediaType.Screen);
     await page.PdfAsync(outputFilePath, pdfOptions);
   }
 
-  private string _SetupHeaderFooter(string html, PdfOptions pdfOptions) {
-    pdfOptions.DisplayHeaderFooter = true;
+  /// <summary>
+  /// Applies extra styles to the given header / footer html because the default ones don't look good on the pdf.
+  /// </summary>
+  /// <param name="html">The header / footer html to add the styles to.</param>
+  /// <returns>The html with added styles.</returns>
+  private string _AddHeaderFooterStylesToHtml(string html) => this._embeddedResourceService.GetResourceContent(_HEADER_FOOTER_STYLES_FILE_NAME) + html;
 
+  private string _FillHeaderFooterDocumentTitleClass(string html) {
     if (this.Options.DocumentTitle == null)
       return html;
 
@@ -215,7 +224,8 @@ public class Markdown2PdfConverter {
     var htmlWrapped = $"<root>{html}</root>";
     var xDocument = XDocument.Parse(htmlWrapped);
     var titleElements = xDocument.XPathSelectElements($"//*[contains(@class, '{_DOCUMENT_TITLE_CLASS}')]");
-    foreach ( var titleElement in titleElements )
+
+    foreach (var titleElement in titleElements)
       titleElement.Value = this.Options.DocumentTitle;
 
     var resultHtml = xDocument.ToString();

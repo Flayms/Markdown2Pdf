@@ -88,7 +88,7 @@ if [[ $INDEX_TO_INCREASE = $PATCH_INDEX ]]; then
 fi
 
 VERSION_NAME="$MAJOR.$MINOR.$PATCH"
-TAG_NAME="v$NEXT_VERSION"
+TAG_NAME="v$VERSION_NAME"
 RELEASE_NAME="Version $TAG_NAME"
 
 # informational output

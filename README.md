@@ -23,7 +23,7 @@ A demo can be found [here!](./assets/demo.pdf)
 
 ```c#
 var converter = new Markdown2PdfConverter();
-converter.Convert("README.md");
+var resultPath = await converter.Convert("README.md");
 ```
 
 ## Options
@@ -39,21 +39,28 @@ var options = var options = new Markdown2PdfOptions {
 var converter = new Markdown2PdfConverter(options);
 ```
 
-|Option|Description|
-|---|---|
-|`HeaderUrl`|Path to an html-file to use as the document-header. Allows the classes `date`, `title`, `document-title`, `url`, `pageNumber` and `totalPages` for injection.|
-|`FooterUrl`|Path to an html-file to use as the document-footer. Allows the classes `date`, `title`, `document-title`, `url`, `pageNumber` and `totalPages` for injection.|
-|`DocumentTitle`|The title of this document. Can be injected into the header / footer by adding the class `document-title` to the element.|
-|`ChromePath`|Path to chrome or chromium executable or self-downloads it if `null`.|
-|`KeepHtml`|`true` if the created html should not be deleted.|
-|`MarginOptions`|Css-margins for the sides of the document.|
-|`ModuleOptions`|Options that decide from where to load additional modules. Default: `ModuleOptions.Remote`.|
-|`Theme`|The styling to apply to the document. Default: `Theme.Github`.|
+| Option | Description |
+| --- | --- |
+| `ModuleOptions` | Options that decide from where to load additional modules. Default: `ModuleOptions.Remote`. |
+| `Theme` |The styling to apply to the document. Default: `Theme.Github`. |
+| `HeaderUrl` | Path to an html-file to use as the document header. [More Information](#header-and-footer). |
+| `FooterUrl` | Path to an html-file to use as the document footer. [More Information](#header-and-footer). |
+| `DocumentTitle` | The title of this document. Can be injected into the header / footer by adding the class `document-title` to the element. |
+| `ChromePath` | Path to chrome or chromium executable or self-downloads it if `null`. |
+| `KeepHtml` | `true` if the created html should not be deleted. |
+| `MarginOptions` | Css-margins for the sides of the document. |
+| `IsLandscape` | Paper orientation. |
+| `Format` | The paper format for the PDF. |
+
+## Header and Footer
+
+With the `MarkdownPdfOptions.HeaderUrl` and `MarkdownPdfOptions.FooterUrl` options a path to a local file containing html for the Header / Footer can be set.  
+Html-elements with the classes `date`, `title`, `document-title`, `url`, `pageNumber` will get their content replaced based on the information. Note that `document-title` can be set with the option `MarkdownPdfOptions.DocumentTitle`.
 
 ## Modules
 
 This library uses node_modules packages.
-By default they're loaded over a CDN like https://cdn.jsdelivr.net.
+By default they're loaded over the CDN they're hosted on e.g. https://cdn.jsdelivr.net.
 
 You can also use a local installation of them by running the script `Init.ps1` and setting `Markdown2PdfOptions.ModuleOptions` to `ModuleOptions.Global`.
 

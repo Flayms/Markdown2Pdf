@@ -1,5 +1,10 @@
-﻿namespace Markdown2Pdf.Options;
+﻿using PuppeteerSharp.Media;
 
+namespace Markdown2Pdf.Options;
+
+/// <summary>
+/// All the options for the conversion.
+/// </summary>
 public class Markdown2PdfOptions {
   //todo: font-name
   //todo: font-size
@@ -7,14 +12,24 @@ public class Markdown2PdfOptions {
   //todo: light theme, dark theme
 
   /// <summary>
-  /// Path to an html-file to use as the document-header.
+  /// Options that decide from where to load additional modules. Default: <see cref="ModuleOptions.Remote"/>.
   /// </summary>
-  public string? HeaderUrl { get; set; }
+  public ModuleOptions ModuleOptions { get; set; } = ModuleOptions.Remote;
 
   /// <summary>
-  /// Path to an html-file to use as the document-footer.
+  /// The styling to apply to the document. Default: <see cref="Theme.Github"/>.
   /// </summary>
-  public string? FooterUrl { get; set; }
+  public Theme Theme { get; set; } = Theme.Github;
+
+  /// <summary>
+  /// An html string to use as the document-header.
+  /// </summary>
+  public string? HeaderHtml { get; set; }
+
+  /// <summary>
+  /// An html string to use as the document-footer.
+  /// </summary>
+  public string? FooterHtml { get; set; }
 
   /// <summary>
   /// The title of this document. Can be injected into the header / footer by adding the class <c>document-title</c> to the element.
@@ -27,7 +42,7 @@ public class Markdown2PdfOptions {
   public string? ChromePath { get; set; }
 
   /// <summary>
-  /// <see langword="true"/> if the created html should not be deleted.
+  /// Doesn't delete the html-file used for the PDF if this is set to <see langword="true"/>. Default: <see langword="false"/>.
   /// </summary>
   public bool KeepHtml { get; set; }
 
@@ -37,12 +52,13 @@ public class Markdown2PdfOptions {
   public MarginOptions? MarginOptions { get; set; }
 
   /// <summary>
-  /// Options that decide from where to load additional modules. Default: <see cref="ModuleOptions.Remote"/>.
+  /// Paper orientation. Default: <see langword="false"/>.
   /// </summary>
-  public ModuleOptions ModuleOptions { get; set; } = ModuleOptions.Remote;
+  public bool IsLandscape { get; set; }
+
 
   /// <summary>
-  /// The styling to apply to the document. Default: <see cref="Theme.Github"/>.
+  /// The paper format for the PDF.
   /// </summary>
-  public Theme Theme { get; set; } = Theme.Github;
+  public PaperFormat Format { get; set; } = PaperFormat.A4;
 }

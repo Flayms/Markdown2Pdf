@@ -25,17 +25,19 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="wwwroot\ContentTemplate_NoScripts.html" />
+	  <None Remove="templates\ContentTemplate_NoScripts.html" />
+	  <None Remove="templates\Header-Footer-Styles.html" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Include="wwwroot\ContentTemplate_NoScripts.html" />
+	  <EmbeddedResource Include="templates\ContentTemplate_NoScripts.html" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Include="wwwroot\ContentTemplate.html">
+	  <EmbeddedResource Include="templates\ContentTemplate.html">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </EmbeddedResource>
+	  <EmbeddedResource Include="templates\Header-Footer-Styles.html" />
 	</ItemGroup>
 
 	<ItemGroup>

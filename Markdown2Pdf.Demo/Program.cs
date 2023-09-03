@@ -3,8 +3,8 @@ using Markdown2Pdf.Options;
 using System.Diagnostics;
 
 var options = new Markdown2PdfOptions {
-  HeaderUrl = "header.html",
-  FooterUrl = "footer.html",
+  HeaderHtml = File.ReadAllText("header.html"),
+  FooterHtml = File.ReadAllText("footer.html"),
   DocumentTitle = "Example PDF",
 
    MarginOptions = new MarginOptions {
@@ -14,10 +14,11 @@ var options = new Markdown2PdfOptions {
      Right = "50px"
    },
    KeepHtml = true,
+   IsLandscape = true,
 };
 
 var converter = new Markdown2PdfConverter(options);
-var resultPath = converter.Convert("README.md");
+var resultPath = await converter.Convert("README.md");
 
 //todo: make this work on linux too
 Process.Start("cmd", $"/c start {resultPath}");
