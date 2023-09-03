@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Markdown2Pdf.Models;
+using Markdown2Pdf.Services;
 
 namespace Markdown2Pdf;
 
@@ -34,11 +35,14 @@ public class Markdown2PdfConverter {
     {ThemeType.Latex, new("https://latex.now.sh/style.css", "latex.css/style.min.css") },
   };
 
+  private readonly EmbeddedResourceService _embeddedResourceService = new EmbeddedResourceService();
+
   private const string _STYLE_KEY = "stylePath";
   private const string _BODY_KEY = "body";
   private const string _DOCUMENT_TITLE_CLASS = "document-title";
-  private const string _TEMPLATE_WITH_SCRIPTS = "ContentTemplate.html";
-  private const string _TEMPLATE_NO_SCRIPTS = "ContentTemplate_NoScripts.html";
+  private const string _TEMPLATE_WITH_SCRIPTS_FILE_NAME = "ContentTemplate.html";
+  private const string _TEMPLATE_NO_SCRIPTS_FILE_NAME = "ContentTemplate_NoScripts.html";
+  private const string _HEADER_FOOTER_STYLES_FILE_NAME = "Header-Footer-Styles.html";
 
   /// <summary>
   /// Instantiate a new <see cref="Markdown2PdfConverter"/>.
@@ -137,16 +141,10 @@ public class Markdown2PdfConverter {
     var currentLocation = Path.GetDirectoryName(assembly.Location);
 
     var templateName = this.Options.ModuleOptions == ModuleOptions.None
-      ? _TEMPLATE_NO_SCRIPTS
-      : _TEMPLATE_WITH_SCRIPTS;
+      ? _TEMPLATE_NO_SCRIPTS_FILE_NAME
+      : _TEMPLATE_WITH_SCRIPTS_FILE_NAME;
 
-    var templateHtmlResource = assembly.GetManifestResourceNames().Single(n => n.EndsWith("ContentTemplate.html"));
-
-    string templateHtml;
-
-    using (var stream = assembly.GetManifestResourceStream(templateHtmlResource))
-    using (var reader = new StreamReader(stream))
-      templateHtml = reader.ReadToEnd();
+    var templateHtml = this._embeddedResourceService.GetResourceContent("ContentTemplate.html");
 
     //create model for templating html
     var templateModel = new Dictionary<string, string>();
@@ -194,20 +192,34 @@ public class Markdown2PdfConverter {
       MarginOptions = puppeteerMargins
     };
 
-    //todo: default header is super small
-    if (options.HeaderUrl != null)
-      pdfOptions.HeaderTemplate = this._SetupHeaderFooter(File.ReadAllText(options.HeaderUrl), pdfOptions);
+    var hasHeaderFooterStylesAdded = false;
 
-    if (options.FooterUrl != null)
-      pdfOptions.FooterTemplate = this._SetupHeaderFooter(File.ReadAllText(options.FooterUrl), pdfOptions);
+    //todo: default header is super small
+    if (options.HeaderUrl != null) {
+      pdfOptions.DisplayHeaderFooter = true;
+      var html = this._FillHeaderFooterDocumentTitleClass(File.ReadAllText(options.HeaderUrl));
+      pdfOptions.HeaderTemplate = _AddHeaderFooterStylesToHtml(html);
+      hasHeaderFooterStylesAdded = true;
+    }
+
+    if (options.FooterUrl != null) {
+      pdfOptions.DisplayHeaderFooter = true;
+      var html = this._FillHeaderFooterDocumentTitleClass(File.ReadAllText(options.FooterUrl));
+      pdfOptions.FooterTemplate = !hasHeaderFooterStylesAdded ? this._AddHeaderFooterStylesToHtml(html) : html;
+    }
 
     await page.EmulateMediaTypeAsync(MediaType.Screen);
     await page.PdfAsync(outputFilePath, pdfOptions);
   }
 
-  private string _SetupHeaderFooter(string html, PdfOptions pdfOptions) {
-    pdfOptions.DisplayHeaderFooter = true;
+  /// <summary>
+  /// Applies extra styles to the given header / footer html because the default ones don't look good on the pdf.
+  /// </summary>
+  /// <param name="html">The header / footer html to add the styles to.</param>
+  /// <returns>The html with added styles.</returns>
+  private string _AddHeaderFooterStylesToHtml(string html) => this._embeddedResourceService.GetResourceContent(_HEADER_FOOTER_STYLES_FILE_NAME) + html;
 
+  private string _FillHeaderFooterDocumentTitleClass(string html) {
     if (this.Options.DocumentTitle == null)
       return html;
 
@@ -216,6 +228,7 @@ public class Markdown2PdfConverter {
     var htmlWrapped = $"<root>{html}</root>";
     var xDocument = XDocument.Parse(htmlWrapped);
     var titleElements = xDocument.XPathSelectElements($"//*[contains(@class, '{_DOCUMENT_TITLE_CLASS}')]");
+
     foreach (var titleElement in titleElements)
       titleElement.Value = this.Options.DocumentTitle;
 

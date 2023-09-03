@@ -2,7 +2,7 @@
 using System.IO;
 using System;
 
-namespace Markdown2Pdf.Helper;
+namespace Markdown2Pdf.Services;
 
 internal class CommandLineHelper {
 

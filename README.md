@@ -55,30 +55,12 @@ var converter = new Markdown2PdfConverter(options);
 ## Header and Footer
 
 With the `MarkdownPdfOptions.HeaderUrl` and `MarkdownPdfOptions.FooterUrl` options a path to a local file containing html for the Header / Footer can be set.  
-Html-elements with the classes `date`, `title`, `document-title`, `url`, `pageNumber` will get their content replaced based on the information. Note that `document-title` is set over the option `MarkdownPdfOptions.DocumentTitle`.
-
-### Remarks
-
-By default the font-size for the header / footer is really small. To address this problem it needs to be manually set to a higher one e.g. `font-size: 18px`.
-
-Also to be displayed properly add the following either to the header or footer html:
-
-```html
-<style>
-    html {
-        -webkit-print-color-adjust: exact;
-    }
-
-    #header, #footer {
-        padding: 0;
-    }
-</style>
-```
+Html-elements with the classes `date`, `title`, `document-title`, `url`, `pageNumber` will get their content replaced based on the information. Note that `document-title` can be set with the option `MarkdownPdfOptions.DocumentTitle`.
 
 ## Modules
 
 This library uses node_modules packages.
-By default they're loaded over a CDN like https://cdn.jsdelivr.net.
+By default they're loaded over the CDN they're hosted on e.g. https://cdn.jsdelivr.net.
 
 You can also use a local installation of them by running the script `Init.ps1` and setting `Markdown2PdfOptions.ModuleOptions` to `ModuleOptions.Global`.
 

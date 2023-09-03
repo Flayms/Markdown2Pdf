@@ -1,4 +1,4 @@
-﻿using Markdown2Pdf.Helper;
+﻿using Markdown2Pdf.Services;
 using System.IO;
 using System.Text.RegularExpressions;
 using System;
