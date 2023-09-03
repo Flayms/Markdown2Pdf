@@ -2,16 +2,16 @@ namespace Markdown2Pdf.Tests;
 
 public class Tests {
 
-  private readonly DirectoryInfo _tempDir = new DirectoryInfo("tempFiles");
+  private readonly DirectoryInfo _tempDir = new("tempFiles");
 
   [SetUp]
-  public void Setup() => _tempDir.Create();
+  public void Setup() => this._tempDir.Create();
 
   [Test]
   public async Task TestGeneralFunctionality() {
     //setup
     var content = "*Hello* **World!**";
-    var markdownFile = Path.Combine(_tempDir.FullName, "markdown.md");
+    var markdownFile = Path.Combine(this._tempDir.FullName, "markdown.md");
 
     File.WriteAllText(markdownFile, content);
 
@@ -41,5 +41,5 @@ public class Tests {
   }
 
   [TearDown]
-  public void Teardown() => _tempDir.Delete(true);
+  public void Teardown() => this._tempDir.Delete(true);
 }

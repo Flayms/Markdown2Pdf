@@ -20,6 +20,9 @@ public class ModuleOptions {
   /// </summary>
   public ModuleLocation ModuleLocation { get;}
 
+  /// <summary>
+  /// The path to the module directory or <see langword="null"/> if not needed.
+  /// </summary>
   public string? ModulePath { get; } //todo: hide this by inheritance instead of null
 
   private ModuleOptions(ModuleLocation moduleLocation, string? modulePath = null) {

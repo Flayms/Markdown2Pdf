@@ -2,6 +2,9 @@
 
 namespace Markdown2Pdf.Options;
 
+/// <summary>
+/// All the options for the conversion.
+/// </summary>
 public class Markdown2PdfOptions {
   //todo: font-name
   //todo: font-size
@@ -19,14 +22,14 @@ public class Markdown2PdfOptions {
   public Theme Theme { get; set; } = Theme.Github;
 
   /// <summary>
-  /// Path to an html-file to use as the document-header.
+  /// An html string to use as the document-header.
   /// </summary>
-  public string? HeaderUrl { get; set; }
+  public string? HeaderHtml { get; set; }
 
   /// <summary>
-  /// Path to an html-file to use as the document-footer.
+  /// An html string to use as the document-footer.
   /// </summary>
-  public string? FooterUrl { get; set; }
+  public string? FooterHtml { get; set; }
 
   /// <summary>
   /// The title of this document. Can be injected into the header / footer by adding the class <c>document-title</c> to the element.

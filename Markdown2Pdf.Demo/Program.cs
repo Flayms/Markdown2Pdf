@@ -3,8 +3,8 @@ using Markdown2Pdf.Options;
 using System.Diagnostics;
 
 var options = new Markdown2PdfOptions {
-  HeaderUrl = "header.html",
-  FooterUrl = "footer.html",
+  HeaderHtml = File.ReadAllText("header.html"),
+  FooterHtml = File.ReadAllText("footer.html"),
   DocumentTitle = "Example PDF",
 
    MarginOptions = new MarginOptions {

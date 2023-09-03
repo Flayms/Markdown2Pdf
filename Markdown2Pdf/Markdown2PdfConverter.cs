@@ -195,16 +195,16 @@ public class Markdown2PdfConverter {
     var hasHeaderFooterStylesAdded = false;
 
     //todo: default header is super small
-    if (options.HeaderUrl != null) {
+    if (options.HeaderHtml != null) {
       pdfOptions.DisplayHeaderFooter = true;
-      var html = this._FillHeaderFooterDocumentTitleClass(File.ReadAllText(options.HeaderUrl));
-      pdfOptions.HeaderTemplate = _AddHeaderFooterStylesToHtml(html);
+      var html = this._FillHeaderFooterDocumentTitleClass(options.HeaderHtml);
+      pdfOptions.HeaderTemplate = this._AddHeaderFooterStylesToHtml(html);
       hasHeaderFooterStylesAdded = true;
     }
 
-    if (options.FooterUrl != null) {
+    if (options.FooterHtml != null) {
       pdfOptions.DisplayHeaderFooter = true;
-      var html = this._FillHeaderFooterDocumentTitleClass(File.ReadAllText(options.FooterUrl));
+      var html = this._FillHeaderFooterDocumentTitleClass(options.FooterHtml);
       pdfOptions.FooterTemplate = !hasHeaderFooterStylesAdded ? this._AddHeaderFooterStylesToHtml(html) : html;
     }
 
