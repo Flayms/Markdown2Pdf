@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using PuppeteerSharp;
 using PuppeteerSharp.Media;
 using System;
-using System.Reflection;
 using System.Linq;
 using Markdown2Pdf.Options;
 using System.Collections.Generic;
@@ -127,24 +126,21 @@ public class Markdown2PdfConverter {
 
   internal string _GenerateHtml(string markdownContent) {
     //todo: decide on how to handle pipeline better
+    //todo: support more plugins
+    //todo: code-color markup
     var pipeline = new MarkdownPipelineBuilder()
       .UseAdvancedExtensions()
       .UseDiagrams()
       .Build();
     //.UseSyntaxHighlighting();
+
     var htmlContent = Markdown.ToHtml(markdownContent, pipeline);
-
-    //todo: support more plugins
-    //todo: code-color markup
-
-    var assembly = Assembly.GetAssembly(typeof(Markdown2PdfConverter));
-    var currentLocation = Path.GetDirectoryName(assembly.Location);
 
     var templateName = this.Options.ModuleOptions == ModuleOptions.None
       ? _TEMPLATE_NO_SCRIPTS_FILE_NAME
       : _TEMPLATE_WITH_SCRIPTS_FILE_NAME;
 
-    var templateHtml = this._embeddedResourceService.GetResourceContent("ContentTemplate.html");
+    var templateHtml = this._embeddedResourceService.GetResourceContent(templateName);
 
     //create model for templating html
     var templateModel = new Dictionary<string, string>();
