@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FILE_NAME=$1
+TEMP_FILE_NAME="tmp.txt"
 LAST_TAG=$(git ls-remote --tags --sort=committerdate | grep -o 'v.*' | sort -r | head -1)
 
 MAJOR_INDEX=0
@@ -11,10 +11,10 @@ INDEX_TO_INCREASE=$PATCH_INDEX
 echo "Last Tag: $LAST_TAG"
 
 # Create file
-git log $LAST_TAG..HEAD --no-merges --oneline > $FILE_NAME
+git log $LAST_TAG..HEAD --no-merges --oneline > $TEMP_FILE_NAME
 
-echo "Created file '$FILE_NAME' with following content:"
-echo "$($FILE_NAME)"
+echo "Created file '$TEMP_FILE_NAME' with following content:"
+echo "$($TEMP_FILE_NAME)"
 echo "----"
 
 # loop over each commit to determine new version
@@ -51,7 +51,7 @@ if echo $MSG_HEADER | grep -E "^(\w.)+(\(.*\))?!:"; then
 
   # don't need to look for patch because it always get's increased if nothing else found
 
-done < $FILE_NAME
+done < $TEMP_FILE_NAME
 
 # remove v letter
 LAST_TAG_TRIMMED="${LAST_TAG:1}"
