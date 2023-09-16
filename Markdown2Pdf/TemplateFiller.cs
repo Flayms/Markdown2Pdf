@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace Markdown2Pdf;
@@ -7,11 +7,11 @@ namespace Markdown2Pdf;
 internal class TemplateFiller {
 
   //matches groups like @(myToken)
-  private static readonly Regex _TOKEN_REGEX = new (@"(?<token>@\(.*\))",
-    RegexOptions.Compiled |RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture);
+  private static readonly Regex _tokenRegex = new(@"(?<token>@\(.*\))",
+    RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture);
 
   public static string FillTemplate(string template, Dictionary<string, string> model) {
-    var matches =  _TOKEN_REGEX.Matches(template);
+    var matches = _tokenRegex.Matches(template);
 
     var filled = template;
 

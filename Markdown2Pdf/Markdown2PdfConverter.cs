@@ -1,16 +1,16 @@
-﻿using Markdig;
-using System.IO;
-using System.Threading.Tasks;
-using PuppeteerSharp;
-using PuppeteerSharp.Media;
 using System;
-using System.Linq;
-using Markdown2Pdf.Options;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Markdig;
 using Markdown2Pdf.Models;
+using Markdown2Pdf.Options;
 using Markdown2Pdf.Services;
+using PuppeteerSharp;
+using PuppeteerSharp.Media;
 
 namespace Markdown2Pdf;
 
@@ -34,7 +34,7 @@ public class Markdown2PdfConverter {
     {ThemeType.Latex, new("https://latex.now.sh/style.css", "latex.css/style.min.css") },
   };
 
-  private readonly EmbeddedResourceService _embeddedResourceService = new EmbeddedResourceService();
+  private readonly EmbeddedResourceService _embeddedResourceService = new();
 
   private const string _STYLE_KEY = "stylePath";
   private const string _BODY_KEY = "body";
@@ -77,7 +77,7 @@ public class Markdown2PdfConverter {
   /// <inheritdoc cref="Convert(FileInfo, FileInfo)"/>
   /// <remarks>The PDF will be saved in the same location as the markdown file with the naming convention "markdownFileName.pdf".</remarks>
   /// <returns>The newly created PDF-file.</returns>
-  public async Task<FileInfo> Convert(FileInfo markdownFile) => new ( await this.Convert(markdownFile.FullName));
+  public async Task<FileInfo> Convert(FileInfo markdownFile) => new(await this.Convert(markdownFile.FullName));
 
   /// <summary>
   /// Converts the given markdown-file to PDF.

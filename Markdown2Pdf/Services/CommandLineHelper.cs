@@ -1,6 +1,6 @@
-﻿using System.Diagnostics;
-using System.IO;
 using System;
+using System.Diagnostics;
+using System.IO;
 
 namespace Markdown2Pdf.Services;
 
@@ -20,10 +20,7 @@ internal class CommandLineHelper {
       WorkingDirectory = workingDirectory,
     };
 
-    var process = Process.Start(processStartInfo);
-
-    if (process == null)
-      throw new Exception("Process should not be null.");
+    var process = Process.Start(processStartInfo) ?? throw new Exception("Process should not be null.");
 
     process.WaitForExit();
 
