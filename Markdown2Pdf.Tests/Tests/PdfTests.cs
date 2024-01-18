@@ -1,6 +1,8 @@
 ﻿using iTextSharp.text.pdf.parser;
 using iTextSharp.text.pdf;
 using Markdown2Pdf.Options;
+using Markdig;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Markdown2Pdf.Tests.Tests;
 
@@ -181,18 +183,66 @@ public class PdfTests
         result = ReadPdfFile(pdfPath, "Page 4/4");
         Assert.That(result.Count, Is.EqualTo(1));
     }
+
+
+    [Test]
+    public async Task TestPDFTwoFiles()
+    {
+        //setup
+        var markdownFile = CopyTestFile("helloworld.md");
+        var markdownFile1 = CopyTestFile("README.md");
+        var logoFile = CopyTestFile("md2pdf.png");
+        List<string> markdownList = new() { markdownFile, markdownFile1 };
+        var converter = new Markdown2PdfConverter();
+
+        
+        //execute
+        
+        string pdfPath = await converter.Convert(markdownList);
+
+        //assert
+        Assert.That(File.Exists(pdfPath));
+        List<int> result = ReadPdfFile(pdfPath, "Hello World!");
+        Assert.That(result.Count, Is.EqualTo(2));
+        Assert.That(result[0], Is.EqualTo(1));
+        Assert.That(result[1], Is.EqualTo(2));
+    }
+
+    [Test]
+    public async Task TestPDFTwoFilesSwitched()
+    {
+        //setup
+        var markdownFile = CopyTestFile("helloworld.md");
+        var markdownFile1 = CopyTestFile("README.md");
+        var logoFile = CopyTestFile("md2pdf.png");
+        List<string> markdownList = new() { markdownFile1, markdownFile };
+        var converter = new Markdown2PdfConverter();
+
+
+        //execute
+
+        string pdfPath = await converter.Convert(markdownList);
+
+        //assert
+        Assert.That(File.Exists(pdfPath));
+        List<int> result = ReadPdfFile(pdfPath, "Hello World!");
+        Assert.That(result.Count, Is.EqualTo(2));
+        Assert.That(result[0], Is.EqualTo(2));
+        Assert.That(result[1], Is.EqualTo(4));
+    }
+
     [TearDown]
     public void Teardown() => _tempDir.Delete(true);
 
-    private String CopyTestFile(String filename)
+    private string CopyTestFile(string filename)
     {
-        var testFile = System.IO.Path.Combine(testFilePath, filename);
-        var markdownFile = System.IO.Path.Combine(_tempDir.FullName, filename);
+        string testFile = System.IO.Path.Combine(testFilePath, filename);
+        string markdownFile = System.IO.Path.Combine(_tempDir.FullName, filename);
         File.Copy(testFile, markdownFile);
         return markdownFile;
      }
 
-    public List<int> ReadPdfFile(string fileName, String searthText)
+    public List<int> ReadPdfFile(string fileName, string searthText)
     {
         List<int> pages = new List<int>();
         if (File.Exists(fileName))

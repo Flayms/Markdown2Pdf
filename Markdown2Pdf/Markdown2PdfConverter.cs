@@ -99,7 +99,7 @@ public class Markdown2PdfConverter {
   }
 
   /// <summary>
-  /// Converts the given markdown-file to PDF.
+  /// Converts the given list of markdown-files to PDF.
   /// </summary>
   /// <param name="markdownFilePath">Path to the markdown file.</param>
   /// <param name="outputFilePath">File path for saving the PDF to.</param>
@@ -110,21 +110,64 @@ public class Markdown2PdfConverter {
 
     var markdownContent = File.ReadAllText(markdownFilePath);
 
-    var html = this._GenerateHtml(markdownContent);
+    await GeneratePDF(outputFilePath, markdownContent, markdownFilePath);
 
-    //todo: make temp-file
-    var markdownDir = Path.GetDirectoryName(markdownFilePath);
-    var markdownFileName = Path.GetFileNameWithoutExtension(markdownFilePath) + ".html";
-    var htmlPath = Path.Combine(markdownDir, markdownFileName);
-    File.WriteAllText(htmlPath, html);
-
-    await this._GeneratePdfAsync(htmlPath, outputFilePath);
-
-    if (!this.Options.KeepHtml)
-      File.Delete(htmlPath);
   }
+    /// <summary>
+    /// Converts the given list of markdown-files to PDF.
+    /// </summary>
+    /// <remarks>The PDF will be saved in the same location of the first markdown file with the naming convention "markdownFileName.pdf"</remarks>
+    public async Task<string> Convert(List<string> markdownFilesPath)
+    {
+        var markdownDir = Path.GetDirectoryName(markdownFilesPath[0]);
+        var outputFileName = Path.GetFileNameWithoutExtension(markdownFilesPath[0]) + ".pdf";
+        var outputFilePath = Path.Combine(markdownDir, outputFileName);
+        await this.Convert(markdownFilesPath, outputFilePath);
 
-  internal string _GenerateHtml(string markdownContent) {
+        return outputFilePath;
+    }
+
+    /// <summary>
+    /// Converts the given list of markdown-files to PDF.
+    /// </summary>
+    /// <param name="markdownFilesPath">List with path to the markdown files.</param>
+    /// <param name="outputFilePath">File path for saving the PDF to.</param>
+
+    public async Task Convert(List<string> markdownFilesPath, string outputFilePath)
+    {
+        var markdownContent = "";
+        for (var i = 0; i < markdownFilesPath.Count; i++)
+        {
+            markdownContent += File.ReadAllText(markdownFilesPath[i]) + (i < markdownFilesPath.Count ? "\n" : "");
+        }
+        var markdownFilePath = Path.GetFullPath(markdownFilesPath[0]);
+        outputFilePath = Path.GetFullPath(outputFilePath);
+        await GeneratePDF(outputFilePath, markdownContent, markdownFilePath);
+    }
+
+    /// <summary>
+    /// Converts the given list of markdown-files to PDF.
+    /// </summary>
+    /// <param name="outputFilePath">File path for saving the PDF to.</param>
+    /// <param name="markdownContent">String hoölding all markdown data</param>
+    /// /// <param name="markdownFilePath">Path to the first markdown file.</param>
+    private async Task GeneratePDF(string outputFilePath, string markdownContent, string markdownFilePath)
+    {
+        var html = this._GenerateHtml(markdownContent);
+
+        //todo: make temp-file
+        var markdownDir = Path.GetDirectoryName(markdownFilePath);
+        var markdownFileName = Path.GetFileNameWithoutExtension(markdownFilePath) + ".html";
+        var htmlPath = Path.Combine(markdownDir, markdownFileName);
+        File.WriteAllText(htmlPath, html);
+
+        await this._GeneratePdfAsync(htmlPath, outputFilePath);
+
+        if (!this.Options.KeepHtml)
+            File.Delete(htmlPath);
+    }
+
+    internal string _GenerateHtml(string markdownContent) {
     //todo: decide on how to handle pipeline better
     //todo: support more plugins
     //todo: code-color markup
