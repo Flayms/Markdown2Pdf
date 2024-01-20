@@ -56,7 +56,6 @@ public class Markdown2PdfOptions {
   /// </summary>
   public bool IsLandscape { get; set; }
 
-
   /// <summary>
   /// The paper format for the PDF.
   /// </summary>

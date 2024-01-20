@@ -1,8 +1,8 @@
-﻿using Markdown2Pdf.Services;
+﻿using System;
 using System.IO;
-using System.Text.RegularExpressions;
-using System;
 using System.Linq;
+using System.Text.RegularExpressions;
+using Markdown2Pdf.Services;
 
 namespace Markdown2Pdf.Options;
 
@@ -18,7 +18,7 @@ public class ModuleOptions {
   /// <summary>
   /// Provides information from where to load modules.
   /// </summary>
-  public ModuleLocation ModuleLocation { get;}
+  public ModuleLocation ModuleLocation { get; }
 
   /// <summary>
   /// The path to the module directory or <see langword="null"/> if not needed.
@@ -27,13 +27,13 @@ public class ModuleOptions {
 
   private ModuleOptions(ModuleLocation moduleLocation, string? modulePath = null) {
     this.ModuleLocation = moduleLocation;
-    ModulePath = modulePath;
+    this.ModulePath = modulePath;
   }
 
   /// <summary>
   /// Don't load any additional modules.
   /// </summary>
-  public static ModuleOptions None => new ModuleOptions(ModuleLocation.None);
+  public static ModuleOptions None => new(ModuleLocation.None);
 
   /// <summary>
   /// Loads the node_modules over remote http-requests.

@@ -57,6 +57,16 @@ var converter = new Markdown2PdfConverter(options);
 With the `MarkdownPdfOptions.HeaderUrl` and `MarkdownPdfOptions.FooterUrl` options a path to a local file containing html for the Header / Footer can be set.  
 Html-elements with the classes `date`, `title`, `document-title`, `url`, `pageNumber` will get their content replaced based on the information. Note that `document-title` can be set with the option `MarkdownPdfOptions.DocumentTitle`.
 
+## Combine several markdown files to one pdf
+
+A list of markdown files can be passed to the converter. The markdownfiles will be concatenated in the given order and the first file will be used for the name of the resulting PDF.
+
+```c#
+var converter = new Markdown2PdfConverter();
+var markdownFiles = new List<string>() { "file1.md", "file2.md" };
+var resultPath = await converter.Convert(markdownFiles);
+```
+
 ## Modules
 
 This library uses node_modules packages.

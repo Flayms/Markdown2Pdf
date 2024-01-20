@@ -1,4 +1,4 @@
-namespace Markdown2Pdf.Tests;
+﻿namespace Markdown2Pdf.Tests.Tests;
 
 public class Tests {
 
