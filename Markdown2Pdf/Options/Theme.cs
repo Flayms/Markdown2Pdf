@@ -6,7 +6,7 @@ public class Theme {
   public string? CssPath { get; } //todo: hide this by inheritance instead of null
 
   public static Theme None => new(ThemeType.None);
-  
+
   /// <summary>
   /// Githubs markdown theme.
   /// </summary>
@@ -21,7 +21,6 @@ public class Theme {
   /// is being used, the npm-package <c>latex.css</c> needs to be installed in the corresponding location.</remarks>
   public static Theme Latex => new(ThemeType.Latex);
   public static Theme Custom(string cssPath) => new(ThemeType.Custom, cssPath);
-
 
   private Theme(ThemeType type, string? cssPath = null) {
     this.Type = type;

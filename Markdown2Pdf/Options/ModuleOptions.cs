@@ -27,7 +27,7 @@ public class ModuleOptions {
 
   private ModuleOptions(ModuleLocation moduleLocation, string? modulePath = null) {
     this.ModuleLocation = moduleLocation;
-    ModulePath = modulePath;
+    this.ModulePath = modulePath;
   }
 
   /// <summary>
@@ -45,7 +45,7 @@ public class ModuleOptions {
   /// Loads the node_modules from the systems global npm node_module directory (needs npm installed and in path).
   /// </summary>
   public static ModuleOptions Global => new(ModuleLocation.Global, _LoadGlobalModulePath());
-  
+
   private static string _LoadGlobalModulePath() {
     //todo: better error handling for cmd command
     var result = CommandLineHelper.RunCommand("npm list -g");
