@@ -59,12 +59,12 @@ Html-elements with the classes `date`, `title`, `document-title`, `url`, `pageNu
 
 ## Combine several markdown files to one pdf
 
-If a list of markdown files ist passed to the converter the markdownfiles will be concatinated in the given order and the first file sets the name of the resulting pdf file.
+A list of markdown files can be passed to the converter. The markdownfiles will be concatenated in the given order and the first file will be used for the name of the resulting PDF.
 
 ```c#
 var converter = new Markdown2PdfConverter();
-List<string> markdownList = new() { "file1.md", "file2.md" };
-var resultPath = await converter.Convert(markdownList);
+var markdownFiles = new List<string>() { "file1.md", "file2.md" };
+var resultPath = await converter.Convert(markdownFiles);
 ```
 
 ## Modules
