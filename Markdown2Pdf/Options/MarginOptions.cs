@@ -1,4 +1,4 @@
-namespace Markdown2Pdf.Options;
+﻿namespace Markdown2Pdf.Options;
 
 /// <summary>
 /// Margin values with units.

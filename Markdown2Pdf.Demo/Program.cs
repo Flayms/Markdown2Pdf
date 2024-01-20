@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Markdown2Pdf;
 using Markdown2Pdf.Options;
 

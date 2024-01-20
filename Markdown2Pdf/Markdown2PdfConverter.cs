@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -53,8 +53,8 @@ public class Markdown2PdfConverter {
     var moduleOptions = this.Options.ModuleOptions;
 
     //adjust local dictionary paths
-    if (moduleOptions.ModuleLocation == ModuleLocation.Custom
-      || moduleOptions.ModuleLocation == ModuleLocation.Global) {
+    if (moduleOptions.ModuleLocation is ModuleLocation.Custom
+      or ModuleLocation.Global) {
       var path = moduleOptions.ModulePath!;
 
       this._packagelocationMapping = this._UpdateDic(this._packagelocationMapping, path);
@@ -110,6 +110,43 @@ public class Markdown2PdfConverter {
 
     var markdownContent = File.ReadAllText(markdownFilePath);
 
+    await this._GeneratePDF(outputFilePath, markdownContent, markdownFilePath);
+  }
+
+  /// <summary>
+  /// Converts the given enumerable of markdown-files to PDF.
+  /// </summary>
+  /// <remarks>The PDF will be saved in the same location of the first markdown file with the naming convention "markdownFileName.pdf".</remarks>
+  public async Task<string> Convert(IEnumerable<string> markdownFilesPath) {
+    var first = markdownFilesPath.First();
+    var markdownDir = Path.GetDirectoryName(first);
+    var outputFileName = Path.GetFileNameWithoutExtension(first) + ".pdf";
+    var outputFilePath = Path.Combine(markdownDir, outputFileName);
+    await this.Convert(markdownFilesPath, outputFilePath);
+
+    return outputFilePath;
+  }
+
+  /// <summary>
+  /// Converts the given enumerable of markdown-files to PDF.
+  /// </summary>
+  /// <param name="markdownFilePaths">Enumerable with paths to the markdown files.</param>
+  /// <param name="outputFilePath">File path for saving the PDF to.</param>
+  public async Task Convert(IEnumerable<string> markdownFilePaths, string outputFilePath) {
+    var markdownContent = string.Join(Environment.NewLine, markdownFilePaths.Select(File.ReadAllText));
+
+    var markdownFilePath = Path.GetFullPath(markdownFilePaths.First());
+    outputFilePath = Path.GetFullPath(outputFilePath);
+    await this._GeneratePDF(outputFilePath, markdownContent, markdownFilePath);
+  }
+
+  /// <summary>
+  /// Converts the given list of markdown-files to PDF.
+  /// </summary>
+  /// <param name="outputFilePath">File path for saving the PDF to.</param>
+  /// <param name="markdownContent">String holding all markdown data</param>
+  /// <param name="markdownFilePath">Path to the first markdown file.</param>
+  private async Task _GeneratePDF(string outputFilePath, string markdownContent, string markdownFilePath) {
     var html = this._GenerateHtml(markdownContent);
 
     //todo: make temp-file
@@ -152,7 +189,7 @@ public class Markdown2PdfConverter {
       templateModel.Add(kvp.Key, isRemote ? kvp.Value.RemotePath : kvp.Value.NodePath);
 
     var theme = this.Options.Theme.Type;
-    if (theme == ThemeType.Github || theme == ThemeType.Latex) {
+    if (theme is ThemeType.Github or ThemeType.Latex) {
       var value = this._themeSourceMapping[theme];
       templateModel.Add(_STYLE_KEY, isRemote ? value.RemotePath : value.NodePath);
     }
@@ -168,7 +205,7 @@ public class Markdown2PdfConverter {
     var options = this.Options;
     var margins = options.MarginOptions;
 
-    await page.GoToAsync("file:///" + htmlFilePath, WaitUntilNavigation.Networkidle2);
+    _ = await page.GoToAsync("file:///" + htmlFilePath, WaitUntilNavigation.Networkidle2);
 
     var puppeteerMargins = new PuppeteerSharp.Media.MarginOptions();
     if (margins != null) {
@@ -248,7 +285,7 @@ public class Markdown2PdfConverter {
 
       if (!localRevs.Contains(BrowserFetcher.DefaultChromiumRevision)) {
         Console.WriteLine("Downloading chromium...");
-        await browserFetcher.DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
+        _ = await browserFetcher.DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
       }
     } else
       launchOptions.ExecutablePath = this.Options.ChromePath;

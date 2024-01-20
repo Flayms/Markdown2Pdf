@@ -1,4 +1,4 @@
-namespace Markdown2Pdf.Tests;
+﻿namespace Markdown2Pdf.Tests.Tests;
 
 public class Tests {
 
@@ -14,7 +14,7 @@ public class Tests {
     var markdownFile = Path.Combine(this._tempDir.FullName, "markdown.md");
 
     File.WriteAllText(markdownFile, content);
-
+    
     var converter = new Markdown2PdfConverter();
 
     //execute

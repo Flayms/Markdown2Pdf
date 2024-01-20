@@ -1,4 +1,4 @@
-namespace Markdown2Pdf.Options;
+﻿namespace Markdown2Pdf.Options;
 
 public class Theme {
 
@@ -6,7 +6,7 @@ public class Theme {
   public string? CssPath { get; } //todo: hide this by inheritance instead of null
 
   public static Theme None => new(ThemeType.None);
-
+  
   /// <summary>
   /// Githubs markdown theme.
   /// </summary>
