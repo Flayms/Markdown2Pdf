@@ -1,16 +1,16 @@
-using Markdig;
-using System.IO;
-using System.Threading.Tasks;
-using PuppeteerSharp;
-using PuppeteerSharp.Media;
-using System;
-using System.Linq;
-using Markdown2Pdf.Options;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Markdig;
 using Markdown2Pdf.Models;
+using Markdown2Pdf.Options;
 using Markdown2Pdf.Services;
+using PuppeteerSharp;
+using PuppeteerSharp.Media;
 
 namespace Markdown2Pdf;
 
@@ -34,7 +34,7 @@ public class Markdown2PdfConverter {
     {ThemeType.Latex, new("https://latex.now.sh/style.css", "latex.css/style.min.css") },
   };
 
-  private readonly EmbeddedResourceService _embeddedResourceService = new EmbeddedResourceService();
+  private readonly EmbeddedResourceService _embeddedResourceService = new();
 
   private const string _STYLE_KEY = "stylePath";
   private const string _BODY_KEY = "body";
@@ -53,8 +53,8 @@ public class Markdown2PdfConverter {
     var moduleOptions = this.Options.ModuleOptions;
 
     //adjust local dictionary paths
-    if (moduleOptions.ModuleLocation == ModuleLocation.Custom
-      || moduleOptions.ModuleLocation == ModuleLocation.Global) {
+    if (moduleOptions.ModuleLocation is ModuleLocation.Custom
+      or ModuleLocation.Global) {
       var path = moduleOptions.ModulePath!;
 
       this._packagelocationMapping = this._UpdateDic(this._packagelocationMapping, path);
@@ -77,7 +77,7 @@ public class Markdown2PdfConverter {
   /// <inheritdoc cref="Convert(FileInfo, FileInfo)"/>
   /// <remarks>The PDF will be saved in the same location as the markdown file with the naming convention "markdownFileName.pdf".</remarks>
   /// <returns>The newly created PDF-file.</returns>
-  public async Task<FileInfo> Convert(FileInfo markdownFile) => new ( await this.Convert(markdownFile.FullName));
+  public async Task<FileInfo> Convert(FileInfo markdownFile) => new(await this.Convert(markdownFile.FullName));
 
   /// <summary>
   /// Converts the given markdown-file to PDF.
@@ -189,7 +189,7 @@ public class Markdown2PdfConverter {
       templateModel.Add(kvp.Key, isRemote ? kvp.Value.RemotePath : kvp.Value.NodePath);
 
     var theme = this.Options.Theme.Type;
-    if (theme == ThemeType.Github || theme == ThemeType.Latex) {
+    if (theme is ThemeType.Github or ThemeType.Latex) {
       var value = this._themeSourceMapping[theme];
       templateModel.Add(_STYLE_KEY, isRemote ? value.RemotePath : value.NodePath);
     }
@@ -205,7 +205,7 @@ public class Markdown2PdfConverter {
     var options = this.Options;
     var margins = options.MarginOptions;
 
-    await page.GoToAsync("file:///" + htmlFilePath, WaitUntilNavigation.Networkidle2);
+    _ = await page.GoToAsync("file:///" + htmlFilePath, WaitUntilNavigation.Networkidle2);
 
     var puppeteerMargins = new PuppeteerSharp.Media.MarginOptions();
     if (margins != null) {
@@ -285,7 +285,7 @@ public class Markdown2PdfConverter {
 
       if (!localRevs.Contains(BrowserFetcher.DefaultChromiumRevision)) {
         Console.WriteLine("Downloading chromium...");
-        await browserFetcher.DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
+        _ = await browserFetcher.DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
       }
     } else
       launchOptions.ExecutablePath = this.Options.ChromePath;

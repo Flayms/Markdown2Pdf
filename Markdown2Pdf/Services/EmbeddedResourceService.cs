@@ -6,7 +6,7 @@ namespace Markdown2Pdf.Services;
 
 internal class EmbeddedResourceService {
 
-  private Assembly _currentAssembly = Assembly.GetAssembly(typeof(Markdown2PdfConverter));
+  private readonly Assembly _currentAssembly = Assembly.GetAssembly(typeof(Markdown2PdfConverter));
 
   /// <summary>
   /// Loads the text content of an embedded resource in this <see cref="Assembly"/>.

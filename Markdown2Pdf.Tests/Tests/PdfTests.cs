@@ -1,5 +1,4 @@
-using System.Text;
-using Markdown2Pdf.Options;
+﻿using Markdown2Pdf.Options;
 using UglyToad.PdfPig;
 using UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor;
 

@@ -1,4 +1,4 @@
-﻿namespace Markdown2Pdf.Models;
+﻿﻿namespace Markdown2Pdf.Models;
 
 internal class ModuleInformation {
 
