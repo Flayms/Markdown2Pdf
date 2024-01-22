@@ -26,7 +26,10 @@ public class Markdown2PdfConverter {
 
   private readonly IReadOnlyDictionary<string, ModuleInformation> _packagelocationMapping = new Dictionary<string, ModuleInformation>() {
     {"mathjax", new ("https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js", "mathjax/es5/tex-mml-chtml.js") },
-    {"mermaid", new ("https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js", "mermaid/dist/mermaid.min.js") }
+    {"mermaid", new ("https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js", "mermaid/dist/mermaid.min.js") },
+    {"highlightjs", new ("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js", "highlight.js") }, // TODO: define alias c# for cs
+    {"highlightjs_style", new ("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles", "highlight.js/styles") },
+
   };
 
   private readonly IReadOnlyDictionary<ThemeType, ModuleInformation> _themeSourceMapping = new Dictionary<ThemeType, ModuleInformation>() {
@@ -144,7 +147,7 @@ public class Markdown2PdfConverter {
   /// Converts the given list of markdown-files to PDF.
   /// </summary>
   /// <param name="outputFilePath">File path for saving the PDF to.</param>
-  /// <param name="markdownContent">String holding all markdown data</param>
+  /// <param name="markdownContent">String holding all markdown data.</param>
   /// <param name="markdownFilePath">Path to the first markdown file.</param>
   private async Task _GeneratePDF(string outputFilePath, string markdownContent, string markdownFilePath) {
     var html = this._GenerateHtml(markdownContent);

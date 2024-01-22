@@ -21,7 +21,7 @@ A demo can be found [here!](./assets/demo.pdf)
 
 ## Usage
 
-```c#
+```cs
 var converter = new Markdown2PdfConverter();
 var resultPath = await converter.Convert("README.md");
 ```
