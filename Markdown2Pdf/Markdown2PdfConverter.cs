@@ -164,10 +164,10 @@ public class Markdown2PdfConverter {
       File.Delete(htmlPath);
   }
 
+  // TODO: refac
   internal string _GenerateHtml(string markdownContent) {
     // TODO: decide on how to handle pipeline better
     // TODO: support more plugins
-    // TODO: code-color markup
     var pipeline = new MarkdownPipelineBuilder()
       .UseAdvancedExtensions()
       .UseDiagrams()
@@ -176,6 +176,7 @@ public class Markdown2PdfConverter {
 
     var htmlContent = Markdown.ToHtml(markdownContent, pipeline);
 
+    // TODO: make template editable for the user
     var templateName = this.Options.ModuleOptions == ModuleOptions.None
       ? _TEMPLATE_NO_SCRIPTS_FILE_NAME
       : _TEMPLATE_WITH_SCRIPTS_FILE_NAME;
@@ -196,6 +197,8 @@ public class Markdown2PdfConverter {
       var value = this._themeSourceMapping[theme];
       templateModel.Add(_STYLE_KEY, isRemote ? value.RemotePath : value.NodePath);
     }
+
+    templateModel.Add("highlightjs_theme_name", this.Options.SyntaxHighlightTheme.ToString());
 
     templateModel.Add(_BODY_KEY, htmlContent);
 
