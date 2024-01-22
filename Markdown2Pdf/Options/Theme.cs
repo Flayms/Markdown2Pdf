@@ -3,7 +3,7 @@
 public class Theme {
 
   public ThemeType Type { get; }
-  public string? CssPath { get; } //todo: hide this by inheritance instead of null
+  public string? CssPath { get; } // TODO: hide this by inheritance instead of null
 
   public static Theme None => new(ThemeType.None);
 

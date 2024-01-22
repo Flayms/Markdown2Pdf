@@ -6,10 +6,10 @@ namespace Markdown2Pdf.Options;
 /// All the options for the conversion.
 /// </summary>
 public class Markdown2PdfOptions {
-  //todo: font-name
-  //todo: font-size
-  //todo: option for generating table of contents
-  //todo: light theme, dark theme
+  // TODO: font-name
+  // TODO: font-size
+  // TODO: option for generating table of contents
+  // TODO: light theme, dark theme
 
   /// <summary>
   /// Options that decide from where to load additional modules. Default: <see cref="ModuleOptions.Remote"/>.
