@@ -37,7 +37,7 @@ public class Markdown2PdfOptions {
   public string? DocumentTitle { get; set; }
 
   /// <summary>
-  /// Path to chrome or chromium executable or self-downloads it if <see langword="null"/>.
+  /// Path to chrome or chromium executable. If set to <see langword="null"/> downloads chromium by itself.
   /// </summary>
   public string? ChromePath { get; set; }
 
@@ -61,5 +61,8 @@ public class Markdown2PdfOptions {
   /// </summary>
   public PaperFormat Format { get; set; } = PaperFormat.A4;
 
-  public HighlightJsTheme SyntaxHighlightTheme { get; set; } = HighlightJsTheme.GITHUB;
+  /// <summary>
+  /// The theme to use for highlighting code blocks.
+  /// </summary>
+  public CodeHighlightTheme CodeHighlightTheme { get; set; } = CodeHighlightTheme.GITHUB;
 }

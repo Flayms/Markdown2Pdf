@@ -27,8 +27,8 @@ public class Markdown2PdfConverter {
   private readonly IReadOnlyDictionary<string, ModuleInformation> _packagelocationMapping = new Dictionary<string, ModuleInformation>() {
     {"mathjax", new ("https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js", "mathjax/es5/tex-mml-chtml.js") },
     {"mermaid", new ("https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js", "mermaid/dist/mermaid.min.js") },
-    {"highlightjs", new ("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js", "highlight.js") }, // TODO: define alias c# for cs
-    {"highlightjs_style", new ("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles", "highlight.js/styles") },
+    {"highlightjs", new ("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js", "@highlightjs/cdn-assets/highlight.min.js") }, // TODO: define alias c# for cs
+    {"highlightjs_style", new ("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles", "@highlightjs/cdn-assets/styles") },
 
   };
 
@@ -182,8 +182,12 @@ public class Markdown2PdfConverter {
       : _TEMPLATE_WITH_SCRIPTS_FILE_NAME;
 
     var templateHtml = this._embeddedResourceService.GetResourceContent(templateName);
+    var templateModel = _CreateTemplateModel(htmlContent);
 
-    // create model for templating html
+    return TemplateFiller.FillTemplate(templateHtml, templateModel);
+  }
+
+  private Dictionary<string, string> _CreateTemplateModel(string htmlContent) {
     var templateModel = new Dictionary<string, string>();
 
     // load correct module paths
@@ -192,17 +196,23 @@ public class Markdown2PdfConverter {
     foreach (var kvp in this._packagelocationMapping)
       templateModel.Add(kvp.Key, isRemote ? kvp.Value.RemotePath : kvp.Value.NodePath);
 
-    var theme = this.Options.Theme.Type;
-    if (theme is ThemeType.Github or ThemeType.Latex) {
-      var value = this._themeSourceMapping[theme];
-      templateModel.Add(_STYLE_KEY, isRemote ? value.RemotePath : value.NodePath);
+    switch (this.Options.Theme) {
+      case PredefinedTheme predefinedTheme when predefinedTheme.Type != ThemeType.None: {
+        var value = this._themeSourceMapping[predefinedTheme.Type];
+        templateModel.Add(_STYLE_KEY, isRemote ? value.RemotePath : value.NodePath);
+        break;
+      }
+
+      case CustomTheme customTheme:
+        templateModel.Add(_STYLE_KEY, customTheme.CssPath);
+        break;
     }
 
-    templateModel.Add("highlightjs_theme_name", this.Options.SyntaxHighlightTheme.ToString());
+    templateModel.Add("highlightjs_theme_name", this.Options.CodeHighlightTheme.ToString());
 
     templateModel.Add(_BODY_KEY, htmlContent);
 
-    return TemplateFiller.FillTemplate(templateHtml, templateModel);
+    return templateModel;
   }
 
   private async Task _GeneratePdfAsync(string htmlFilePath, string outputFilePath) {
