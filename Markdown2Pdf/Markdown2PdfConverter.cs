@@ -27,7 +27,7 @@ public class Markdown2PdfConverter {
   private readonly IReadOnlyDictionary<string, ModuleInformation> _packagelocationMapping = new Dictionary<string, ModuleInformation>() {
     {"mathjax", new ("https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js", "mathjax/es5/tex-mml-chtml.js") },
     {"mermaid", new ("https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js", "mermaid/dist/mermaid.min.js") },
-    {"highlightjs", new ("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js", "@highlightjs/cdn-assets/highlight.min.js") }, // TODO: define alias c# for cs
+    {"highlightjs", new ("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js", "@highlightjs/cdn-assets/highlight.min.js") },
     {"highlightjs_style", new ("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles", "@highlightjs/cdn-assets/styles") },
 
   };
@@ -164,7 +164,6 @@ public class Markdown2PdfConverter {
       File.Delete(htmlPath);
   }
 
-  // TODO: refac
   internal string _GenerateHtml(string markdownContent) {
     // TODO: decide on how to handle pipeline better
     // TODO: support more plugins
@@ -172,7 +171,6 @@ public class Markdown2PdfConverter {
       .UseAdvancedExtensions()
       .UseDiagrams()
       .Build();
-    //.UseSyntaxHighlighting();
 
     var htmlContent = Markdown.ToHtml(markdownContent, pipeline);
 

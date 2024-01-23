@@ -22,6 +22,11 @@ public class Markdown2PdfOptions {
   public Theme Theme { get; set; } = Theme.Github;
 
   /// <summary>
+  /// The theme to use for highlighting code blocks. Default: <see cref="CodeHighlightTheme.Github"/>.
+  /// </summary>
+  public CodeHighlightTheme CodeHighlightTheme { get; set; } = CodeHighlightTheme.Github;
+
+  /// <summary>
   /// An html string to use as the document-header.
   /// </summary>
   public string? HeaderHtml { get; set; }
@@ -60,9 +65,4 @@ public class Markdown2PdfOptions {
   /// The paper format for the PDF.
   /// </summary>
   public PaperFormat Format { get; set; } = PaperFormat.A4;
-
-  /// <summary>
-  /// The theme to use for highlighting code blocks.
-  /// </summary>
-  public CodeHighlightTheme CodeHighlightTheme { get; set; } = CodeHighlightTheme.GITHUB;
 }
