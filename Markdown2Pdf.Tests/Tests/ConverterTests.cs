@@ -9,7 +9,7 @@ public class Tests {
 
   [Test]
   public async Task TestGeneralFunctionality() {
-    //setup
+    // arrange
     var content = "*Hello* **World!**";
     var markdownFile = Path.Combine(this._tempDir.FullName, "markdown.md");
 
@@ -17,10 +17,10 @@ public class Tests {
 
     var converter = new Markdown2PdfConverter();
 
-    //execute
+    // act
     var pdfPath = await converter.Convert(markdownFile);
 
-    //assert
+    // assert
     Assert.That(File.Exists(pdfPath));
   }
 
@@ -30,13 +30,13 @@ public class Tests {
   [TestCase("", "<link rel=\"stylesheet\" href=")]
   [TestCase("*Hello* **World!**", "<p><em>Hello</em> <strong>World!</strong></p>")]
   public void TestConversionToHtml(string markdown, string expectedHtmlPart) {
-    //setup
+    // arrange
     var converter = new Markdown2PdfConverter();
 
-    //execute
+    // act
     var html = converter._GenerateHtml(markdown);
 
-    //assert
+    // assert
     Assert.That(html, Does.Contain(expectedHtmlPart));
   }
 

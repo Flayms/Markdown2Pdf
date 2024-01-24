@@ -21,17 +21,27 @@ A demo can be found [here!](./assets/demo.pdf)
 
 ## Usage
 
-```c#
+```cs
 var converter = new Markdown2PdfConverter();
 var resultPath = await converter.Convert("README.md");
+```
+
+### Combine several markdown files to one PDF
+
+A list of markdown files can be passed to the converter. This concatenates the markdown file content.
+
+```cs
+var converter = new Markdown2PdfConverter();
+var markdownFiles = new List<string>() { "file1.md", "file2.md" };
+var resultPath = await converter.Convert(markdownFiles); // "file1.pdf"
 ```
 
 ## Options
 
 To further specify the conversion process you can pass `Markdown2PdfOptions` to the converter:
 
-```c#
-var options = var options = new Markdown2PdfOptions {
+```cs
+var options = new Markdown2PdfOptions {
   HeaderUrl = "header.html",
   FooterUrl = "footer.html",
   DocumentTitle = "Example PDF",
@@ -43,6 +53,7 @@ var converter = new Markdown2PdfConverter(options);
 | --- | --- |
 | `ModuleOptions` | Options that decide from where to load additional modules. Default: `ModuleOptions.Remote`. |
 | `Theme` |The styling to apply to the document. Default: `Theme.Github`. |
+| `CodeHighlightTheme` | The theme to use for highlighting code blocks. Default: `CodeHighlightTheme.Github`. |
 | `HeaderUrl` | Path to an html-file to use as the document header. [More Information](#header-and-footer). |
 | `FooterUrl` | Path to an html-file to use as the document footer. [More Information](#header-and-footer). |
 | `DocumentTitle` | The title of this document. Can be injected into the header / footer by adding the class `document-title` to the element. |
@@ -56,16 +67,6 @@ var converter = new Markdown2PdfConverter(options);
 
 With the `MarkdownPdfOptions.HeaderUrl` and `MarkdownPdfOptions.FooterUrl` options a path to a local file containing html for the Header / Footer can be set.  
 Html-elements with the classes `date`, `title`, `document-title`, `url`, `pageNumber` will get their content replaced based on the information. Note that `document-title` can be set with the option `MarkdownPdfOptions.DocumentTitle`.
-
-## Combine several markdown files to one pdf
-
-A list of markdown files can be passed to the converter. The markdownfiles will be concatenated in the given order and the first file will be used for the name of the resulting PDF.
-
-```c#
-var converter = new Markdown2PdfConverter();
-var markdownFiles = new List<string>() { "file1.md", "file2.md" };
-var resultPath = await converter.Convert(markdownFiles);
-```
 
 ## Modules
 
@@ -82,5 +83,6 @@ Alternatively you can also install the packages from the script manually and con
 
 * [MathJax](https://github.com/mathjax/MathJax): Latex-Math rendering
 * [Mermaid](https://github.com/mermaid-js/mermaid): Diagrams
+* [Highlight.js](https://github.com/highlightjs/highlight.js): Syntax highlighting
 * [github-markdown-css](https://github.com/sindresorhus/github-markdown-css): Github-Theme
 * [latex-css](https://github.com/vincentdoerig/latex-css): Latex-Theme

@@ -68,9 +68,9 @@ This has a [Link](https://github.com/Flayms/Markdown2Pdf).
 
 ### Code blocks
 
-```c#
+```cs
 public void Main(string[] args) {
-    Console.WriteLine("Hello World!);
+    Console.WriteLine("Hello World!");
 }
 ```
 

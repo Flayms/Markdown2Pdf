@@ -26,7 +26,10 @@ public class Markdown2PdfConverter {
 
   private readonly IReadOnlyDictionary<string, ModuleInformation> _packagelocationMapping = new Dictionary<string, ModuleInformation>() {
     {"mathjax", new ("https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js", "mathjax/es5/tex-mml-chtml.js") },
-    {"mermaid", new ("https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js", "mermaid/dist/mermaid.min.js") }
+    {"mermaid", new ("https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js", "mermaid/dist/mermaid.min.js") },
+    {"highlightjs", new ("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js", "@highlightjs/cdn-assets/highlight.min.js") },
+    {"highlightjs_style", new ("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles", "@highlightjs/cdn-assets/styles") },
+
   };
 
   private readonly IReadOnlyDictionary<ThemeType, ModuleInformation> _themeSourceMapping = new Dictionary<ThemeType, ModuleInformation>() {
@@ -52,7 +55,7 @@ public class Markdown2PdfConverter {
 
     var moduleOptions = this.Options.ModuleOptions;
 
-    //adjust local dictionary paths
+    // adjust local dictionary paths
     if (moduleOptions.ModuleLocation is ModuleLocation.Custom
       or ModuleLocation.Global) {
       var path = moduleOptions.ModulePath!;
@@ -144,12 +147,12 @@ public class Markdown2PdfConverter {
   /// Converts the given list of markdown-files to PDF.
   /// </summary>
   /// <param name="outputFilePath">File path for saving the PDF to.</param>
-  /// <param name="markdownContent">String holding all markdown data</param>
+  /// <param name="markdownContent">String holding all markdown data.</param>
   /// <param name="markdownFilePath">Path to the first markdown file.</param>
   private async Task _GeneratePDF(string outputFilePath, string markdownContent, string markdownFilePath) {
     var html = this._GenerateHtml(markdownContent);
 
-    //todo: make temp-file
+    // TODO: make temp-file
     var markdownDir = Path.GetDirectoryName(markdownFilePath);
     var markdownFileName = Path.GetFileNameWithoutExtension(markdownFilePath) + ".html";
     var htmlPath = Path.Combine(markdownDir, markdownFileName);
@@ -162,41 +165,52 @@ public class Markdown2PdfConverter {
   }
 
   internal string _GenerateHtml(string markdownContent) {
-    //todo: decide on how to handle pipeline better
-    //todo: support more plugins
-    //todo: code-color markup
+    // TODO: decide on how to handle pipeline better
+    // TODO: support more plugins
     var pipeline = new MarkdownPipelineBuilder()
       .UseAdvancedExtensions()
       .UseDiagrams()
       .Build();
-    //.UseSyntaxHighlighting();
 
     var htmlContent = Markdown.ToHtml(markdownContent, pipeline);
 
+    // TODO: make template editable for the user
     var templateName = this.Options.ModuleOptions == ModuleOptions.None
       ? _TEMPLATE_NO_SCRIPTS_FILE_NAME
       : _TEMPLATE_WITH_SCRIPTS_FILE_NAME;
 
     var templateHtml = this._embeddedResourceService.GetResourceContent(templateName);
+    var templateModel = _CreateTemplateModel(htmlContent);
 
-    //create model for templating html
+    return TemplateFiller.FillTemplate(templateHtml, templateModel);
+  }
+
+  private Dictionary<string, string> _CreateTemplateModel(string htmlContent) {
     var templateModel = new Dictionary<string, string>();
 
-    //load correct module paths
+    // load correct module paths
     var isRemote = this.Options.ModuleOptions.ModuleLocation == ModuleLocation.Remote;
 
     foreach (var kvp in this._packagelocationMapping)
       templateModel.Add(kvp.Key, isRemote ? kvp.Value.RemotePath : kvp.Value.NodePath);
 
-    var theme = this.Options.Theme.Type;
-    if (theme is ThemeType.Github or ThemeType.Latex) {
-      var value = this._themeSourceMapping[theme];
-      templateModel.Add(_STYLE_KEY, isRemote ? value.RemotePath : value.NodePath);
+    switch (this.Options.Theme) {
+      case PredefinedTheme predefinedTheme when predefinedTheme.Type != ThemeType.None: {
+        var value = this._themeSourceMapping[predefinedTheme.Type];
+        templateModel.Add(_STYLE_KEY, isRemote ? value.RemotePath : value.NodePath);
+        break;
+      }
+
+      case CustomTheme customTheme:
+        templateModel.Add(_STYLE_KEY, customTheme.CssPath);
+        break;
     }
+
+    templateModel.Add("highlightjs_theme_name", this.Options.CodeHighlightTheme.ToString());
 
     templateModel.Add(_BODY_KEY, htmlContent);
 
-    return TemplateFiller.FillTemplate(templateHtml, templateModel);
+    return templateModel;
   }
 
   private async Task _GeneratePdfAsync(string htmlFilePath, string outputFilePath) {
@@ -209,7 +223,7 @@ public class Markdown2PdfConverter {
 
     var puppeteerMargins = new PuppeteerSharp.Media.MarginOptions();
     if (margins != null) {
-      //todo: remove double initialization
+      // TODO: remove double initialization
       puppeteerMargins = new PuppeteerSharp.Media.MarginOptions {
         Top = margins.Top,
         Bottom = margins.Bottom,
@@ -221,13 +235,13 @@ public class Markdown2PdfConverter {
     var pdfOptions = new PdfOptions {
       Format = options.Format,
       Landscape = options.IsLandscape,
-      PrintBackground = true, //todo: background doesnt work for margins
+      PrintBackground = true, // TODO: background doesnt work for margins
       MarginOptions = puppeteerMargins
     };
 
     var hasHeaderFooterStylesAdded = false;
 
-    //todo: default header is super small
+    // TODO: default header is super small
     if (options.HeaderHtml != null) {
       pdfOptions.DisplayHeaderFooter = true;
       var html = this._FillHeaderFooterDocumentTitleClass(options.HeaderHtml);
@@ -256,8 +270,8 @@ public class Markdown2PdfConverter {
     if (this.Options.DocumentTitle == null)
       return html;
 
-    //todo: document this
-    //need to wrap bc html could have multiple roots
+    // TODO: document this
+    // need to wrap bc html could have multiple roots
     var htmlWrapped = $"<root>{html}</root>";
     var xDocument = XDocument.Parse(htmlWrapped);
     var titleElements = xDocument.XPathSelectElements($"//*[contains(@class, '{_DOCUMENT_TITLE_CLASS}')]");
@@ -267,7 +281,7 @@ public class Markdown2PdfConverter {
 
     var resultHtml = xDocument.ToString();
 
-    //remove helper wrap
+    // remove helper wrap
     var lines = resultHtml.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
     resultHtml = string.Join(Environment.NewLine, lines.Take(lines.Length - 1).Skip(1));
 

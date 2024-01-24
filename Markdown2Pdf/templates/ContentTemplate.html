@@ -1,12 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script id="MathJax-script" async src="@(mathjax)"></script>
-    <script src="@(mermaid)"></script>
-    <link rel="stylesheet" href="@(stylePath)" />
+  <script id="MathJax-script" async src="@(mathjax)"></script>
+  <script src="@(mermaid)"></script>
+  <link rel="stylesheet" href="@(stylePath)" />
+
+  <script src="@(highlightjs)"></script>
+  <link rel="stylesheet" href="@(highlightjs_style)/@(highlightjs_theme_name)" />
+  <script> 
+    hljs.highlightAll();
+  </script>
 </head>
 <body class="markdown-body">
-    @(body)
+  @(body)
 </body>
 
 </html>

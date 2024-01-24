@@ -14,7 +14,7 @@ internal class EmbeddedResourceService {
   /// <param name="resourceName">The filename of the resource to load.</param>
   /// <returns>The text content of the resource.</returns>
   internal string GetResourceContent(string resourceName) {
-    //todo: check if there's a better way to do this
+    // TODO: check if there's a better way to do this
     var searchPath = $".{resourceName}";
     var resourcePath = this._currentAssembly.GetManifestResourceNames().Single(n => n.EndsWith(searchPath));
 

@@ -3,11 +3,11 @@ using System.Text.RegularExpressions;
 
 namespace Markdown2Pdf;
 
-//todo: refac
+// TODO: refac
 internal class TemplateFiller {
 
-  //matches groups like @(myToken)
-  private static readonly Regex _tokenRegex = new(@"(?<token>@\(.*\))",
+  // matches groups like @(myToken)
+  private static readonly Regex _tokenRegex = new(@"(?<token>@\(.*?\))",
     RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture);
 
   public static string FillTemplate(string template, Dictionary<string, string> model) {
@@ -19,7 +19,7 @@ internal class TemplateFiller {
       var token = match.Groups["token"].Value;
       var keyName = token.Replace("@", string.Empty).Replace("(", string.Empty).Replace(")", string.Empty);
 
-      //todo: better exception in fail case
+      // TODO: better exception in fail case
       var value = model[keyName];
 
       filled = filled.Replace(token, value);

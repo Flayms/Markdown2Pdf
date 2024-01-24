@@ -6,9 +6,9 @@ using Markdown2Pdf.Services;
 
 namespace Markdown2Pdf.Options;
 
-//todo: tests
-//todo: create plan on how to upgrade to never version
-//todo: option none
+// TODO: tests
+// TODO: create plan on how to upgrade to never version
+// TODO: option none
 
 /// <summary>
 /// Options that decide from where to load additional modules.
@@ -23,7 +23,7 @@ public class ModuleOptions {
   /// <summary>
   /// The path to the module directory or <see langword="null"/> if not needed.
   /// </summary>
-  public string? ModulePath { get; } //todo: hide this by inheritance instead of null
+  public string? ModulePath { get; } // TODO: hide this by inheritance instead of null
 
   private ModuleOptions(ModuleLocation moduleLocation, string? modulePath = null) {
     this.ModuleLocation = moduleLocation;
@@ -47,7 +47,7 @@ public class ModuleOptions {
   public static ModuleOptions Global => new(ModuleLocation.Global, _LoadGlobalModulePath());
 
   private static string _LoadGlobalModulePath() {
-    //todo: better error handling for cmd command
+    // TODO: better error handling for cmd command
     var result = CommandLineHelper.RunCommand("npm list -g");
     var globalModulePath = Path.Combine(Regex.Split(result, "\r\n|\r|\n").First(), "node_modules");
 

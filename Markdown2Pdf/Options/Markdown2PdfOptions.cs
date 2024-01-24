@@ -6,10 +6,10 @@ namespace Markdown2Pdf.Options;
 /// All the options for the conversion.
 /// </summary>
 public class Markdown2PdfOptions {
-  //todo: font-name
-  //todo: font-size
-  //todo: option for generating table of contents
-  //todo: light theme, dark theme
+  // TODO: font-name
+  // TODO: font-size
+  // TODO: option for generating table of contents
+  // TODO: light theme, dark theme
 
   /// <summary>
   /// Options that decide from where to load additional modules. Default: <see cref="ModuleOptions.Remote"/>.
@@ -20,6 +20,11 @@ public class Markdown2PdfOptions {
   /// The styling to apply to the document. Default: <see cref="Theme.Github"/>.
   /// </summary>
   public Theme Theme { get; set; } = Theme.Github;
+
+  /// <summary>
+  /// The theme to use for highlighting code blocks. Default: <see cref="CodeHighlightTheme.Github"/>.
+  /// </summary>
+  public CodeHighlightTheme CodeHighlightTheme { get; set; } = CodeHighlightTheme.Github;
 
   /// <summary>
   /// An html string to use as the document-header.
@@ -37,7 +42,7 @@ public class Markdown2PdfOptions {
   public string? DocumentTitle { get; set; }
 
   /// <summary>
-  /// Path to chrome or chromium executable or self-downloads it if <see langword="null"/>.
+  /// Path to chrome or chromium executable. If set to <see langword="null"/> downloads chromium by itself.
   /// </summary>
   public string? ChromePath { get; set; }
 
