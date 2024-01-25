@@ -12,8 +12,13 @@ internal class PredefinedTheme : Theme {
   }
 }
 
+/// <summary>
+/// All predefined themes.
+/// </summary>
 public enum ThemeType {
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
   None,
   Github,
   Latex
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 }

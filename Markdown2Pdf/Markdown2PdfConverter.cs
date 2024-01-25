@@ -29,7 +29,6 @@ public class Markdown2PdfConverter {
     {"mermaid", new ("https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js", "mermaid/dist/mermaid.min.js") },
     {"highlightjs", new ("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js", "@highlightjs/cdn-assets/highlight.min.js") },
     {"highlightjs_style", new ("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles", "@highlightjs/cdn-assets/styles") },
-
   };
 
   private readonly IReadOnlyDictionary<ThemeType, ModuleInformation> _themeSourceMapping = new Dictionary<ThemeType, ModuleInformation>() {
@@ -38,9 +37,9 @@ public class Markdown2PdfConverter {
   };
 
   private readonly EmbeddedResourceService _embeddedResourceService = new();
-
   private const string _STYLE_KEY = "stylePath";
   private const string _BODY_KEY = "body";
+  private const string _CODE_HIGHLIGHT_THEME_NAME_KEY = "highlightjs_theme_name";
   private const string _DOCUMENT_TITLE_CLASS = "document-title";
   private const string _TEMPLATE_WITH_SCRIPTS_FILE_NAME = "ContentTemplate.html";
   private const string _TEMPLATE_NO_SCRIPTS_FILE_NAME = "ContentTemplate_NoScripts.html";
@@ -50,15 +49,14 @@ public class Markdown2PdfConverter {
   /// Instantiate a new <see cref="Markdown2PdfConverter"/>.
   /// </summary>
   /// <param name="options">Optional options to specify how to convert the markdown.</param>
-  public Markdown2PdfConverter(Markdown2PdfOptions? options = default) {
+  public Markdown2PdfConverter(Markdown2PdfOptions? options = null) {
     this.Options = options ?? new Markdown2PdfOptions();
 
     var moduleOptions = this.Options.ModuleOptions;
 
     // adjust local dictionary paths
-    if (moduleOptions.ModuleLocation is ModuleLocation.Custom
-      or ModuleLocation.Global) {
-      var path = moduleOptions.ModulePath!;
+    if (moduleOptions is NodeModuleOptions nodeModuleOptions) {
+      var path = nodeModuleOptions.ModulePath;
 
       this._packagelocationMapping = this._UpdateDic(this._packagelocationMapping, path);
       this._themeSourceMapping = this._UpdateDic(this._themeSourceMapping, path);
@@ -180,7 +178,7 @@ public class Markdown2PdfConverter {
       : _TEMPLATE_WITH_SCRIPTS_FILE_NAME;
 
     var templateHtml = this._embeddedResourceService.GetResourceContent(templateName);
-    var templateModel = _CreateTemplateModel(htmlContent);
+    var templateModel = this._CreateTemplateModel(htmlContent);
 
     return TemplateFiller.FillTemplate(templateHtml, templateModel);
   }
@@ -206,7 +204,7 @@ public class Markdown2PdfConverter {
         break;
     }
 
-    templateModel.Add("highlightjs_theme_name", this.Options.CodeHighlightTheme.ToString());
+    templateModel.Add(_CODE_HIGHLIGHT_THEME_NAME_KEY, this.Options.CodeHighlightTheme.ToString());
 
     templateModel.Add(_BODY_KEY, htmlContent);
 
@@ -221,16 +219,14 @@ public class Markdown2PdfConverter {
 
     _ = await page.GoToAsync("file:///" + htmlFilePath, WaitUntilNavigation.Networkidle2);
 
-    var puppeteerMargins = new PuppeteerSharp.Media.MarginOptions();
-    if (margins != null) {
-      // TODO: remove double initialization
-      puppeteerMargins = new PuppeteerSharp.Media.MarginOptions {
+    var puppeteerMargins = margins != null
+      ? new PuppeteerSharp.Media.MarginOptions {
         Top = margins.Top,
         Bottom = margins.Bottom,
         Left = margins.Left,
         Right = margins.Right,
-      };
-    }
+      }
+      : new PuppeteerSharp.Media.MarginOptions();
 
     var pdfOptions = new PdfOptions {
       Format = options.Format,
@@ -266,11 +262,15 @@ public class Markdown2PdfConverter {
   /// <returns>The html with added styles.</returns>
   private string _AddHeaderFooterStylesToHtml(string html) => this._embeddedResourceService.GetResourceContent(_HEADER_FOOTER_STYLES_FILE_NAME) + html;
 
+  /// <summary>
+  /// Inserts the document title into all elements containing the document-title class.
+  /// </summary>
+  /// <param name="html">Template html.</param>
+  /// <returns>The html with inserted document-title.</returns>
   private string _FillHeaderFooterDocumentTitleClass(string html) {
     if (this.Options.DocumentTitle == null)
       return html;
 
-    // TODO: document this
     // need to wrap bc html could have multiple roots
     var htmlWrapped = $"<root>{html}</root>";
     var xDocument = XDocument.Parse(htmlWrapped);

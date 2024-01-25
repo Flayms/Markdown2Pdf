@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace Markdown2Pdf;
+namespace Markdown2Pdf.Services;
 
-// TODO: refac
 internal class TemplateFiller {
 
   // matches groups like @(myToken)
@@ -19,8 +19,8 @@ internal class TemplateFiller {
       var token = match.Groups["token"].Value;
       var keyName = token.Replace("@", string.Empty).Replace("(", string.Empty).Replace(")", string.Empty);
 
-      // TODO: better exception in fail case
-      var value = model[keyName];
+      if (!model.TryGetValue(keyName, out var value))
+        throw new Exception($"The given model has no value provided for the templatekey \"{keyName}\".");
 
       filled = filled.Replace(token, value);
     }

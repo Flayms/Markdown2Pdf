@@ -1,5 +1,4 @@
 ﻿
-
 namespace Markdown2Pdf.Options;
 
 /// <summary>
@@ -23,9 +22,7 @@ public readonly struct CodeHighlightTheme {
   /// <summary>
   /// Returns the css file name of the theme.
   /// </summary>
-  public override string ToString() {
-    return this._sheetName;
-  }
+  public override string ToString() => this._sheetName;
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
   public static CodeHighlightTheme OneCLight => new("1c-light.css");
