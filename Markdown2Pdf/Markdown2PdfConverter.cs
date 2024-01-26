@@ -161,10 +161,9 @@ public class Markdown2PdfConverter {
   private async Task _GeneratePDF(string outputFilePath, string markdownContent, string markdownFilePath) {
     var html = this.GenerateHtml(markdownContent);
 
-    // TODO: make temp-file
     var markdownDir = Path.GetDirectoryName(markdownFilePath);
-    var markdownFileName = Path.GetFileNameWithoutExtension(markdownFilePath) + ".html";
-    var htmlPath = Path.Combine(markdownDir, markdownFileName);
+    var htmlFileName = Path.GetFileNameWithoutExtension(markdownFilePath) + ".html";
+    var htmlPath = Path.Combine(markdownDir, htmlFileName);
     File.WriteAllText(htmlPath, html);
 
     await this._GeneratePdfAsync(htmlPath, outputFilePath);
@@ -174,11 +173,8 @@ public class Markdown2PdfConverter {
   }
 
   internal string GenerateHtml(string markdownContent) {
-    // TODO: decide on how to handle pipeline better
-    // TODO: support more plugins
     var pipeline = new MarkdownPipelineBuilder()
       .UseAdvancedExtensions()
-      .UseDiagrams()
       .Build();
 
     var htmlContent = Markdown.ToHtml(markdownContent, pipeline);
