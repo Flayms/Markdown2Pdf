@@ -34,7 +34,7 @@ public class Tests {
     var converter = new Markdown2PdfConverter();
 
     // act
-    var html = converter._GenerateHtml(markdown);
+    var html = converter.GenerateHtml(markdown);
 
     // assert
     Assert.That(html, Does.Contain(expectedHtmlPart));

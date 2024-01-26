@@ -79,6 +79,10 @@ You can also use a local installation of them by running the script `Init.ps1` a
 
 Alternatively you can also install the packages from the script manually and configure a custom installation path with `ModuleOptions.FromLocalPath()`.
 
+### Further modification
+
+To get more control over the HTML generation (e.g. to add your own JS-Scripts), modify the `converter.ContentTemplate`.
+
 ### Used Modules
 
 * [MathJax](https://github.com/mathjax/MathJax): Latex-Math rendering

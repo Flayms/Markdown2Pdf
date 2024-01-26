@@ -24,6 +24,11 @@ public class Markdown2PdfConverter {
   /// </summary>
   public Markdown2PdfOptions Options { get; }
 
+  /// <summary>
+  /// The template used for generating the html which then gets converted into PDF.
+  /// </summary>
+  public string ContentTemplate { get; set; }
+
   private readonly IReadOnlyDictionary<string, ModuleInformation> _packagelocationMapping = new Dictionary<string, ModuleInformation>() {
     {"mathjax", new ("https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js", "mathjax/es5/tex-mml-chtml.js") },
     {"mermaid", new ("https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js", "mermaid/dist/mermaid.min.js") },
@@ -61,6 +66,12 @@ public class Markdown2PdfConverter {
       this._packagelocationMapping = this._UpdateDic(this._packagelocationMapping, path);
       this._themeSourceMapping = this._UpdateDic(this._themeSourceMapping, path);
     }
+
+    var templateName = this.Options.ModuleOptions == ModuleOptions.None
+      ? _TEMPLATE_NO_SCRIPTS_FILE_NAME
+      : _TEMPLATE_WITH_SCRIPTS_FILE_NAME;
+
+    this.ContentTemplate = this._embeddedResourceService.GetResourceContent(templateName);
   }
 
   private IReadOnlyDictionary<TKey, ModuleInformation> _UpdateDic<TKey>(IReadOnlyDictionary<TKey, ModuleInformation> dicToUpdate, string path) {
@@ -148,7 +159,7 @@ public class Markdown2PdfConverter {
   /// <param name="markdownContent">String holding all markdown data.</param>
   /// <param name="markdownFilePath">Path to the first markdown file.</param>
   private async Task _GeneratePDF(string outputFilePath, string markdownContent, string markdownFilePath) {
-    var html = this._GenerateHtml(markdownContent);
+    var html = this.GenerateHtml(markdownContent);
 
     // TODO: make temp-file
     var markdownDir = Path.GetDirectoryName(markdownFilePath);
@@ -162,7 +173,7 @@ public class Markdown2PdfConverter {
       File.Delete(htmlPath);
   }
 
-  internal string _GenerateHtml(string markdownContent) {
+  internal string GenerateHtml(string markdownContent) {
     // TODO: decide on how to handle pipeline better
     // TODO: support more plugins
     var pipeline = new MarkdownPipelineBuilder()
@@ -171,16 +182,9 @@ public class Markdown2PdfConverter {
       .Build();
 
     var htmlContent = Markdown.ToHtml(markdownContent, pipeline);
-
-    // TODO: make template editable for the user
-    var templateName = this.Options.ModuleOptions == ModuleOptions.None
-      ? _TEMPLATE_NO_SCRIPTS_FILE_NAME
-      : _TEMPLATE_WITH_SCRIPTS_FILE_NAME;
-
-    var templateHtml = this._embeddedResourceService.GetResourceContent(templateName);
     var templateModel = this._CreateTemplateModel(htmlContent);
 
-    return TemplateFiller.FillTemplate(templateHtml, templateModel);
+    return TemplateFiller.FillTemplate(this.ContentTemplate, templateModel);
   }
 
   private Dictionary<string, string> _CreateTemplateModel(string htmlContent) {
