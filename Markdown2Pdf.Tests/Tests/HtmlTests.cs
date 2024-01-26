@@ -88,7 +88,6 @@ public class Tests {
     return await Puppeteer.LaunchAsync(launchOptions);
   }
 
-
   [TearDown]
   public void Teardown() => this._tempDir.Delete(true);
 
