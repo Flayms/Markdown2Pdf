@@ -15,14 +15,14 @@ public class PdfTests {
 
   [Test]
   public async Task TestGeneralOutput() {
-    //setup
+    // arrange
     var markdownFile = this._CopyTestFile("helloworld.md");
     var converter = new Markdown2PdfConverter();
 
-    //execute
+    // act
     var pdfPath = await converter.Convert(markdownFile);
 
-    //assert
+    // assert
     Assert.That(File.Exists(pdfPath));
     var result = _SearchPdfFile(pdfPath, "Hello World!");
     Assert.That(result, Has.Count.EqualTo(1));
@@ -30,7 +30,7 @@ public class PdfTests {
 
   [Test]
   public async Task TestHeader() {
-    //setup
+    // arrange
     var markdownFile = this._CopyTestFile("helloworld.md");
     var headerFile = this._CopyTestFile("header.html");
 
@@ -39,10 +39,10 @@ public class PdfTests {
       DocumentTitle = "Example PDF"
     };
     var converter = new Markdown2PdfConverter(options);
-    //execute
+    // act
     var pdfPath = await converter.Convert(markdownFile);
 
-    //assert
+    // assert
     Assert.That(File.Exists(pdfPath));
 
     var result = _SearchPdfFile(pdfPath, "Hello World!");
@@ -54,7 +54,7 @@ public class PdfTests {
 
   [Test]
   public async Task TestHeaderPages() {
-    //setup
+    // arrange
     var markdownFile = this._CopyTestFile("README.md");
     var headerFile = this._CopyTestFile("header.html");
 
@@ -65,10 +65,10 @@ public class PdfTests {
       DocumentTitle = "Example PDF"
     };
     var converter = new Markdown2PdfConverter(options);
-    //execute
+    // act
     var pdfPath = await converter.Convert(markdownFile);
 
-    //assert
+    // assert
     Assert.That(File.Exists(pdfPath));
 
     var result = _SearchPdfFile(pdfPath, "Common Markdown Functionality");
@@ -79,7 +79,7 @@ public class PdfTests {
   }
   [Test]
   public async Task TestFooter() {
-    //setup
+    // arrange
     var markdownFile = this._CopyTestFile("helloworld.md");
     var footerFile = this._CopyTestFile("footer.html");
 
@@ -87,10 +87,10 @@ public class PdfTests {
       FooterHtml = File.ReadAllText(footerFile)
     };
     var converter = new Markdown2PdfConverter(options);
-    //execute
+    // act
     var pdfPath = await converter.Convert(markdownFile);
 
-    //assert
+    // assert
     Assert.That(File.Exists(pdfPath));
 
     var result = _SearchPdfFile(pdfPath, "Hello World!");
@@ -106,7 +106,7 @@ public class PdfTests {
 
   [Test]
   public async Task TestFooterPages() {
-    //setup
+    // arrange
     var markdownFile = this._CopyTestFile("README.md");
     var footerFile = this._CopyTestFile("footer.html");
 
@@ -116,10 +116,10 @@ public class PdfTests {
       FooterHtml = File.ReadAllText(footerFile),
     };
     var converter = new Markdown2PdfConverter(options);
-    //execute
+    // act
     var pdfPath = await converter.Convert(markdownFile);
 
-    //assert
+    // assert
     var result = _SearchPdfFile(pdfPath, "Common Markdown Functionality");
     Assert.That(result, Has.Count.EqualTo(1));
 
@@ -135,7 +135,7 @@ public class PdfTests {
 
   [Test]
   public async Task TestHeaderFooterPages() {
-    //setup
+    // arrange
     var markdownFile = this._CopyTestFile("README.md");
     var headerFile = this._CopyTestFile("header.html");
     var footerFile = this._CopyTestFile("footer.html");
@@ -148,10 +148,10 @@ public class PdfTests {
       FooterHtml = File.ReadAllText(footerFile)
     };
     var converter = new Markdown2PdfConverter(options);
-    //execute
+    // act
     var pdfPath = await converter.Convert(markdownFile);
 
-    //assert
+    // assert
     var result = _SearchPdfFile(pdfPath, "Common Markdown Functionality");
     Assert.That(result, Has.Count.EqualTo(1));
 
@@ -170,17 +170,17 @@ public class PdfTests {
 
   [Test]
   public async Task TestPDFTwoFiles() {
-    //setup
+    // arrange
     var markdownFile = this._CopyTestFile("helloworld.md");
     var markdownFile1 = this._CopyTestFile("README.md");
     var logoFile = this._CopyTestFile("md2pdf.png");
     var markdownList = new List<string>() { markdownFile, markdownFile1 };
     var converter = new Markdown2PdfConverter();
 
-    //execute
+    // act
     var pdfPath = await converter.Convert(markdownList);
 
-    //assert
+    // assert
     Assert.That(File.Exists(pdfPath));
     var result = _SearchPdfFile(pdfPath, "Hello World!");
     Assert.That(result, Has.Count.EqualTo(2));
@@ -192,17 +192,17 @@ public class PdfTests {
 
   [Test]
   public async Task TestPDFTwoFilesSwitched() {
-    //setup
+    // arrange
     var markdownFile = this._CopyTestFile("helloworld.md");
     var markdownFile1 = this._CopyTestFile("README.md");
     var logoFile = this._CopyTestFile("md2pdf.png");
     var markdownList = new List<string>() { markdownFile1, markdownFile };
     var converter = new Markdown2PdfConverter();
 
-    //execute
+    // act
     var pdfPath = await converter.Convert(markdownList);
 
-    //assert
+    // assert
     Assert.That(File.Exists(pdfPath));
     var result = _SearchPdfFile(pdfPath, "Hello World!");
     Assert.That(result, Has.Count.EqualTo(2));
@@ -223,11 +223,11 @@ public class PdfTests {
   }
 
   /// <summary>
-  /// Searches a PDF file for the given text.
+  /// Searches in a PDF file for the given text.
   /// </summary>
-  /// <param name="fileName">The PDF to search.</param>
+  /// <param name="fileName">The PDF to search in.</param>
   /// <param name="searchText">The text to search with.</param>
-  /// <returns>A list of the page numbers containing the text.</returns>
+  /// <returns>A list of all page numbers containing the text.</returns>
   private static List<int> _SearchPdfFile(string fileName, string searchText) {
     var pages = new List<int>();
 
