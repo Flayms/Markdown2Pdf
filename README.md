@@ -73,20 +73,26 @@ Html-elements with the classes `date`, `title`, `document-title`, `url`, `pageNu
 This library uses node_modules packages.
 By default they're loaded over the CDN they're hosted on e.g. https://cdn.jsdelivr.net.
 
-You can also use a local installation of them by running the script `Init.ps1` and setting `Markdown2PdfOptions.ModuleOptions` to `ModuleOptions.Global`.
+You can also use a local installation by installing the following packages and setting `Markdown2PdfOptions.ModuleOptions` to `ModuleOptions.FromLocalPath()`:
+
+```bash
+npm i mathjax@3
+npm i mermaid@10.2.3
+npm i @highlightjs/cdn-assets@11.9.0
+npm i github-markdown-css
+npm i latex.css
+```
 
 > **Note:** For this you need to have *npm* installed and added to `PATH`.
 
-Alternatively you can also install the packages from the script manually and configure a custom installation path with `ModuleOptions.FromLocalPath()`.
+| Module | Description |
+| --- | --- |
+| [MathJax](https://github.com/mathjax/MathJax) | Latex-Math rendering |
+| [Mermaid](https://github.com/mermaid-js/mermaid) | Diagrams |
+| [Highlight.js](https://github.com/highlightjs/highlight.js) | Syntax highlighting |
+| [github-markdown-css](https://github.com/sindresorhus/github-markdown-css) | Github-Theme |
+| [latex-css](https://github.com/vincentdoerig/latex-css) | Latex-Theme |
 
 ### Further modification
 
 To get more control over the HTML generation (e.g. to add your own JS-Scripts), modify the `converter.ContentTemplate`.
-
-### Used Modules
-
-* [MathJax](https://github.com/mathjax/MathJax): Latex-Math rendering
-* [Mermaid](https://github.com/mermaid-js/mermaid): Diagrams
-* [Highlight.js](https://github.com/highlightjs/highlight.js): Syntax highlighting
-* [github-markdown-css](https://github.com/sindresorhus/github-markdown-css): Github-Theme
-* [latex-css](https://github.com/vincentdoerig/latex-css): Latex-Theme
