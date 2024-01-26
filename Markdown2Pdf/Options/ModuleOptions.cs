@@ -1,8 +1,5 @@
 ﻿namespace Markdown2Pdf.Options;
 
-// TODO: tests
-// TODO: create plan on how to upgrade to never version
-
 /// <summary>
 /// Options that decide from where to load additional modules.
 /// </summary>
