@@ -33,11 +33,6 @@ public class ModuleOptions {
   public static ModuleOptions Remote => new(ModuleLocation.Remote);
 
   /// <summary>
-  /// Loads the node_modules from the systems global npm node_module directory (needs npm installed and in path).
-  /// </summary>
-  public static ModuleOptions Global => NodeModuleOptions.Global;
-
-  /// <summary>
   /// Loads the node_modules from the given (local) npm directory.
   /// </summary>
   /// <param name="modulePath">The path to the node_module directory.</param>
@@ -51,9 +46,6 @@ public enum ModuleLocation {
 
   /// <inheritdoc cref="ModuleOptions.Remote"/>
   Remote,
-
-  /// <inheritdoc cref="ModuleOptions.Global"/>
-  Global,
 
   /// <inheritdoc cref="ModuleOptions.FromLocalPath(string)"/>
   Custom
