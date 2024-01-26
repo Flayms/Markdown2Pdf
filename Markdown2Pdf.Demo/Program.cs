@@ -20,5 +20,4 @@ var options = new Markdown2PdfOptions {
 var converter = new Markdown2PdfConverter(options);
 var resultPath = await converter.Convert("README.md");
 
-// TODO: make this work on linux too
-Process.Start("cmd", $"/c start {resultPath}");
+Process.Start(new ProcessStartInfo { FileName = resultPath, UseShellExecute = true });
