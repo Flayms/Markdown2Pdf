@@ -7,12 +7,12 @@
 
   <script src="@(highlightjs)"></script>
   <link rel="stylesheet" href="@(highlightjs_style)/@(highlightjs_theme_name)" />
-  <script> 
+  <script>
     hljs.highlightAll();
   </script>
+  @(customCss)
 </head>
 <body class="markdown-body">
   @(body)
 </body>
-
 </html>
