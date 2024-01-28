@@ -6,14 +6,7 @@ namespace Markdown2Pdf.Options;
 /// </summary>
 public readonly struct CodeHighlightTheme {
 
-  private readonly string _sheetName;
-
-  /// <summary>
-  /// Creates a new <see cref="CodeHighlightTheme"/> with the default theme.
-  /// </summary>
-  public CodeHighlightTheme() {
-    this._sheetName = "default.css";
-  }
+  private readonly string _sheetName = string.Empty;
 
   private CodeHighlightTheme(string theme) {
     this._sheetName = theme;
@@ -23,6 +16,11 @@ public readonly struct CodeHighlightTheme {
   /// Returns the css file name of the theme.
   /// </summary>
   public override string ToString() => this._sheetName;
+
+  /// <summary>
+  /// Apply no theme.
+  /// </summary>
+  public static CodeHighlightTheme None => new();
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
   public static CodeHighlightTheme OneCLight => new("1c-light.css");
