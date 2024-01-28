@@ -122,7 +122,7 @@ public class Markdown2PdfConverter {
 
     var markdownContent = File.ReadAllText(markdownFilePath);
 
-    await this._GeneratePDF(outputFilePath, markdownContent, markdownFilePath);
+    await this._Convert(outputFilePath, markdownContent, markdownFilePath);
   }
 
   /// <summary>
@@ -149,7 +149,7 @@ public class Markdown2PdfConverter {
 
     var markdownFilePath = Path.GetFullPath(markdownFilePaths.First());
     outputFilePath = Path.GetFullPath(outputFilePath);
-    await this._GeneratePDF(outputFilePath, markdownContent, markdownFilePath);
+    await this._Convert(outputFilePath, markdownContent, markdownFilePath);
   }
 
   /// <summary>
@@ -158,7 +158,11 @@ public class Markdown2PdfConverter {
   /// <param name="outputFilePath">File path for saving the PDF to.</param>
   /// <param name="markdownContent">String holding all markdown data.</param>
   /// <param name="markdownFilePath">Path to the first markdown file.</param>
-  private async Task _GeneratePDF(string outputFilePath, string markdownContent, string markdownFilePath) {
+  private async Task _Convert(string outputFilePath, string markdownContent, string markdownFilePath) {
+    // prepare markdown
+    this.Options.TableOfContents?.InsertInto(ref markdownContent);
+
+    // generate html
     var html = this.GenerateHtml(markdownContent);
 
     var markdownDir = Path.GetDirectoryName(markdownFilePath);
@@ -166,6 +170,7 @@ public class Markdown2PdfConverter {
     var htmlPath = Path.Combine(markdownDir, htmlFileName);
     File.WriteAllText(htmlPath, html);
 
+    // generate pdf
     await this._GeneratePdfAsync(htmlPath, outputFilePath);
 
     if (!this.Options.KeepHtml)

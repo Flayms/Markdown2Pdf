@@ -65,4 +65,6 @@ public class Markdown2PdfOptions {
   /// The paper format for the PDF.
   /// </summary>
   public PaperFormat Format { get; set; } = PaperFormat.A4;
+
+  public TableOfContents? TableOfContents { get; set; } = null;
 }
