@@ -159,9 +159,6 @@ public class Markdown2PdfConverter {
   /// <param name="markdownContent">String holding all markdown data.</param>
   /// <param name="markdownFilePath">Path to the first markdown file.</param>
   private async Task _Convert(string outputFilePath, string markdownContent, string markdownFilePath) {
-    // prepare markdown
-    this.Options.TableOfContents?.InsertInto(ref markdownContent);
-
     // generate html
     var html = this.GenerateHtml(markdownContent);
 
@@ -178,6 +175,9 @@ public class Markdown2PdfConverter {
   }
 
   internal string GenerateHtml(string markdownContent) {
+    // prepare markdown
+    this.Options.TableOfContents?.InsertInto(ref markdownContent);
+
     var pipeline = new MarkdownPipelineBuilder()
       .UseAdvancedExtensions()
       .Build();
