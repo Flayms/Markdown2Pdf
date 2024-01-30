@@ -16,7 +16,7 @@ public class PdfTests {
     var converter = new Markdown2PdfConverter();
 
     // act
-    var pdfPath = await converter.Convert(Utils.helloWorldFile.FullName);
+    var pdfPath = await converter.Convert(Utils.helloWorldFile);
 
     // assert
     Assert.That(File.Exists(pdfPath));
@@ -28,14 +28,14 @@ public class PdfTests {
   public async Task TestHeader() {
     // arrange
     var options = new Markdown2PdfOptions {
-      HeaderHtml = File.ReadAllText(Utils.headerFile.FullName),
+      HeaderHtml = File.ReadAllText(Utils.headerFile),
       DocumentTitle = "Example PDF"
     };
 
     var converter = new Markdown2PdfConverter(options);
 
     // act
-    var pdfPath = await converter.Convert(Utils.helloWorldFile.FullName);
+    var pdfPath = await converter.Convert(Utils.helloWorldFile);
 
     // assert
     Assert.That(File.Exists(pdfPath));
@@ -51,13 +51,13 @@ public class PdfTests {
   public async Task TestHeaderPages() {
     // arrange
     var options = new Markdown2PdfOptions {
-      HeaderHtml = File.ReadAllText(Utils.headerFile.FullName),
+      HeaderHtml = File.ReadAllText(Utils.headerFile),
       DocumentTitle = "Example PDF"
     };
     var converter = new Markdown2PdfConverter(options);
 
     // act
-    var pdfPath = await converter.Convert(Utils.readmeFile.FullName);
+    var pdfPath = await converter.Convert(Utils.readmeFile);
 
     // assert
     Assert.That(File.Exists(pdfPath));
@@ -74,12 +74,12 @@ public class PdfTests {
     // arrange
 
     var options = new Markdown2PdfOptions {
-      FooterHtml = File.ReadAllText(Utils.footerFile.FullName)
+      FooterHtml = File.ReadAllText(Utils.footerFile)
     };
     var converter = new Markdown2PdfConverter(options);
 
     // act
-    var pdfPath = await converter.Convert(Utils.helloWorldFile.FullName);
+    var pdfPath = await converter.Convert(Utils.helloWorldFile);
 
     // assert
     Assert.That(File.Exists(pdfPath));
@@ -99,12 +99,12 @@ public class PdfTests {
   public async Task TestFooterPages() {
     // arrange
     var options = new Markdown2PdfOptions {
-      FooterHtml = File.ReadAllText(Utils.footerFile.FullName),
+      FooterHtml = File.ReadAllText(Utils.footerFile),
     };
     var converter = new Markdown2PdfConverter(options);
 
     // act
-    var pdfPath = await converter.Convert(Utils.readmeFile.FullName);
+    var pdfPath = await converter.Convert(Utils.readmeFile);
 
     // assert
     var result = Utils.SearchPdfFile(pdfPath, "Common Markdown Functionality");
@@ -124,14 +124,14 @@ public class PdfTests {
   public async Task TestHeaderFooterPages() {
     // arrange
     var options = new Markdown2PdfOptions {
-      HeaderHtml = File.ReadAllText(Utils.headerFile.FullName),
+      HeaderHtml = File.ReadAllText(Utils.headerFile),
       DocumentTitle = "Example PDF",
-      FooterHtml = File.ReadAllText(Utils.footerFile.FullName)
+      FooterHtml = File.ReadAllText(Utils.footerFile)
     };
     var converter = new Markdown2PdfConverter(options);
     // act
 
-    var pdfPath = await converter.Convert(Utils.readmeFile.FullName);
+    var pdfPath = await converter.Convert(Utils.readmeFile);
 
     // assert
     var result = Utils.SearchPdfFile(pdfPath, "Common Markdown Functionality");
@@ -153,7 +153,7 @@ public class PdfTests {
   [Test]
   public async Task TestPDFTwoFiles() {
     // arrange
-    var markdownList = new List<string>() { Utils.helloWorldFile.FullName, Utils.readmeFile.FullName };
+    var markdownList = new List<string>() { Utils.helloWorldFile, Utils.readmeFile };
     var converter = new Markdown2PdfConverter();
 
     // act
@@ -172,7 +172,7 @@ public class PdfTests {
   [Test]
   public async Task TestPDFTwoFilesSwitched() {
     // arrange
-    var markdownList = new List<string>() { Utils.readmeFile.FullName, Utils.helloWorldFile.FullName };
+    var markdownList = new List<string>() { Utils.readmeFile, Utils.helloWorldFile };
     var converter = new Markdown2PdfConverter();
 
     // act

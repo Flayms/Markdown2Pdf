@@ -124,3 +124,7 @@ C -->|One| D[Laptop]
 C -->|Two| E[iPhone]
 C -->|Three| F[Car]
 ```
+
+# <img src="md2pdf.png" alt="Logo" Width=64px/> ._-This - is a &@! heading __ with . and ! -
+
+<!--TOC-->

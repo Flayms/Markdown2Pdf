@@ -1,19 +1,20 @@
-﻿using PuppeteerSharp;
-using UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor;
+﻿using System.Text.RegularExpressions;
+using PuppeteerSharp;
 using UglyToad.PdfPig;
+using UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor;
 
 namespace Markdown2Pdf.Tests.Tests;
-internal class Utils {
+internal partial class Utils {
 
   internal static readonly DirectoryInfo tempDir = new("tempFiles");
   internal static readonly string testFilePath = Path.GetDirectoryName(Path.GetDirectoryName(TestContext.CurrentContext.TestDirectory))!
     .Replace("bin", "TestFiles");
 
-  internal static readonly FileInfo helloWorldFile = new(Path.Combine(tempDir.FullName, "helloworld.md"));
-  internal static readonly FileInfo readmeFile = new(Path.Combine(tempDir.FullName, "README.md"));
-  internal static readonly FileInfo headerFile = new(Path.Combine(tempDir.FullName, "header.html"));
-  internal static readonly FileInfo footerFile = new(Path.Combine(tempDir.FullName, "footer.html"));
-  internal static readonly FileInfo logoFile = new(Path.Combine(tempDir.FullName, "md2pdf.png"));
+  internal static readonly string helloWorldFile = Path.Combine(tempDir.FullName, "helloworld.md");
+  internal static readonly string readmeFile = Path.Combine(tempDir.FullName, "README.md");
+  internal static readonly string headerFile = Path.Combine(tempDir.FullName, "header.html");
+  internal static readonly string footerFile = Path.Combine(tempDir.FullName, "footer.html");
+  internal static readonly string logoFile = Path.Combine(tempDir.FullName, "md2pdf.png");
 
   internal static async Task<string> RenderHtmlAsync(string htmlFilePath) {
     using var browser = await _CreateBrowserAsync();
@@ -41,7 +42,7 @@ internal class Utils {
   internal static void CopyTestFiles() {
     foreach (var file in Directory.EnumerateFiles(testFilePath)) {
       var markdownFile = Path.Combine(tempDir.FullName, Path.GetFileName(file));
-      File.Copy(file, markdownFile);
+      File.Copy(file, markdownFile, true);
     }
   }
 
@@ -68,5 +69,8 @@ internal class Utils {
 
     return pages;
   }
+
+  [GeneratedRegex("\r\n?|\n")]
+  internal static partial Regex LineBreakRegex();
 
 }

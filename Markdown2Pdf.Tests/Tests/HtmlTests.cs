@@ -1,8 +1,8 @@
-﻿using PuppeteerSharp;
+﻿using Markdown2Pdf.Options;
 
 namespace Markdown2Pdf.Tests.Tests;
 
-public class Tests {
+public partial class Tests {
 
   [SetUp]
   public void Setup() {
@@ -16,7 +16,7 @@ public class Tests {
     var converter = new Markdown2PdfConverter();
 
     // act
-    var pdfPath = await converter.Convert(Utils.helloWorldFile.FullName);
+    var pdfPath = await converter.Convert(Utils.helloWorldFile);
 
     // assert
     Assert.That(File.Exists(pdfPath));
@@ -47,7 +47,7 @@ public class Tests {
     var converter = new Markdown2PdfConverter();
 
     // act
-    var html = converter.GenerateHtml(File.ReadAllText(Utils.readmeFile.FullName));
+    var html = converter.GenerateHtml(File.ReadAllText(Utils.readmeFile));
 
     // render html
     var tempHtmlPath = Path.Combine(Utils.tempDir.FullName + "temp.html");
@@ -58,7 +58,27 @@ public class Tests {
     Assert.That(renderedHtml, Does.Contain(expectedHtmlContent));
   }
 
+  [Test]
+  [TestCase("""<ol><li><a href="#h2-heading">h2 Heading</a><ol>""")]
+  [TestCase("""</li><li><a href="#horizontal-rules">Horizontal Rules</a></li>""")]
+  [TestCase("""<a href="#this-is-a-heading_with.and">""")]
+  public void TestTableOfContents(string content) {
+    // arrange
+    var options = new Markdown2PdfOptions {
+      TableOfContents = new TableOfContents(true, 4)
+    };
+    var converter = new Markdown2PdfConverter(options);
+
+    // act
+    var html = converter.GenerateHtml(File.ReadAllText(Utils.readmeFile));
+
+    // remove line endings for easier comparison
+    html = Utils.LineBreakRegex().Replace(html, string.Empty);
+
+    // assert
+    Assert.That(html, Does.Contain(content));
+  }
+
   [TearDown]
   public void Teardown() => Utils.tempDir.Delete(true);
-
 }
