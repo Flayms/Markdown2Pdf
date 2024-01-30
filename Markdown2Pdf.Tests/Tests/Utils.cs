@@ -46,28 +46,30 @@ internal partial class Utils {
     }
   }
 
+  internal static bool PdfContains(string pdfPath, string searchText) => PdfContainsSum(pdfPath, searchText) > 0;
+
   /// <summary>
-  /// Searches in a PDF file for the given text.
+  /// Searches for the amount of occurences of the given text in the PDF.
   /// </summary>
   /// <param name="fileName">The PDF to search in.</param>
   /// <param name="searchText">The text to search with.</param>
-  /// <returns>A list of all page numbers containing the text.</returns>
-  internal static List<int> SearchPdfFile(string fileName, string searchText) {
-    var pages = new List<int>();
+  /// <returns>The amount of occurences.</returns>
+  internal static int PdfContainsSum(string fileName, string searchText) {
+    var sum = 0;
 
     if (!File.Exists(fileName))
-      return pages;
+      return sum;
 
     using (var pdf = PdfDocument.Open(fileName)) {
       foreach (var page in pdf.GetPages()) {
         var text = ContentOrderTextExtractor.GetText(page);
 
         if (text.Contains(searchText))
-          pages.Add(page.Number);
+         ++sum;
       }
     }
 
-    return pages;
+    return sum;
   }
 
   [GeneratedRegex("\r\n?|\n")]

@@ -70,7 +70,7 @@ This has a [Link](https://github.com/Flayms/Markdown2Pdf).
 
 ```cs
 public void Main(string[] args) {
-    Console.WriteLine("Hello World!");
+    Console.WriteLine("Example Code!");
 }
 ```
 
@@ -78,7 +78,7 @@ public void Main(string[] args) {
 
 | Value | Type |
 | --- | --- |
-| "Hello World" | string |
+| "Example Code" | string |
 | 7 | integer |
 | true | boolean |
 

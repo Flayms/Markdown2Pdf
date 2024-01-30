@@ -4,14 +4,18 @@ namespace Markdown2Pdf.Tests.Tests;
 
 public class PdfTests {
 
+  static PdfTests() => _Setup();
+
   [SetUp]
-  public void Setup() {
+  public void Setup() => _Setup();
+
+  private static void _Setup() {
     Utils.tempDir.Create();
     Utils.CopyTestFiles();
   }
 
   [Test]
-  public async Task TestGeneralOutput() {
+  public async Task TestGeneratesPdf() {
     // arrange
     var converter = new Markdown2PdfConverter();
 
@@ -19,17 +23,25 @@ public class PdfTests {
     var pdfPath = await converter.Convert(Utils.helloWorldFile);
 
     // assert
-    Assert.That(File.Exists(pdfPath));
-    var result = Utils.SearchPdfFile(pdfPath, "Hello World!");
-    Assert.That(result, Has.Count.EqualTo(1));
+    Assert.Multiple(() => {
+      Assert.That(File.Exists(pdfPath));
+      Assert.That(Utils.PdfContains(pdfPath, "Hello World!"));
+    });
   }
 
+  private static object?[] _GetTestCases() => new object?[] {
+      new [] { File.ReadAllText(Utils.headerFile), null, "Header Text" },
+      new [] { null, File.ReadAllText(Utils.footerFile), "Page 1/1" },
+    };
+
   [Test]
-  public async Task TestHeader() {
+  [TestCaseSource(nameof(_GetTestCases))]
+  public async Task TestHeaderFooter2(string? headerContent, string? footerContent, string expected) {
     // arrange
     var options = new Markdown2PdfOptions {
-      HeaderHtml = File.ReadAllText(Utils.headerFile),
-      DocumentTitle = "Example PDF"
+      HeaderHtml = headerContent,
+      FooterHtml = footerContent,
+      DocumentTitle = "Header Text"
     };
 
     var converter = new Markdown2PdfConverter(options);
@@ -38,13 +50,7 @@ public class PdfTests {
     var pdfPath = await converter.Convert(Utils.helloWorldFile);
 
     // assert
-    Assert.That(File.Exists(pdfPath));
-
-    var result = Utils.SearchPdfFile(pdfPath, "Hello World!");
-    Assert.That(result, Has.Count.EqualTo(1));
-
-    result = Utils.SearchPdfFile(pdfPath, "Example PDF");
-    Assert.That(result, Has.Count.EqualTo(1));
+    Assert.That(Utils.PdfContains(pdfPath, expected));
   }
 
   [Test]
@@ -60,39 +66,8 @@ public class PdfTests {
     var pdfPath = await converter.Convert(Utils.readmeFile);
 
     // assert
-    Assert.That(File.Exists(pdfPath));
-
-    var result = Utils.SearchPdfFile(pdfPath, "Common Markdown Functionality");
-    Assert.That(result, Has.Count.EqualTo(1));
-
-    result = Utils.SearchPdfFile(pdfPath, "Example PDF");
-    Assert.That(result, Has.Count.EqualTo(4));
-  }
-
-  [Test]
-  public async Task TestFooter() {
-    // arrange
-
-    var options = new Markdown2PdfOptions {
-      FooterHtml = File.ReadAllText(Utils.footerFile)
-    };
-    var converter = new Markdown2PdfConverter(options);
-
-    // act
-    var pdfPath = await converter.Convert(Utils.helloWorldFile);
-
-    // assert
-    Assert.That(File.Exists(pdfPath));
-
-    var result = Utils.SearchPdfFile(pdfPath, "Hello World!");
-    Assert.That(result, Has.Count.EqualTo(1));
-
-    result = Utils.SearchPdfFile(pdfPath, "Page");
-    Assert.That(result, Has.Count.EqualTo(1));
-
-    result = Utils.SearchPdfFile(pdfPath, "Page 1/1");
-    Assert.That(result, Has.Count.EqualTo(1));
-
+    var amountOfOccurences = Utils.PdfContainsSum(pdfPath, "Example PDF");
+    Assert.That(amountOfOccurences, Is.EqualTo(4));
   }
 
   [Test]
@@ -107,51 +82,14 @@ public class PdfTests {
     var pdfPath = await converter.Convert(Utils.readmeFile);
 
     // assert
-    var result = Utils.SearchPdfFile(pdfPath, "Common Markdown Functionality");
-    Assert.That(result, Has.Count.EqualTo(1));
-
-    result = Utils.SearchPdfFile(pdfPath, "Page");
-    Assert.That(result, Has.Count.EqualTo(4));
-
-    result = Utils.SearchPdfFile(pdfPath, "Page 1/4");
-    Assert.That(result, Has.Count.EqualTo(1));
-
-    result = Utils.SearchPdfFile(pdfPath, "Page 4/4");
-    Assert.That(result, Has.Count.EqualTo(1));
+    Assert.Multiple(() => {
+      Assert.That(Utils.PdfContains(pdfPath, "Page 1/4"));
+      Assert.That(Utils.PdfContains(pdfPath, "Page 4/4"));
+    });
   }
 
   [Test]
-  public async Task TestHeaderFooterPages() {
-    // arrange
-    var options = new Markdown2PdfOptions {
-      HeaderHtml = File.ReadAllText(Utils.headerFile),
-      DocumentTitle = "Example PDF",
-      FooterHtml = File.ReadAllText(Utils.footerFile)
-    };
-    var converter = new Markdown2PdfConverter(options);
-    // act
-
-    var pdfPath = await converter.Convert(Utils.readmeFile);
-
-    // assert
-    var result = Utils.SearchPdfFile(pdfPath, "Common Markdown Functionality");
-    Assert.That(result, Has.Count.EqualTo(1));
-
-    result = Utils.SearchPdfFile(pdfPath, "Example PDF");
-    Assert.That(result, Has.Count.EqualTo(4));
-
-    result = Utils.SearchPdfFile(pdfPath, "Page");
-    Assert.That(result, Has.Count.EqualTo(4));
-
-    result = Utils.SearchPdfFile(pdfPath, "Page 1/4");
-    Assert.That(result, Has.Count.EqualTo(1));
-
-    result = Utils.SearchPdfFile(pdfPath, "Page 4/4");
-    Assert.That(result, Has.Count.EqualTo(1));
-  }
-
-  [Test]
-  public async Task TestPDFTwoFiles() {
+  public async Task TestCombineTwoFiles() {
     // arrange
     var markdownList = new List<string>() { Utils.helloWorldFile, Utils.readmeFile };
     var converter = new Markdown2PdfConverter();
@@ -160,31 +98,9 @@ public class PdfTests {
     var pdfPath = await converter.Convert(markdownList);
 
     // assert
-    Assert.That(File.Exists(pdfPath));
-    var result = Utils.SearchPdfFile(pdfPath, "Hello World!");
-    Assert.That(result, Has.Count.EqualTo(2));
     Assert.Multiple(() => {
-      Assert.That(result[0], Is.EqualTo(1));
-      Assert.That(result[1], Is.EqualTo(2));
-    });
-  }
-
-  [Test]
-  public async Task TestPDFTwoFilesSwitched() {
-    // arrange
-    var markdownList = new List<string>() { Utils.readmeFile, Utils.helloWorldFile };
-    var converter = new Markdown2PdfConverter();
-
-    // act
-    var pdfPath = await converter.Convert(markdownList);
-
-    // assert
-    Assert.That(File.Exists(pdfPath));
-    var result = Utils.SearchPdfFile(pdfPath, "Hello World!");
-    Assert.That(result, Has.Count.EqualTo(2));
-    Assert.Multiple(() => {
-      Assert.That(result[0], Is.EqualTo(2));
-      Assert.That(result[1], Is.EqualTo(4));
+      Assert.That(Utils.PdfContains(pdfPath, "Hello World!"));
+      Assert.That(Utils.PdfContains(pdfPath, "Common Markdown Functionality"));
     });
   }
 
