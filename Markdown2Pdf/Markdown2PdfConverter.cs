@@ -43,6 +43,7 @@ public class Markdown2PdfConverter {
 
   private readonly EmbeddedResourceService _embeddedResourceService = new();
   private const string _STYLE_KEY = "stylePath";
+  private const string _CUSTOM_CSS_KEY = "customCss";
   private const string _BODY_KEY = "body";
   private const string _CODE_HIGHLIGHT_THEME_NAME_KEY = "highlightjs_theme_name";
   private const string _DOCUMENT_TITLE_CLASS = "document-title";
@@ -210,7 +211,7 @@ public class Markdown2PdfConverter {
     }
 
     templateModel.Add(_CODE_HIGHLIGHT_THEME_NAME_KEY, this.Options.CodeHighlightTheme.ToString());
-
+    templateModel.Add(_CUSTOM_CSS_KEY, this.Options.CustomCss);
     templateModel.Add(_BODY_KEY, htmlContent);
 
     return templateModel;
@@ -237,7 +238,8 @@ public class Markdown2PdfConverter {
       Format = options.Format,
       Landscape = options.IsLandscape,
       PrintBackground = true, // TODO: background doesnt work for margins
-      MarginOptions = puppeteerMargins
+      MarginOptions = puppeteerMargins,
+      Scale = options.Scale
     };
 
     var hasHeaderFooterStylesAdded = false;

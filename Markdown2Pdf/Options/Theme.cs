@@ -13,15 +13,15 @@ public abstract class Theme {
   /// <summary>
   /// Githubs markdown theme.
   /// </summary>
-  /// <remarks>If the option <see cref="ModuleOptions.Global "/> or <see cref="ModuleOptions.FromLocalPath(string)"/> 
-  /// is being used, the npm-package <c>github-markdown-css</c> needs to be installed in the corresponding location.</remarks>
+  /// <remarks>If the option <see cref="ModuleOptions.FromLocalPath(string)"/> is being used, 
+  /// the npm-package <c>github-markdown-css</c> needs to be installed in the corresponding location.</remarks>
   public static Theme Github => new PredefinedTheme(ThemeType.Github);
 
   /// <summary>
   /// Latex like document styling.
   /// </summary>
-  /// <remarks>If the option <see cref="ModuleOptions.Global "/> or <see cref="ModuleOptions.FromLocalPath(string)"/> 
-  /// is being used, the npm-package <c>latex.css</c> needs to be installed in the corresponding location.</remarks>
+  /// <remarks>If the option <see cref="ModuleOptions.FromLocalPath(string)"/> is being used, 
+  /// the npm-package <c>latex.css</c> needs to be installed in the corresponding location.</remarks>
   public static Theme Latex => new PredefinedTheme(ThemeType.Latex);
 
   /// <summary>

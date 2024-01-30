@@ -6,9 +6,6 @@ namespace Markdown2Pdf.Options;
 /// All the options for the conversion.
 /// </summary>
 public class Markdown2PdfOptions {
-  // TODO: font-name
-  // TODO: font-size
-  // TODO: light theme, dark theme
 
   /// <summary>
   /// Options that decide from where to load additional modules. Default: <see cref="ModuleOptions.Remote"/>.
@@ -41,12 +38,17 @@ public class Markdown2PdfOptions {
   public string? DocumentTitle { get; set; }
 
   /// <summary>
+  /// A <see langword="string"/> containing CSS to apply extra styling to the document.
+  /// </summary>
+  public string CustomCss { get; set; } = string.Empty;
+
+  /// <summary>
   /// Path to chrome or chromium executable. If set to <see langword="null"/> downloads chromium by itself.
   /// </summary>
   public string? ChromePath { get; set; }
 
   /// <summary>
-  /// Doesn't delete the html-file used for the PDF if this is set to <see langword="true"/>. Default: <see langword="false"/>.
+  /// Doesn't delete the html-file used for generating the PDF if set to <see langword="true"/>. Default: <see langword="false"/>.
   /// </summary>
   public bool KeepHtml { get; set; }
 
@@ -64,6 +66,9 @@ public class Markdown2PdfOptions {
   /// The paper format for the PDF.
   /// </summary>
   public PaperFormat Format { get; set; } = PaperFormat.A4;
+
+  /// <inheritdoc cref="PuppeteerSharp.PdfOptions.Scale"/>
+  public decimal Scale { get; set; } = 1;
 
   /// <inheritdoc cref="Options.TableOfContents"/>
   public TableOfContents? TableOfContents { get; set; } = null;

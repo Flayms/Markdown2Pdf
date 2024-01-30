@@ -76,11 +76,11 @@ public void Main(string[] args) {
 
 ### Tables
 
-|Value|Type|
-|---|---|
-|"Hello World"|string|
-|7|integer|
-|true|boolean|
+| Value | Type |
+| --- | --- |
+| "Hello World" | string |
+| 7 | integer |
+| true | boolean |
 
 ### Task Lists
 
@@ -108,11 +108,11 @@ Latex $\color{green}Color \color{blue}\text{ works}$
 
 ### In a Table
 
-|Name|Struktur|
-|---|---|
-|CNF|$(A \lor \neg B \lor C) \land (\neg A \lor B  \lor C)$|
-|Binomal coefficient|$$\binom{n}{k} = \frac{n!}{k!(n-k)!}$$|
-|Matrix|$\begin{pmatrix}-3 & 4 \\1 & -2\end{pmatrix}$|
+| Name | Formula |
+| --- | --- |
+| CNF | $(A \lor \neg B \lor C) \land (\neg A \lor B  \lor C)$ |
+| Binomal coefficient | $$\binom{n}{k} = \frac{n!}{k!(n-k)!}$$ |
+| Matrix | $\begin{pmatrix}-3 & 4 \\1 & -2\end{pmatrix}$ |
 
 ## Mermaid Graphs
 
