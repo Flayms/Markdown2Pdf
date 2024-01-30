@@ -57,16 +57,27 @@ var converter = new Markdown2PdfConverter(options);
 | `HeaderUrl` | Path to an html-file to use as the document header. [More Information](#header-and-footer). |
 | `FooterUrl` | Path to an html-file to use as the document footer. [More Information](#header-and-footer). |
 | `DocumentTitle` | The title of this document. Can be injected into the header / footer by adding the class `document-title` to the element. |
+| `CustomCss` | A `string` containing CSS to apply extra styling to the document. [More Information](#custom-style).|
 | `ChromePath` | Path to chrome or chromium executable or self-downloads it if `null`. |
 | `KeepHtml` | `true` if the created html should not be deleted. |
 | `MarginOptions` | Css-margins for the sides of the document. |
 | `IsLandscape` | Paper orientation. |
 | `Format` | The paper format for the PDF. |
+| `Scale` | Scale of the content. Default: `1`. Must be between 0.1 and 2. |
 
 ## Header and Footer
 
-With the `MarkdownPdfOptions.HeaderUrl` and `MarkdownPdfOptions.FooterUrl` options a path to a local file containing html for the Header / Footer can be set.  
-Html-elements with the classes `date`, `title`, `document-title`, `url`, `pageNumber` will get their content replaced based on the information. Note that `document-title` can be set with the option `MarkdownPdfOptions.DocumentTitle`.
+With the `Markdown2PdfOptions.HeaderUrl` and `Markdown2PdfOptions.FooterUrl` options a path to a local file containing html for the Header / Footer can be set.  
+Html-elements with the classes `date`, `title`, `document-title`, `url`, `pageNumber` will get their content replaced based on the information. Note that `document-title` can be set with the option `Markdown2PdfOptions.DocumentTitle`.
+
+## Custom Style
+
+Custom CSS can be set with the `Markdown2PdfOptions.CustomCss` option.
+Example adding pagebreaks:
+```cs
+options.CustomCss = "<style>h1, h2, h3 { page-break-before: always; }</style>";
+```
+
 
 ## Modules
 

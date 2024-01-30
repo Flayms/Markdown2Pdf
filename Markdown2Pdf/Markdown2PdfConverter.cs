@@ -43,6 +43,7 @@ public class Markdown2PdfConverter {
 
   private readonly EmbeddedResourceService _embeddedResourceService = new();
   private const string _STYLE_KEY = "stylePath";
+  private const string _CUSTOM_CSS_KEY = "customCss";
   private const string _BODY_KEY = "body";
   private const string _CODE_HIGHLIGHT_THEME_NAME_KEY = "highlightjs_theme_name";
   private const string _DOCUMENT_TITLE_CLASS = "document-title";
@@ -122,7 +123,7 @@ public class Markdown2PdfConverter {
 
     var markdownContent = File.ReadAllText(markdownFilePath);
 
-    await this._GeneratePDF(outputFilePath, markdownContent, markdownFilePath);
+    await this._Convert(outputFilePath, markdownContent, markdownFilePath);
   }
 
   /// <summary>
@@ -149,7 +150,7 @@ public class Markdown2PdfConverter {
 
     var markdownFilePath = Path.GetFullPath(markdownFilePaths.First());
     outputFilePath = Path.GetFullPath(outputFilePath);
-    await this._GeneratePDF(outputFilePath, markdownContent, markdownFilePath);
+    await this._Convert(outputFilePath, markdownContent, markdownFilePath);
   }
 
   /// <summary>
@@ -158,7 +159,8 @@ public class Markdown2PdfConverter {
   /// <param name="outputFilePath">File path for saving the PDF to.</param>
   /// <param name="markdownContent">String holding all markdown data.</param>
   /// <param name="markdownFilePath">Path to the first markdown file.</param>
-  private async Task _GeneratePDF(string outputFilePath, string markdownContent, string markdownFilePath) {
+  private async Task _Convert(string outputFilePath, string markdownContent, string markdownFilePath) {
+    // generate html
     var html = this.GenerateHtml(markdownContent);
 
     var markdownDir = Path.GetDirectoryName(markdownFilePath);
@@ -166,6 +168,7 @@ public class Markdown2PdfConverter {
     var htmlPath = Path.Combine(markdownDir, htmlFileName);
     File.WriteAllText(htmlPath, html);
 
+    // generate pdf
     await this._GeneratePdfAsync(htmlPath, outputFilePath);
 
     if (!this.Options.KeepHtml)
@@ -173,6 +176,9 @@ public class Markdown2PdfConverter {
   }
 
   internal string GenerateHtml(string markdownContent) {
+    // prepare markdown
+    this.Options.TableOfContents?.InsertInto(ref markdownContent);
+
     var pipeline = new MarkdownPipelineBuilder()
       .UseAdvancedExtensions()
       .Build();
@@ -205,7 +211,7 @@ public class Markdown2PdfConverter {
     }
 
     templateModel.Add(_CODE_HIGHLIGHT_THEME_NAME_KEY, this.Options.CodeHighlightTheme.ToString());
-
+    templateModel.Add(_CUSTOM_CSS_KEY, this.Options.CustomCss);
     templateModel.Add(_BODY_KEY, htmlContent);
 
     return templateModel;
@@ -232,7 +238,8 @@ public class Markdown2PdfConverter {
       Format = options.Format,
       Landscape = options.IsLandscape,
       PrintBackground = true, // TODO: background doesnt work for margins
-      MarginOptions = puppeteerMargins
+      MarginOptions = puppeteerMargins,
+      Scale = options.Scale
     };
 
     var hasHeaderFooterStylesAdded = false;

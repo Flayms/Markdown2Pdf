@@ -70,17 +70,17 @@ This has a [Link](https://github.com/Flayms/Markdown2Pdf).
 
 ```cs
 public void Main(string[] args) {
-    Console.WriteLine("Hello World!");
+    Console.WriteLine("Example Code!");
 }
 ```
 
 ### Tables
 
-|Value|Type|
-|---|---|
-|"Hello World"|string|
-|7|integer|
-|true|boolean|
+| Value | Type |
+| --- | --- |
+| "Example Code" | string |
+| 7 | integer |
+| true | boolean |
 
 ### Task Lists
 
@@ -108,11 +108,11 @@ Latex $\color{green}Color \color{blue}\text{ works}$
 
 ### In a Table
 
-|Name|Struktur|
-|---|---|
-|CNF|$(A \lor \neg B \lor C) \land (\neg A \lor B  \lor C)$|
-|Binomal coefficient|$$\binom{n}{k} = \frac{n!}{k!(n-k)!}$$|
-|Matrix|$\begin{pmatrix}-3 & 4 \\1 & -2\end{pmatrix}$|
+| Name | Formula |
+| --- | --- |
+| CNF | $(A \lor \neg B \lor C) \land (\neg A \lor B  \lor C)$ |
+| Binomal coefficient | $$\binom{n}{k} = \frac{n!}{k!(n-k)!}$$ |
+| Matrix | $\begin{pmatrix}-3 & 4 \\1 & -2\end{pmatrix}$ |
 
 ## Mermaid Graphs
 
@@ -124,3 +124,7 @@ C -->|One| D[Laptop]
 C -->|Two| E[iPhone]
 C -->|Three| F[Car]
 ```
+
+# <img src="md2pdf.png" alt="Logo" Width=64px/> ._-This - is a &@! heading __ with . and ! -
+
+<!--TOC-->
