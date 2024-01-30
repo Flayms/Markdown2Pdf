@@ -1,4 +1,5 @@
-﻿using Markdown2Pdf.Options;
+﻿using System.Reflection;
+using Markdown2Pdf.Options;
 
 namespace Markdown2Pdf.Tests.Tests;
 
@@ -39,12 +40,29 @@ public partial class Tests {
   }
 
   [Test]
-  [TestCase("<mjx-math class=\"MJX-TEX\" aria-hidden=\"true\">", TestName = "Mathjax")]
-  [TestCase("<div class=\"mermaid\" data-processed=\"true\">", TestName = "Mermaid")]
-  [TestCase("<span class=\"hljs-keyword\">public</span>", TestName = "HighlightJs")]
-  public async Task TestModuleFunctionality(string expectedHtmlContent) {
+  public async Task TestModuleFunctionality([Values(
+    "<mjx-math class=\"MJX-TEX\" aria-hidden=\"true\">",
+    "<div class=\"mermaid\" data-processed=\"true\">",
+    "<span class=\"hljs-keyword\">public</span>"
+    )] string expectedHtmlContent, [Values(true, false)] bool runLocally) {
     // arrange
-    var converter = new Markdown2PdfConverter();
+    var options = new Markdown2PdfOptions {
+      ModuleOptions = ModuleOptions.Remote
+    };
+
+    if (runLocally) {
+      // load modules from local dir
+      var nodeModuleLocation = Path.Combine(Path.GetDirectoryName(
+        Assembly.GetExecutingAssembly().Location)!, "node_modules");
+
+      Assert.That(Directory.Exists(nodeModuleLocation),
+        $"'{nodeModuleLocation}' Could not be found. " +
+        "Try running 'npm install' within the executing directory.");
+
+      options.ModuleOptions = ModuleOptions.FromLocalPath(nodeModuleLocation);
+    }
+
+    var converter = new Markdown2PdfConverter(options);
 
     // act
     var html = converter.GenerateHtml(File.ReadAllText(Utils.readmeFile));

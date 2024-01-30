@@ -26,19 +26,11 @@ var converter = new Markdown2PdfConverter();
 var resultPath = await converter.Convert("README.md");
 ```
 
-### Combine several markdown files to one PDF
-
-A list of markdown files can be passed to the converter. This concatenates the markdown file content.
-
-```cs
-var converter = new Markdown2PdfConverter();
-var markdownFiles = new List<string>() { "file1.md", "file2.md" };
-var resultPath = await converter.Convert(markdownFiles); // "file1.pdf"
-```
+> An enumeration of markdown files can also be passed to the converter, combining them into one PDF. 
 
 ## Options
 
-To further specify the conversion process you can pass `Markdown2PdfOptions` to the converter:
+To further specify the conversion process, pass `Markdown2PdfOptions` to the converter:
 
 ```cs
 var options = new Markdown2PdfOptions {
@@ -49,21 +41,22 @@ var options = new Markdown2PdfOptions {
 var converter = new Markdown2PdfConverter(options);
 ```
 
-| Option | Description |
-| --- | --- |
-| `ModuleOptions` | Options that decide from where to load additional modules. Default: `ModuleOptions.Remote`. |
-| `Theme` |The styling to apply to the document. Default: `Theme.Github`. |
-| `CodeHighlightTheme` | The theme to use for highlighting code blocks. Default: `CodeHighlightTheme.Github`. |
-| `HeaderUrl` | Path to an html-file to use as the document header. [More Information](#header-and-footer). |
-| `FooterUrl` | Path to an html-file to use as the document footer. [More Information](#header-and-footer). |
-| `DocumentTitle` | The title of this document. Can be injected into the header / footer by adding the class `document-title` to the element. |
-| `CustomCss` | A `string` containing CSS to apply extra styling to the document. [More Information](#custom-style).|
-| `ChromePath` | Path to chrome or chromium executable or self-downloads it if `null`. |
-| `KeepHtml` | `true` if the created html should not be deleted. |
-| `MarginOptions` | Css-margins for the sides of the document. |
-| `IsLandscape` | Paper orientation. |
-| `Format` | The paper format for the PDF. |
-| `Scale` | Scale of the content. Default: `1`. Must be between 0.1 and 2. |
+| Option | Description | Default |
+| --- | --- | --- |
+| `ModuleOptions` | Options that decide from where to load additional modules. | `ModuleOptions.Remote` |
+| `Theme` |The styling to apply to the document. | `Theme.Github` |
+| `CodeHighlightTheme` | The theme to use for highlighting code blocks. | `CodeHighlightTheme.Github` |
+| `HeaderUrl` | Path to an html-file to use as the document header. [More Information](#header-and-footer). | `null` |
+| `FooterUrl` | Path to an html-file to use as the document footer. [More Information](#header-and-footer). | `null` |
+| `DocumentTitle` | The title of this document. Can be injected into the header / footer by adding the class `document-title` to the element. | `null` |
+| `CustomCss` | A `string` containing CSS to apply extra styling to the document. [More Information](#custom-style).| `String.Empty` |
+| `ChromePath` | Path to chrome or chromium executable or self-downloads it if `null`. | `null` |
+| `KeepHtml` | `true` if the created html should not be deleted. | `false` |
+| `MarginOptions` | Css-margins for the sides of the document. | `null` |
+| `IsLandscape` | Paper orientation. | `false` |
+| `Format` | The paper format for the PDF. | `A4` |
+| `Scale` | Scale of the content. Must be between 0.1 and 2. | `1` |
+| `TableOfContents` | Creates a TOC out of the markdown headers and writes it into a `<!--TOC-->` comment within the markdown document. | `null` |
 
 ## Header and Footer
 

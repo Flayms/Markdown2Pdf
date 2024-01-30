@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@highlightjs/cdn-assets": "^11.9.0",
     "github-markdown-css": "^5.2.0",
     "latex.css": "^1.9.0",
     "mathjax": "^3.2.2",
