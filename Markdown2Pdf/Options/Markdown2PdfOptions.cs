@@ -8,7 +8,6 @@ namespace Markdown2Pdf.Options;
 public class Markdown2PdfOptions {
   // TODO: font-name
   // TODO: font-size
-  // TODO: option for generating table of contents
   // TODO: light theme, dark theme
 
   /// <summary>
@@ -66,5 +65,6 @@ public class Markdown2PdfOptions {
   /// </summary>
   public PaperFormat Format { get; set; } = PaperFormat.A4;
 
+  /// <inheritdoc cref="Options.TableOfContents"/>
   public TableOfContents? TableOfContents { get; set; } = null;
 }
