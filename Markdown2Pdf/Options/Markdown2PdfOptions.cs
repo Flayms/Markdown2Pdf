@@ -6,7 +6,6 @@ namespace Markdown2Pdf.Options;
 /// All the options for the conversion.
 /// </summary>
 public class Markdown2PdfOptions {
-  // TODO: option for generating table of contents
 
   /// <summary>
   /// Options that decide from where to load additional modules. Default: <see cref="ModuleOptions.Remote"/>.
@@ -70,4 +69,7 @@ public class Markdown2PdfOptions {
 
   /// <inheritdoc cref="PuppeteerSharp.PdfOptions.Scale"/>
   public decimal Scale { get; set; } = 1;
+
+  /// <inheritdoc cref="Options.TableOfContents"/>
+  public TableOfContents? TableOfContents { get; set; } = null;
 }
