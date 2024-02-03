@@ -12,7 +12,7 @@ public class TableOfContents {
   private readonly bool _isOrdered;
 
   private const string _IDENTIFIER = "<!--TOC-->";
-  private static readonly Regex _headerReg = new("^(?<depth>#{1,6}) +(?<title>.*)$",
+  private static readonly Regex _headerReg = new("^(?<depth>#{1,6}) +(?<title>[^\r\n]*)",
     RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.ExplicitCapture);
   private static readonly Regex _htmlElementReg = new("<[^>]*>[^>]*</[^>]*>|<[^>]*/>", RegexOptions.Compiled);
 
