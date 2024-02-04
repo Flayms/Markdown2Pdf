@@ -12,7 +12,7 @@ public class TableOfContents {
   private readonly bool _isOrdered;
 
   private const string _IDENTIFIER = "<!--TOC-->";
-  private static readonly Regex _headerReg = new("^(?<depth>#{1,6}) +(?<title>[^\r\n]*)",
+  private static readonly Regex _headerReg = new("^(?<hashes>#{1,6}) +(?<title>[^\r\n]*)",
     RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.ExplicitCapture);
   private static readonly Regex _htmlElementReg = new("<[^>]*>[^>]*</[^>]*>|<[^>]*/>", RegexOptions.Compiled);
 
@@ -39,9 +39,12 @@ public class TableOfContents {
     var matches = _headerReg.Matches(markdownContent);
     var tocBuilder = new StringBuilder();
     var delimiter = this._isOrdered ? "1. " : "* ";
+    var depthOffset = (int?)null;
+    var lastOriginalDepth = -1;
+    var lastDepth = -1;
 
     foreach (Match match in matches) {
-      var depth = match.Groups["depth"].Value.Length;
+      var depth = match.Groups["hashes"].Value.Length - 1;
 
       if (depth > this._maxDepthLevel)
         continue;
@@ -55,10 +58,38 @@ public class TableOfContents {
 
       var link = $"[{title}]({linkAddress})";
 
-      _ = tocBuilder.Append(new string(' ', (depth - 1) * 4)); // indent 4 spaces per level
+      // logic to display indentations properly
+      var originalDepth = depth;
+
+      // fix first depth
+      if (depthOffset is null) {
+        depthOffset = -depth;
+        depth += depthOffset.Value;
+      } else {
+        // offset depth
+        var nextDepthOffset = depth < -depthOffset.Value ? -depth : depthOffset.Value;
+
+        depth += depthOffset.Value;
+        depthOffset = nextDepthOffset;
+
+        if (depth < 0)
+          depth = 0;
+      }
+
+      // keep depth if the same as before
+      if (originalDepth == lastOriginalDepth)
+        depth = lastDepth;
+      else if (lastDepth != -1 && depth - lastDepth > 1)
+          depth = lastDepth + 1; // maximum of one intendation difference between items
+
+      lastDepth = depth;
+      lastOriginalDepth = originalDepth;
+
+      _ = tocBuilder.Append(new string(' ', depth * 4)); // indent 4 spaces per level
       _ = tocBuilder.Append(delimiter);
       _ = tocBuilder.AppendLine(link);
     }
+
     markdownContent = markdownContent.Replace(_IDENTIFIER, tocBuilder.ToString());
   }
 
