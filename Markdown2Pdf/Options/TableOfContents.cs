@@ -15,6 +15,7 @@ public class TableOfContents {
   private static readonly Regex _headerReg = new("^(?<hashes>#{1,6}) +(?<title>[^\r\n]*)",
     RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.ExplicitCapture);
   private static readonly Regex _htmlElementReg = new("<[^>]*>[^>]*</[^>]*>|<[^>]*/>", RegexOptions.Compiled);
+  private static readonly Regex _emojiReg = new(":(\\w+):", RegexOptions.Compiled);
 
   /// <summary>
   /// Inserts a Table of Contents into the PDF, generated from all headers. 
@@ -52,6 +53,7 @@ public class TableOfContents {
       // build link
       var title = match.Groups["title"].Value;
       title = _htmlElementReg.Replace(title, string.Empty);
+      title = _emojiReg.Replace(title, string.Empty).Trim();
 
       var linkAddress = LinkHelper.Urilize(title, true);
       linkAddress = "#" + linkAddress.ToLower();
