@@ -53,9 +53,9 @@ public class TableOfContents {
       // build link
       var title = match.Groups["title"].Value;
       title = _htmlElementReg.Replace(title, string.Empty);
+      title = _emojiReg.Replace(title, string.Empty).Trim();
 
-      var linkAddress = _emojiReg.Replace(title, string.Empty);
-      linkAddress = LinkHelper.Urilize(linkAddress, true);
+      var linkAddress = LinkHelper.Urilize(title, true);
       linkAddress = "#" + linkAddress.ToLower();
 
       var link = $"[{title}]({linkAddress})";
