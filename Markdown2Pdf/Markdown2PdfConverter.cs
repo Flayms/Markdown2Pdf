@@ -181,6 +181,7 @@ public class Markdown2PdfConverter {
 
     var pipeline = new MarkdownPipelineBuilder()
       .UseAdvancedExtensions()
+      .UseEmojiAndSmiley()
       .Build();
 
     var htmlContent = Markdown.ToHtml(markdownContent, pipeline);

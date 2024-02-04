@@ -88,6 +88,9 @@ public void Main(string[] args) {
 - [ ] Update the website
 - [ ] Contact the media
 
+### :fire: Emojis
+
+:clap: Supports :clap: emojis :clap: 
 
 ## Latex
 
