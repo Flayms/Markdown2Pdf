@@ -301,16 +301,18 @@ public class Markdown2PdfConverter {
       Headless = true
     };
 
-    if (this.Options.ChromePath == null) {
-      using var browserFetcher = new BrowserFetcher();
-      var localRevs = browserFetcher.LocalRevisions();
-
-      if (!localRevs.Contains(BrowserFetcher.DefaultChromiumRevision)) {
-        Console.WriteLine("Downloading chromium...");
-        _ = await browserFetcher.DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
-      }
-    } else
+    if (this.Options.ChromePath != null) {
       launchOptions.ExecutablePath = this.Options.ChromePath;
+      return await Puppeteer.LaunchAsync(launchOptions);
+    }
+
+    using var browserFetcher = new BrowserFetcher();
+    var installed = browserFetcher.GetInstalledBrowsers();
+
+    if (!installed.Any()) {
+      Console.WriteLine("Downloading chromium...");
+      _ = await browserFetcher.DownloadAsync();
+    }
 
     return await Puppeteer.LaunchAsync(launchOptions);
   }
