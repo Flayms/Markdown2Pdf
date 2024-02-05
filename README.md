@@ -81,8 +81,8 @@ You can also use a local installation by installing the following packages and s
 
 ```bash
 npm i mathjax@3
-npm i mermaid@10.2.3
-npm i @highlightjs/cdn-assets@11.9.0
+npm i mermaid@10
+npm i @highlightjs/cdn-assets@11
 npm i github-markdown-css
 npm i latex.css
 ```
