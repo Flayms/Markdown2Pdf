@@ -43,9 +43,10 @@ public class Markdown2PdfOptions {
   public string? DocumentTitle { get; set; }
 
   /// <summary>
-  /// A <see langword="string"/> containing CSS to apply extra styling to the document.
+  /// A <see langword="string"/> containing any content valid inside a html <c>&lt;head&gt;</c> 
+  /// to apply extra scripting / styling to the document.
   /// </summary>
-  public string CustomCss { get; set; } = string.Empty;
+  public string? CustomHeadContent { get; set; }
 
   /// <summary>
   /// Path to chrome or chromium executable. If set to <see langword="null"/> downloads chromium by itself.
