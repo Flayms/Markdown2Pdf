@@ -23,6 +23,11 @@ public class Markdown2PdfOptions {
   public CodeHighlightTheme CodeHighlightTheme { get; set; } = CodeHighlightTheme.Github;
 
   /// <summary>
+  /// Auto detect the language for code blocks without specfied language.
+  /// </summary>
+  public bool EnableAutoLanguageDetection { get; set; }
+
+  /// <summary>
   /// An html string to use as the document-header.
   /// </summary>
   public string? HeaderHtml { get; set; }

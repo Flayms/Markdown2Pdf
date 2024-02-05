@@ -41,15 +41,23 @@ public class Markdown2PdfConverter {
     {ThemeType.Latex, new("https://latex.now.sh/style.css", "latex.css/style.min.css") },
   };
 
+  public readonly IReadOnlyDictionary<string, string> _otherMappings = new Dictionary<string, string>() {
+    {"disableAutoLanguageDetection", "hljs.configure({ languages: [] });" },
+  };
+
   private readonly EmbeddedResourceService _embeddedResourceService = new();
   private const string _STYLE_KEY = "stylePath";
   private const string _CUSTOM_CSS_KEY = "customCss";
   private const string _BODY_KEY = "body";
   private const string _CODE_HIGHLIGHT_THEME_NAME_KEY = "highlightjs_theme_name";
+  private const string _DISABLE_AUTO_LANGUAGE_DETECTION_KEY = "disableAutoLanguageDetection";
+  private const string _DISABLE_AUTO_LANGUAGE_DETECTION_VALUE = "hljs.configure({ languages: [] });";
+
   private const string _DOCUMENT_TITLE_CLASS = "document-title";
   private const string _TEMPLATE_WITH_SCRIPTS_FILE_NAME = "ContentTemplate.html";
   private const string _TEMPLATE_NO_SCRIPTS_FILE_NAME = "ContentTemplate_NoScripts.html";
   private const string _HEADER_FOOTER_STYLES_FILE_NAME = "Header-Footer-Styles.html";
+
 
   /// <summary>
   /// Instantiate a new <see cref="Markdown2PdfConverter"/>.
@@ -210,6 +218,11 @@ public class Markdown2PdfConverter {
         templateModel.Add(_STYLE_KEY, customTheme.CssPath);
         break;
     }
+
+    var languageDetectionValue = this.Options.EnableAutoLanguageDetection
+      ? string.Empty
+      : _DISABLE_AUTO_LANGUAGE_DETECTION_VALUE;
+    templateModel.Add(_DISABLE_AUTO_LANGUAGE_DETECTION_KEY, languageDetectionValue);
 
     templateModel.Add(_CODE_HIGHLIGHT_THEME_NAME_KEY, this.Options.CodeHighlightTheme.ToString());
     templateModel.Add(_CUSTOM_CSS_KEY, this.Options.CustomCss);
