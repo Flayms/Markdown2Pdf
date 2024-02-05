@@ -46,6 +46,7 @@ var converter = new Markdown2PdfConverter(options);
 | `ModuleOptions` | Options that decide from where to load additional modules. | `ModuleOptions.Remote` |
 | `Theme` |The styling to apply to the document. | `Theme.Github` |
 | `CodeHighlightTheme` | The theme to use for highlighting code blocks. | `CodeHighlightTheme.Github` |
+| `EnableAutoLanguageDetection` | Auto detect the language for code blocks without specfied language. | `false` |
 | `HeaderUrl` | Path to an html-file to use as the document header. [More Information](#header-and-footer). | `null` |
 | `FooterUrl` | Path to an html-file to use as the document footer. [More Information](#header-and-footer). | `null` |
 | `DocumentTitle` | The title of this document. Can be injected into the header / footer by adding the class `document-title` to the element. | `null` |
