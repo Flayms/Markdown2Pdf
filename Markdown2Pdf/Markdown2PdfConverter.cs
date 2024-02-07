@@ -111,7 +111,7 @@ public class Markdown2PdfConverter {
   /// <remarks>The PDF will be saved in the same location as the markdown file with the naming convention "markdownFileName.pdf".</remarks>
   /// <returns>Filepath to the generated pdf.</returns>
   public async Task<string> Convert(string markdownFilePath) {
-    var markdownDir = Path.GetDirectoryName(markdownFilePath);
+    var markdownDir = Path.GetDirectoryName(Path.GetFullPath(markdownFilePath));
     var outputFileName = Path.GetFileNameWithoutExtension(markdownFilePath) + ".pdf";
     var outputFilePath = Path.Combine(markdownDir, outputFileName);
     await this.Convert(markdownFilePath, outputFilePath);
