@@ -41,7 +41,7 @@ public class Markdown2PdfConverter {
     {ThemeType.Latex, new("https://latex.now.sh/style.css", "latex.css/style.min.css") },
   };
 
-  public readonly IReadOnlyDictionary<string, string> _otherMappings = new Dictionary<string, string>() {
+  private readonly IReadOnlyDictionary<string, string> _otherMappings = new Dictionary<string, string>() {
     {"disableAutoLanguageDetection", "hljs.configure({ languages: [] });" },
   };
 
@@ -311,7 +311,8 @@ public class Markdown2PdfConverter {
 
   private async Task<IBrowser> _CreateBrowserAsync() {
     var launchOptions = new LaunchOptions {
-      Headless = true
+      Headless = true,
+      Args = new[] { "--no-sandbox" }, // needed for running inside docker
     };
 
     if (this.Options.ChromePath != null) {
