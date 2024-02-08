@@ -100,3 +100,20 @@ npm i latex.css
 ### Further modification
 
 To get more control over the HTML generation (e.g. to add your own JS-Scripts), modify the `converter.ContentTemplate`.
+
+## Running in Docker
+
+The bundled Chromium that get's installed by Puppeteer doesn't ship with all necessary dependencies (See [Running Puppeteer in Docker](https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#running-puppeteer-in-docker)).
+
+To resolve this install them in your `.dockerfile`:
+
+```dockerfile
+RUN apt-get update \
+    && apt-get install -y wget gnupg \
+    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
+    && apt-get update \
+    && apt-get install -y google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
+      --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
+```
