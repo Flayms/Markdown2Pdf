@@ -56,8 +56,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Markdig" Version="0.31.0" />
-		<PackageReference Include="PuppeteerSharp" Version="10.1.0" />
+		<PackageReference Include="Markdig" Version="0.34.0" />
+		<PackageReference Include="PuppeteerSharp" Version="14.0.0" />
 	</ItemGroup>
 
 </Project>

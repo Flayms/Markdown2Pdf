@@ -8,9 +8,19 @@
   <script src="@(highlightjs)"></script>
   <link rel="stylesheet" href="@(highlightjs_style)/@(highlightjs_theme_name)" />
   <script>
+    @(disableAutoLanguageDetection)
     hljs.highlightAll();
   </script>
-  @(customCss)
+  <style>
+    body {
+      background-color: white;
+    }
+
+    pre {
+      padding: 0;
+    }
+  </style>
+  @(customHeadContent)
 </head>
 <body class="markdown-body">
   @(body)

@@ -30,10 +30,11 @@ internal partial class Utils {
     };
 
     using var browserFetcher = new BrowserFetcher();
-    var localRevs = browserFetcher.LocalRevisions();
+    var installed = browserFetcher.GetInstalledBrowsers();
 
-    if (!localRevs.Contains(BrowserFetcher.DefaultChromiumRevision)) {
-      _ = await browserFetcher.DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
+    if (!installed.Any()) {
+      Console.WriteLine("Downloading chromium...");
+      _ = await browserFetcher.DownloadAsync();
     }
 
     return await Puppeteer.LaunchAsync(launchOptions);

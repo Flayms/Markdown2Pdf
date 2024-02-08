@@ -80,6 +80,7 @@ public partial class Tests {
   [TestCase("""<ol><li><a href="#h2-heading">h2 Heading</a><ol>""")]
   [TestCase("""</li><li><a href="#horizontal-rules">Horizontal Rules</a></li>""")]
   [TestCase("""<a href="#this-is-a-heading_with.and">""")]
+  [TestCase("""<a href="#emojis">""")]
   public void TestTableOfContents(string content) {
     // arrange
     var options = new Markdown2PdfOptions {

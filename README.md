@@ -46,10 +46,11 @@ var converter = new Markdown2PdfConverter(options);
 | `ModuleOptions` | Options that decide from where to load additional modules. | `ModuleOptions.Remote` |
 | `Theme` |The styling to apply to the document. | `Theme.Github` |
 | `CodeHighlightTheme` | The theme to use for highlighting code blocks. | `CodeHighlightTheme.Github` |
+| `EnableAutoLanguageDetection` | Auto detect the language for code blocks without specfied language. | `false` |
 | `HeaderUrl` | Path to an html-file to use as the document header. [More Information](#header-and-footer). | `null` |
 | `FooterUrl` | Path to an html-file to use as the document footer. [More Information](#header-and-footer). | `null` |
 | `DocumentTitle` | The title of this document. Can be injected into the header / footer by adding the class `document-title` to the element. | `null` |
-| `CustomCss` | A `string` containing CSS to apply extra styling to the document. [More Information](#custom-style).| `String.Empty` |
+| `CustomHeadContent` | A `string` containing any content valid inside a html `<head>` to apply extra scripting / styling to the document.. [More Information](#customization).| `null` |
 | `ChromePath` | Path to chrome or chromium executable or self-downloads it if `null`. | `null` |
 | `KeepHtml` | `true` if the created html should not be deleted. | `false` |
 | `MarginOptions` | Css-margins for the sides of the document. | `null` |
@@ -63,14 +64,13 @@ var converter = new Markdown2PdfConverter(options);
 With the `Markdown2PdfOptions.HeaderUrl` and `Markdown2PdfOptions.FooterUrl` options a path to a local file containing html for the Header / Footer can be set.  
 Html-elements with the classes `date`, `title`, `document-title`, `url`, `pageNumber` will get their content replaced based on the information. Note that `document-title` can be set with the option `Markdown2PdfOptions.DocumentTitle`.
 
-## Custom Style
+## Customization
 
-Custom CSS can be set with the `Markdown2PdfOptions.CustomCss` option.
-Example adding pagebreaks:
+Custom head content can be set with the `Markdown2PdfOptions.CustomHeadContent` option.
+Example adding PDF pagebreaks:
 ```cs
-options.CustomCss = "<style>h1, h2, h3 { page-break-before: always; }</style>";
+options.CustomHeadContent = "<style>h1, h2, h3 { page-break-before: always; }</style>";
 ```
-
 
 ## Modules
 
@@ -81,8 +81,8 @@ You can also use a local installation by installing the following packages and s
 
 ```bash
 npm i mathjax@3
-npm i mermaid@10.2.3
-npm i @highlightjs/cdn-assets@11.9.0
+npm i mermaid@10
+npm i @highlightjs/cdn-assets@11
 npm i github-markdown-css
 npm i latex.css
 ```
@@ -100,3 +100,20 @@ npm i latex.css
 ### Further modification
 
 To get more control over the HTML generation (e.g. to add your own JS-Scripts), modify the `converter.ContentTemplate`.
+
+## Running in Docker
+
+The bundled Chromium that get's installed by Puppeteer doesn't ship with all necessary dependencies (See [Running Puppeteer in Docker](https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#running-puppeteer-in-docker)).
+
+To resolve this install them in your `.dockerfile`:
+
+```dockerfile
+RUN apt-get update \
+    && apt-get install -y wget gnupg \
+    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
+    && apt-get update \
+    && apt-get install -y google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
+      --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
+```

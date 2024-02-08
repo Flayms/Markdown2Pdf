@@ -31,25 +31,29 @@ public class Markdown2PdfConverter {
 
   private readonly IReadOnlyDictionary<string, ModuleInformation> _packagelocationMapping = new Dictionary<string, ModuleInformation>() {
     {"mathjax", new ("https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js", "mathjax/es5/tex-mml-chtml.js") },
-    {"mermaid", new ("https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js", "mermaid/dist/mermaid.min.js") },
+    {"mermaid", new ("https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js", "mermaid/dist/mermaid.min.js") },
     {"highlightjs", new ("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js", "@highlightjs/cdn-assets/highlight.min.js") },
     {"highlightjs_style", new ("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles", "@highlightjs/cdn-assets/styles") },
   };
 
   private readonly IReadOnlyDictionary<ThemeType, ModuleInformation> _themeSourceMapping = new Dictionary<ThemeType, ModuleInformation>() {
-    {ThemeType.Github, new("https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css", "github-markdown-css/github-markdown.css") },
+    {ThemeType.Github, new("https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.1/github-markdown-light.min.css", "github-markdown-css/github-markdown-light.css") },
     {ThemeType.Latex, new("https://latex.now.sh/style.css", "latex.css/style.min.css") },
   };
 
   private readonly EmbeddedResourceService _embeddedResourceService = new();
   private const string _STYLE_KEY = "stylePath";
-  private const string _CUSTOM_CSS_KEY = "customCss";
+  private const string _CUSTOM_HEAD_KEY = "customHeadContent";
   private const string _BODY_KEY = "body";
   private const string _CODE_HIGHLIGHT_THEME_NAME_KEY = "highlightjs_theme_name";
+  private const string _DISABLE_AUTO_LANGUAGE_DETECTION_KEY = "disableAutoLanguageDetection";
+  private const string _DISABLE_AUTO_LANGUAGE_DETECTION_VALUE = "hljs.configure({ languages: [] });";
+
   private const string _DOCUMENT_TITLE_CLASS = "document-title";
   private const string _TEMPLATE_WITH_SCRIPTS_FILE_NAME = "ContentTemplate.html";
   private const string _TEMPLATE_NO_SCRIPTS_FILE_NAME = "ContentTemplate_NoScripts.html";
   private const string _HEADER_FOOTER_STYLES_FILE_NAME = "Header-Footer-Styles.html";
+
 
   /// <summary>
   /// Instantiate a new <see cref="Markdown2PdfConverter"/>.
@@ -103,7 +107,7 @@ public class Markdown2PdfConverter {
   /// <remarks>The PDF will be saved in the same location as the markdown file with the naming convention "markdownFileName.pdf".</remarks>
   /// <returns>Filepath to the generated pdf.</returns>
   public async Task<string> Convert(string markdownFilePath) {
-    var markdownDir = Path.GetDirectoryName(markdownFilePath);
+    var markdownDir = Path.GetDirectoryName(Path.GetFullPath(markdownFilePath));
     var outputFileName = Path.GetFileNameWithoutExtension(markdownFilePath) + ".pdf";
     var outputFilePath = Path.Combine(markdownDir, outputFileName);
     await this.Convert(markdownFilePath, outputFilePath);
@@ -181,6 +185,7 @@ public class Markdown2PdfConverter {
 
     var pipeline = new MarkdownPipelineBuilder()
       .UseAdvancedExtensions()
+      .UseEmojiAndSmiley()
       .Build();
 
     var htmlContent = Markdown.ToHtml(markdownContent, pipeline);
@@ -210,8 +215,13 @@ public class Markdown2PdfConverter {
         break;
     }
 
+    var languageDetectionValue = this.Options.EnableAutoLanguageDetection
+      ? string.Empty
+      : _DISABLE_AUTO_LANGUAGE_DETECTION_VALUE;
+    templateModel.Add(_DISABLE_AUTO_LANGUAGE_DETECTION_KEY, languageDetectionValue);
+
     templateModel.Add(_CODE_HIGHLIGHT_THEME_NAME_KEY, this.Options.CodeHighlightTheme.ToString());
-    templateModel.Add(_CUSTOM_CSS_KEY, this.Options.CustomCss);
+    templateModel.Add(_CUSTOM_HEAD_KEY, this.Options.CustomHeadContent ?? string.Empty);
     templateModel.Add(_BODY_KEY, htmlContent);
 
     return templateModel;
@@ -297,19 +307,22 @@ public class Markdown2PdfConverter {
 
   private async Task<IBrowser> _CreateBrowserAsync() {
     var launchOptions = new LaunchOptions {
-      Headless = true
+      Headless = true,
+      Args = new[] { "--no-sandbox" }, // needed for running inside docker
     };
 
-    if (this.Options.ChromePath == null) {
-      using var browserFetcher = new BrowserFetcher();
-      var localRevs = browserFetcher.LocalRevisions();
-
-      if (!localRevs.Contains(BrowserFetcher.DefaultChromiumRevision)) {
-        Console.WriteLine("Downloading chromium...");
-        _ = await browserFetcher.DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
-      }
-    } else
+    if (this.Options.ChromePath != null) {
       launchOptions.ExecutablePath = this.Options.ChromePath;
+      return await Puppeteer.LaunchAsync(launchOptions);
+    }
+
+    using var browserFetcher = new BrowserFetcher();
+    var installed = browserFetcher.GetInstalledBrowsers();
+
+    if (!installed.Any()) {
+      Console.WriteLine("Downloading chromium...");
+      _ = await browserFetcher.DownloadAsync();
+    }
 
     return await Puppeteer.LaunchAsync(launchOptions);
   }
