@@ -41,7 +41,7 @@ public class Markdown2PdfConverter {
     {ThemeType.Latex, new("https://latex.now.sh/style.css", "latex.css/style.min.css") },
   };
 
-  public readonly IReadOnlyDictionary<string, string> _otherMappings = new Dictionary<string, string>() {
+  private readonly IReadOnlyDictionary<string, string> _otherMappings = new Dictionary<string, string>() {
     {"disableAutoLanguageDetection", "hljs.configure({ languages: [] });" },
   };
 
@@ -111,7 +111,7 @@ public class Markdown2PdfConverter {
   /// <remarks>The PDF will be saved in the same location as the markdown file with the naming convention "markdownFileName.pdf".</remarks>
   /// <returns>Filepath to the generated pdf.</returns>
   public async Task<string> Convert(string markdownFilePath) {
-    var markdownDir = Path.GetDirectoryName(markdownFilePath);
+    var markdownDir = Path.GetDirectoryName(Path.GetFullPath(markdownFilePath));
     var outputFileName = Path.GetFileNameWithoutExtension(markdownFilePath) + ".pdf";
     var outputFilePath = Path.Combine(markdownDir, outputFileName);
     await this.Convert(markdownFilePath, outputFilePath);
@@ -311,7 +311,8 @@ public class Markdown2PdfConverter {
 
   private async Task<IBrowser> _CreateBrowserAsync() {
     var launchOptions = new LaunchOptions {
-      Headless = true
+      Headless = true,
+      Args = new[] { "--no-sandbox" }, // needed for running inside docker
     };
 
     if (this.Options.ChromePath != null) {
