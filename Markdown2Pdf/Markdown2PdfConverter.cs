@@ -41,10 +41,6 @@ public class Markdown2PdfConverter {
     {ThemeType.Latex, new("https://latex.now.sh/style.css", "latex.css/style.min.css") },
   };
 
-  private readonly IReadOnlyDictionary<string, string> _otherMappings = new Dictionary<string, string>() {
-    {"disableAutoLanguageDetection", "hljs.configure({ languages: [] });" },
-  };
-
   private readonly EmbeddedResourceService _embeddedResourceService = new();
   private const string _STYLE_KEY = "stylePath";
   private const string _CUSTOM_HEAD_KEY = "customHeadContent";
