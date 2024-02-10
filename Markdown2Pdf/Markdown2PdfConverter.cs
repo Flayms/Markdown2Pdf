@@ -320,7 +320,7 @@ public class Markdown2PdfConverter {
     var installed = browserFetcher.GetInstalledBrowsers();
 
     if (!installed.Any()) {
-      Console.WriteLine("Downloading chromium...");
+      Console.WriteLine("Path to chrome was not specified. Downloading chrome...");
       _ = await browserFetcher.DownloadAsync();
     }
 
