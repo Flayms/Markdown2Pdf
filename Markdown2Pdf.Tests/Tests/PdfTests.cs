@@ -104,6 +104,25 @@ public class PdfTests {
     });
   }
 
+  [Test]
+  public async Task TestTableOfContents() {
+    // arrange
+    var options = new Markdown2PdfOptions {
+      FooterHtml = File.ReadAllText(Utils.footerFile),
+      TableOfContents = new TableOfContents(true, 4)
+    };
+    var converter = new Markdown2PdfConverter(options);
+
+    // act
+    var pdfPath = await converter.Convert(Utils.readmeFile);
+
+    // assert
+    Assert.Multiple(() => {
+      Assert.That(Utils.PdfContains(pdfPath, "Page 1/5"));
+      Assert.That(Utils.PdfContains(pdfPath, "Page 5/5"));
+    });
+  }
+
   [TearDown]
   public void Teardown() => Utils.tempDir.Delete(true);
 

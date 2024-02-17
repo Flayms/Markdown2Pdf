@@ -3,7 +3,7 @@ using Markdown2Pdf.Options;
 
 namespace Markdown2Pdf.Tests.Tests;
 
-public partial class Tests {
+public partial class HtmlTests {
 
   [SetUp]
   public void Setup() {
