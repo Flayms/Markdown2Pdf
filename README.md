@@ -57,7 +57,7 @@ var converter = new Markdown2PdfConverter(options);
 | `IsLandscape` | Paper orientation. | `false` |
 | `Format` | The paper format for the PDF. | `A4` |
 | `Scale` | Scale of the content. Must be between 0.1 and 2. | `1` |
-| `TableOfContents` | Creates a TOC out of the markdown headers and writes it into a `<!--TOC-->` comment within the markdown document. [More Information](#table-of-content). | `null` |
+| `TableOfContents` | Creates a TOC out of the markdown headers and writes it into a `<!--TOC-->` comment within the markdown document. [More Information](#table-of-contents). | `null` |
 
 ## Header and Footer
 
@@ -72,7 +72,7 @@ Example adding PDF pagebreaks:
 options.CustomHeadContent = "<style>h1, h2, h3 { page-break-before: always; }</style>";
 ```
 
-## Table of content
+## Table of contents
 
 To add a table of content insert `<!--TOC-->` to markdown file and add TableOfContent to options.
 
