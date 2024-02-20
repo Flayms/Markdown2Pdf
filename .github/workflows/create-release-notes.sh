@@ -16,7 +16,7 @@ declare -A SYMBOLS=(
     [perf]=⚡
     [test]=🔬
     [build]=🏗
-    [ci]=🔧
+    [ci]=🤖
     [chore]=🧹
     [revert]=⏪
 )
