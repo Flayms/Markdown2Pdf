@@ -92,6 +92,7 @@ You can also use a local installation by installing the following packages and s
 ```bash
 npm i mathjax@3
 npm i mermaid@10
+npm i font-awesome
 npm i @highlightjs/cdn-assets@11
 npm i github-markdown-css
 npm i latex.css
@@ -103,6 +104,7 @@ npm i latex.css
 | --- | --- |
 | [MathJax](https://github.com/mathjax/MathJax) | Latex-Math rendering |
 | [Mermaid](https://github.com/mermaid-js/mermaid) | Diagrams |
+| [Font-Awesome](https://fontawesome.com/) | Icons (Supported within mermaid diagrams) |
 | [Highlight.js](https://github.com/highlightjs/highlight.js) | Syntax highlighting |
 | [github-markdown-css](https://github.com/sindresorhus/github-markdown-css) | Github-Theme |
 | [latex-css](https://github.com/vincentdoerig/latex-css) | Latex-Theme |
