@@ -9,6 +9,14 @@ namespace Markdown2Pdf.Options;
 /// <inheritdoc cref="TableOfContents(bool, int)"/>
 public class TableOfContents {
 
+  private readonly struct Link(string title, string linkAddress, int Depth) {
+    public string Title { get; } = title;
+    public string LinkAddress { get; } = linkAddress;
+    public int Depth { get; } = Depth;
+
+    public override readonly string ToString() => $"<a href=\"{this.LinkAddress}\">{this.Title}</a>";
+  }
+
   private readonly int _maxDepthLevel;
   private readonly bool _isOrdered;
 
@@ -35,14 +43,6 @@ public class TableOfContents {
 
     this._isOrdered = isOrdered;
     this._maxDepthLevel = maxDepthLevel;
-  }
-
-  private readonly struct Link(string title, string linkAddress, int Depth) {
-    public string Title { get; } = title;
-    public string LinkAddress { get; } = linkAddress;
-    public int Depth { get; } = Depth;
-
-    public override readonly string ToString() => $"<a href=\"{this.LinkAddress}\">{this.Title}</a>";
   }
 
   private IEnumerable<Link> _CreateLinks(string markdownContent) {
@@ -72,7 +72,7 @@ public class TableOfContents {
   internal string ToHtml(string markdownContent) {
     var links = _CreateLinks(markdownContent);
     var tocBuilder = new StringBuilder();
-    var lastDepth = -1;
+    var lastDepth = -1; // start at -1 to open the list on first element
     var openList = this._isOrdered ? "<ol>" : "<ul>";
     var closeList = this._isOrdered ? "</ol>" : "</ul>";
 
