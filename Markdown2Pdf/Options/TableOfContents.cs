@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using Markdig.Helpers;
@@ -7,6 +8,14 @@ namespace Markdown2Pdf.Options;
 
 /// <inheritdoc cref="TableOfContents(bool, int)"/>
 public class TableOfContents {
+
+  private readonly struct Link(string title, string linkAddress, int Depth) {
+    public string Title { get; } = title;
+    public string LinkAddress { get; } = linkAddress;
+    public int Depth { get; } = Depth;
+
+    public override readonly string ToString() => $"<a href=\"{this.LinkAddress}\">{this.Title}</a>";
+  }
 
   private readonly int _maxDepthLevel;
   private readonly bool _isOrdered;
@@ -36,13 +45,9 @@ public class TableOfContents {
     this._maxDepthLevel = maxDepthLevel;
   }
 
-  internal void InsertInto(ref string markdownContent) {
+  private IEnumerable<Link> _CreateLinks(string markdownContent) {
     var matches = _headerReg.Matches(markdownContent);
-    var tocBuilder = new StringBuilder();
-    var delimiter = this._isOrdered ? "1. " : "* ";
-    var depthOffset = (int?)null;
-    var lastOriginalDepth = -1;
-    var lastDepth = -1;
+    var links = new List<Link>(matches.Count);
 
     foreach (Match match in matches) {
       var depth = match.Groups["hashes"].Value.Length - 1;
@@ -58,41 +63,59 @@ public class TableOfContents {
       var linkAddress = LinkHelper.Urilize(title, true);
       linkAddress = "#" + linkAddress.ToLower();
 
-      var link = $"[{title}]({linkAddress})";
-
-      // logic to display indentations properly
-      var originalDepth = depth;
-
-      // fix first depth
-      if (depthOffset is null) {
-        depthOffset = -depth;
-        depth += depthOffset.Value;
-      } else {
-        // offset depth
-        var nextDepthOffset = depth < -depthOffset.Value ? -depth : depthOffset.Value;
-
-        depth += depthOffset.Value;
-        depthOffset = nextDepthOffset;
-
-        if (depth < 0)
-          depth = 0;
-      }
-
-      // keep depth if the same as before
-      if (originalDepth == lastOriginalDepth)
-        depth = lastDepth;
-      else if (lastDepth != -1 && depth - lastDepth > 1)
-          depth = lastDepth + 1; // maximum of one intendation difference between items
-
-      lastDepth = depth;
-      lastOriginalDepth = originalDepth;
-
-      _ = tocBuilder.Append(new string(' ', depth * 4)); // indent 4 spaces per level
-      _ = tocBuilder.Append(delimiter);
-      _ = tocBuilder.AppendLine(link);
+      links.Add(new Link(title, linkAddress, depth));
     }
 
-    markdownContent = markdownContent.Replace(_IDENTIFIER, tocBuilder.ToString());
+    return links;
   }
+
+  internal string ToHtml(string markdownContent) {
+    var links = _CreateLinks(markdownContent);
+    var tocBuilder = new StringBuilder();
+    var lastDepth = -1; // start at -1 to open the list on first element
+    var openList = this._isOrdered ? "<ol>" : "<ul>";
+    var closeList = this._isOrdered ? "</ol>" : "</ul>";
+
+    foreach (var link in links) {
+
+      switch (link.Depth) {
+        case var depth when depth > lastDepth: // nested element
+          tocBuilder.AppendLine();
+          tocBuilder.AppendLine(openList);
+
+          ++lastDepth;
+          break;
+
+        case var depth when depth == lastDepth: // same height
+          // close previous element
+          tocBuilder.AppendLine("</li>");
+          break;
+
+        default: // depth < lastDepth
+          // determine difference
+          var difference = lastDepth - link.Depth;
+
+          // close previous elements
+          for (var i = 0; i < difference; ++i) {
+            tocBuilder.AppendLine("</li>");
+            tocBuilder.AppendLine(closeList);
+          }
+
+          tocBuilder.AppendLine("</li>");
+          break;
+      }
+
+      lastDepth = link.Depth;
+      tocBuilder.Append($"<li>{link}");
+    }
+
+    tocBuilder.AppendLine("</li>");
+    tocBuilder.AppendLine(closeList);
+
+    return tocBuilder.ToString();
+  }
+
+  internal void InsertInto(ref string htmlContent, string tocHtml)
+    => htmlContent = htmlContent.Replace(_IDENTIFIER, tocHtml);
 
 }
