@@ -13,7 +13,8 @@ var options = new Markdown2PdfOptions {
     Left = "50px",
     Right = "50px"
   },
-  KeepHtml = true
+  KeepHtml = true,
+  TableOfContents = new TableOfContents(isOrdered: true, maxDepthLevel: 5)
 };
 
 var converter = new Markdown2PdfConverter(options);

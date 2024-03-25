@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://www.nuget.org/packages/Markdown2Pdf" target="_blank">
-    <img alt="Nuget" src="https://img.shields.io/nuget/v/Markdown2Pdf">
+    <img alt="Nuget" src="https://img.shields.io/nuget/v/Markdown2Pdf" />
   </a>
   
   <a href="https://github.com/Flayms/Markdown2Pdf/actions/workflows/build-and-release.yml" target="_blank">
@@ -15,9 +15,13 @@
   <br>
 </p>
 
-.NET library for converting Markdown to PDF. Uses [Markdig](https://github.com/xoofx/markdig) for converting markdown to html and then [Puppeteer Sharp](https://github.com/hardkoded/puppeteer-sharp) to convert that output to PDF. For a cross-platform cli-wrapper checkout [Markdown2Pdf.Console](https://github.com/Flayms/Markdown2Pdf.Console).
+.NET library for converting Markdown to PDF. Uses [Markdig](https://github.com/xoofx/markdig) for converting markdown to html and then [Puppeteer Sharp](https://github.com/hardkoded/puppeteer-sharp) to convert that output to PDF.
 
-A demo can be found [here!](./assets/demo.pdf)
+A created demo PDF can be found [here!](./assets/demo.pdf)
+
+For a cross-platform cli-application using this package checkout [Markdown2Pdf.Console](https://github.com/Flayms/Markdown2Pdf.Console).
+
+
 
 ## Usage
 
@@ -74,13 +78,16 @@ options.CustomHeadContent = "<style>h1, h2, h3 { page-break-before: always; }</s
 
 ## Table of contents
 
-To add a table of content insert `<!--TOC-->` to markdown file and add TableOfContent to options.
+To add a table of contents insert `<!--TOC-->` into the markdown file and use the `Markdown2PdfOptions.TableOfContents` option.
 
-Example adding table of content with a depth of 4 levels:
+Example creating a TOC with a depth level of 4 (includes all headers to `H5`):
 
 ```cs
 options.TableOfContents = new TableOfContents(true, 4);
 ```
+
+> The TOC gets generated within a `<nav class="table-of-contents">`.
+> This can be used to apply extra custom styles.
 
 ## Modules
 

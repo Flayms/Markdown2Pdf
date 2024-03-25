@@ -2,6 +2,8 @@
 
 This is a demo of all the Markdown2Pdf features.
 
+## Table of Contents
+
 <!--TOC-->
 
 ## Common Markdown Functionality
