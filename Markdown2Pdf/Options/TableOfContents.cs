@@ -70,47 +70,47 @@ public class TableOfContents {
   }
 
   internal string ToHtml(string markdownContent) {
+    var NL = Environment.NewLine;
     var links = _CreateLinks(markdownContent);
-    var tocBuilder = new StringBuilder();
     var lastDepth = -1; // start at -1 to open the list on first element
     var openList = this._isOrdered ? "<ol>" : "<ul>";
     var closeList = this._isOrdered ? "</ol>" : "</ul>";
+    var tocBuilder = new StringBuilder();
 
     foreach (var link in links) {
 
       switch (link.Depth) {
         case var depth when depth > lastDepth: // nested element
-          tocBuilder.AppendLine();
-          tocBuilder.AppendLine(openList);
+          var difference = link.Depth - lastDepth;
 
-          ++lastDepth;
+          // open nestings
+          for (var i = 0; i < difference; ++i)
+            tocBuilder.Append(NL + openList + NL + "<li>");
           break;
 
         case var depth when depth == lastDepth: // same height
           // close previous element
           tocBuilder.AppendLine("</li>");
+          tocBuilder.Append("<li>");
           break;
 
         default: // depth < lastDepth
-          // determine difference
-          var difference = lastDepth - link.Depth;
+          difference = lastDepth - link.Depth;
 
           // close previous elements
-          for (var i = 0; i < difference; ++i) {
-            tocBuilder.AppendLine("</li>");
-            tocBuilder.AppendLine(closeList);
-          }
+          for (var i = 0; i < difference; ++i)
+            tocBuilder.Append(NL + "</li>" + NL + closeList);
 
-          tocBuilder.AppendLine("</li>");
+          tocBuilder.Append(NL + "<li>");
           break;
       }
 
       lastDepth = link.Depth;
-      tocBuilder.Append($"<li>{link}");
+      tocBuilder.Append(link);
     }
 
-    tocBuilder.AppendLine("</li>");
-    tocBuilder.AppendLine(closeList);
+    for (var i = 0; i <= lastDepth; ++i)
+      tocBuilder.Append(NL + "</li>" + NL + closeList);
 
     return tocBuilder.ToString();
   }
