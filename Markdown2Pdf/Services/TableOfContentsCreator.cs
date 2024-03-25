@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using Markdig.Helpers;
+using Markdown2Pdf.Options;
 
-namespace Markdown2Pdf.Options;
+namespace Markdown2Pdf.Services;
 
-/// <inheritdoc cref="TableOfContents(bool, int)"/>
-public class TableOfContents {
+internal class TableOfContentsCreator(TableOfContentsOptions options) {
 
   private readonly struct Link(string title, string linkAddress, int Depth) {
     public string Title { get; } = title;
@@ -17,8 +17,9 @@ public class TableOfContents {
     public override readonly string ToString() => $"<a href=\"{this.LinkAddress}\">{this.Title}</a>";
   }
 
-  private readonly int _maxDepthLevel;
-  private readonly bool _isOrdered;
+  private readonly bool _isOrdered = options.IsOrdered;
+  private readonly int _minDepthLevel = options.MinDepthLevel;
+  private readonly int _maxDepthLevel = options.MaxDepthLevel;
 
   private const string _IDENTIFIER = "<!--TOC-->";
   private const string _HTML_CLASS_NAME = "table-of-contents";
@@ -27,25 +28,6 @@ public class TableOfContents {
   private static readonly Regex _htmlElementReg = new("<[^>]*>[^>]*</[^>]*>|<[^>]*/>", RegexOptions.Compiled);
   private static readonly Regex _emojiReg = new(":(\\w+):", RegexOptions.Compiled);
 
-  /// <summary>
-  /// Inserts a Table of Contents into the PDF, generated from all headers. 
-  /// The TOC will be inserted into all <c>&lt;!--TOC--&gt;</c> comments within the markdown document. 
-  /// </summary>
-  /// <param name="isOrdered">
-  /// If <see langword="true"/>, will generate an Ordered List, otherwise an Unordered List.
-  /// </param>
-  /// <param name="maxDepthLevel">
-  /// 0-based maximum level of heading depth to include in the TOC 
-  /// (e.g. <c>3</c> will include headings up to <c>&lt;h4&gt;</c>).
-  /// </param>
-  public TableOfContents(bool isOrdered = true, int maxDepthLevel = 3) {
-    if (maxDepthLevel is < 0 or > 5)
-      throw new ArgumentOutOfRangeException();
-
-    this._isOrdered = isOrdered;
-    this._maxDepthLevel = maxDepthLevel;
-  }
-
   private IEnumerable<Link> _CreateLinks(string markdownContent) {
     var matches = _headerReg.Matches(markdownContent);
     var links = new List<Link>(matches.Count);
@@ -53,7 +35,7 @@ public class TableOfContents {
     foreach (Match match in matches) {
       var depth = match.Groups["hashes"].Value.Length - 1;
 
-      if (depth > this._maxDepthLevel)
+      if (depth < this._minDepthLevel || depth > this._maxDepthLevel)
         continue;
 
       // build link

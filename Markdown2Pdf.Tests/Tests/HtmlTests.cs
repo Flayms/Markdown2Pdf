@@ -84,7 +84,10 @@ public partial class HtmlTests {
   public void TestTableOfContents(string content) {
     // arrange
     var options = new Markdown2PdfOptions {
-      TableOfContents = new TableOfContents(true, 4)
+      TableOfContents = new TableOfContentsOptions {
+        IsOrdered = true,
+        MaxDepthLevel = 4
+      }
     };
     var converter = new Markdown2PdfConverter(options);
 
