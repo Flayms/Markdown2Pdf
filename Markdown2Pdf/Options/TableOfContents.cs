@@ -34,11 +34,11 @@ public class TableOfContents {
   /// If <see langword="true"/>, will generate an Ordered List, otherwise an Unordered List.
   /// </param>
   /// <param name="maxDepthLevel">
-  /// The maximum level of heading depth to include in the TOC 
-  /// (e.g. <c>3</c> will include headings up to <c>&lt;h3&gt;</c>).
+  /// 0-based maximum level of heading depth to include in the TOC 
+  /// (e.g. <c>3</c> will include headings up to <c>&lt;h4&gt;</c>).
   /// </param>
   public TableOfContents(bool isOrdered = true, int maxDepthLevel = 3) {
-    if (maxDepthLevel is < 1 or > 6)
+    if (maxDepthLevel is < 0 or > 5)
       throw new ArgumentOutOfRangeException();
 
     this._isOrdered = isOrdered;
