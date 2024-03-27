@@ -2,7 +2,7 @@
 
 This is a demo of all the Markdown2Pdf features.
 
-## Table of Contents
+## Table of Contents <!-- omit from toc -->
 
 <!--TOC-->
 

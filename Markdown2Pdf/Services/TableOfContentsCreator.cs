@@ -25,6 +25,7 @@ internal class TableOfContentsCreator(TableOfContentsOptions options) {
   private readonly int _maxDepthLevel = options.MaxDepthLevel -1;
 
   private const string _IDENTIFIER = "<!--TOC-->";
+  private const string _OMIT_IN_TOC_IDENTIFIER = "<!-- omit from toc -->";
   private const string _HTML_CLASS_NAME = "table-of-contents";
   private static readonly Regex _headerReg = new("^(?<hashes>#{1,6}) +(?<title>[^\r\n]*)",
     RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.ExplicitCapture);
@@ -37,12 +38,14 @@ internal class TableOfContentsCreator(TableOfContentsOptions options) {
 
     foreach (Match match in matches) {
       var depth = match.Groups["hashes"].Value.Length - 1;
+      var title = match.Groups["title"].Value;
 
-      if (depth < this._minDepthLevel || depth > this._maxDepthLevel)
+      if (depth < this._minDepthLevel
+        || depth > this._maxDepthLevel
+        || title.ToLower().EndsWith(_OMIT_IN_TOC_IDENTIFIER))
         continue;
 
       // build link
-      var title = match.Groups["title"].Value;
       title = _htmlElementReg.Replace(title, string.Empty);
       title = _emojiReg.Replace(title, string.Empty).Trim();
 

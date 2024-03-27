@@ -21,8 +21,6 @@ A created demo PDF can be found [here!](./assets/demo.pdf)
 
 For a cross-platform cli-application using this package checkout [Markdown2Pdf.Console](https://github.com/Flayms/Markdown2Pdf.Console).
 
-
-
 ## Usage
 
 ```cs
@@ -92,8 +90,12 @@ options.TableOfContents = new TableOfContentsOptions {
 };
 ```
 
-> The TOC gets generated within a `<nav class="table-of-contents">`.
-> This can be used to apply extra custom styles.
+A header can be omitted from the toc by ending it with `<!-- omit from toc -->`:
+```md
+## This header won't be displayed in the TOC <!-- omit from toc -->
+```
+
+The TOC gets generated within a `<nav class="table-of-contents">`. This can be used to apply extra custom styles.
 
 ## Modules
 
