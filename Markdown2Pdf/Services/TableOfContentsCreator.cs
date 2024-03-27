@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Markdig.Helpers;
@@ -18,8 +19,10 @@ internal class TableOfContentsCreator(TableOfContentsOptions options) {
   }
 
   private readonly bool _isOrdered = options.IsOrdered;
-  private readonly int _minDepthLevel = options.MinDepthLevel;
-  private readonly int _maxDepthLevel = options.MaxDepthLevel;
+
+  // Substract 1 to adjust to 0 based values
+  private readonly int _minDepthLevel = options.MinDepthLevel -1;
+  private readonly int _maxDepthLevel = options.MaxDepthLevel -1;
 
   private const string _IDENTIFIER = "<!--TOC-->";
   private const string _HTML_CLASS_NAME = "table-of-contents";
@@ -55,7 +58,11 @@ internal class TableOfContentsCreator(TableOfContentsOptions options) {
   internal string ToHtml(string markdownContent) {
     var NL = Environment.NewLine;
     var links = _CreateLinks(markdownContent);
+    var minLinkDepth = links.Min(l => l.Depth);
+    var minDepth = Math.Max(this._minDepthLevel, minLinkDepth); // ensure that there's no unneeded nesting
+
     var lastDepth = -1; // start at -1 to open the list on first element
+
     var openList = this._isOrdered ? "<ol>" : "<ul>";
     var closeList = this._isOrdered ? "</ol>" : "</ul>";
     var tocBuilder = new StringBuilder();
@@ -63,10 +70,13 @@ internal class TableOfContentsCreator(TableOfContentsOptions options) {
     tocBuilder.Append($"<nav class=\"{_HTML_CLASS_NAME}\">");
 
     foreach (var link in links) {
+      var fixedLinkDepth = link.Depth - minDepth; // Reduce nesting by minDepth
+      if (fixedLinkDepth < 0)
+        continue;
 
-      switch (link.Depth) {
+      switch (fixedLinkDepth) {
         case var depth when depth > lastDepth: // nested element
-          var difference = link.Depth - lastDepth;
+          var difference = fixedLinkDepth - lastDepth;
 
           // open nestings
           for (var i = 0; i < difference; ++i)
@@ -80,7 +90,7 @@ internal class TableOfContentsCreator(TableOfContentsOptions options) {
           break;
 
         default: // depth < lastDepth
-          difference = lastDepth - link.Depth;
+          difference = lastDepth - fixedLinkDepth;
 
           // close previous elements
           for (var i = 0; i < difference; ++i)
@@ -90,7 +100,7 @@ internal class TableOfContentsCreator(TableOfContentsOptions options) {
           break;
       }
 
-      lastDepth = link.Depth;
+      lastDepth = fixedLinkDepth;
       tocBuilder.Append(link);
     }
 

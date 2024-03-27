@@ -16,8 +16,8 @@ var options = new Markdown2PdfOptions {
   KeepHtml = true,
   TableOfContents = new TableOfContentsOptions {
     IsOrdered = true,
-    MinDepthLevel = 1,
-    MaxDepthLevel = 5
+    MinDepthLevel = 2,
+    MaxDepthLevel = 6
   }
 };
 

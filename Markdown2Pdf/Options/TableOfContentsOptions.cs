@@ -8,7 +8,7 @@ namespace Markdown2Pdf.Options;
 /// </summary>
 public class TableOfContentsOptions {
 
-  private const int _MIN_DEPTH_LEVEL = 0;
+  private const int _MIN_DEPTH_LEVEL = 1;
   private const int _MAX_DEPTH_LEVEL = 6;
 
   /// <summary>
@@ -21,14 +21,14 @@ public class TableOfContentsOptions {
 
   /// <summary>
   /// The minimum level of heading depth to include in the TOC
-  /// (e.g. <c>1</c> will exclude all headings up to <c>&lt;h1&gt;</c>).
-  /// Range: <c>0</c> to <c>5</c>.
+  /// (e.g. <c>1</c> will only include headings greater than or equal to <c>&lt;h1&gt;</c>).
+  /// Range: <c>1</c> to <c>6</c>.
   /// </summary>
   public int MinDepthLevel {
     get => this._minDepthLevel ?? _MIN_DEPTH_LEVEL;
     set {
-      if (value is < _MIN_DEPTH_LEVEL or > _MAX_DEPTH_LEVEL - 1)
-        throw new ArgumentOutOfRangeException($"Value must be between {_MIN_DEPTH_LEVEL} and {_MAX_DEPTH_LEVEL - 1}.");
+      if (value is < _MIN_DEPTH_LEVEL or > _MAX_DEPTH_LEVEL)
+        throw new ArgumentOutOfRangeException($"Value must be between {_MIN_DEPTH_LEVEL} and {_MAX_DEPTH_LEVEL}.");
 
       if (this._maxDepthLevel != null && value > this._maxDepthLevel)
         throw new ArgumentOutOfRangeException($"{nameof(this.MinDepthLevel)} cannot be greater than {nameof(this.MaxDepthLevel)}");
@@ -38,17 +38,17 @@ public class TableOfContentsOptions {
   }
 
   private int? _maxDepthLevel;
-  
-  /// <summary>3
+
+  /// <summary>
   /// The maximum level of heading depth to include in the TOC 
-  /// (e.g. <c>3</c> will include headings up to <c>&lt;h3&gt;</c>).
+  /// (e.g. <c>3</c> will include headings less than or equal to <c>&lt;h3&gt;</c>).
   /// Range: <c>1</c> to <c>6</c>.
   /// </summary>
   public int MaxDepthLevel {
     get => this._maxDepthLevel ?? _MAX_DEPTH_LEVEL;
     set {
-      if (value is < _MIN_DEPTH_LEVEL + 1 or > _MAX_DEPTH_LEVEL)
-        throw new ArgumentOutOfRangeException($"Value must be between {_MIN_DEPTH_LEVEL + 1} and {_MAX_DEPTH_LEVEL}.");
+      if (value is < _MIN_DEPTH_LEVEL or > _MAX_DEPTH_LEVEL)
+        throw new ArgumentOutOfRangeException($"Value must be between {_MIN_DEPTH_LEVEL} and {_MAX_DEPTH_LEVEL}.");
 
       if (this._minDepthLevel != null && value < this._minDepthLevel)
         throw new ArgumentOutOfRangeException($"{nameof(this.MaxDepthLevel)} cannot be less than {nameof(this.MinDepthLevel)}");
