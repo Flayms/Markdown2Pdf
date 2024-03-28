@@ -24,13 +24,15 @@ internal class TableOfContentsCreator(TableOfContentsOptions options) {
   private readonly int _minDepthLevel = options.MinDepthLevel -1;
   private readonly int _maxDepthLevel = options.MaxDepthLevel -1;
 
-  private const string _IDENTIFIER = "<!--TOC-->";
   private const string _OMIT_IN_TOC_IDENTIFIER = "<!-- omit from toc -->";
   private const string _HTML_CLASS_NAME = "table-of-contents";
+
   private static readonly Regex _headerReg = new("^(?<hashes>#{1,6}) +(?<title>[^\r\n]*)",
     RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.ExplicitCapture);
   private static readonly Regex _htmlElementReg = new("<[^>]*>[^>]*</[^>]*>|<[^>]*/>", RegexOptions.Compiled);
   private static readonly Regex _emojiReg = new(":(\\w+):", RegexOptions.Compiled);
+  private static readonly Regex _insertionRegex = new("""^(\[TOC]|\[\[_TOC_]]|<!-- toc -->)\r?$""",
+    RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline);
 
   private IEnumerable<Link> _CreateLinks(string markdownContent) {
     var matches = _headerReg.Matches(markdownContent);
@@ -115,7 +117,7 @@ internal class TableOfContentsCreator(TableOfContentsOptions options) {
     return tocBuilder.ToString();
   }
 
-  internal void InsertInto(ref string htmlContent, string tocHtml)
-    => htmlContent = htmlContent.Replace(_IDENTIFIER, tocHtml);
+  internal void InsertInto(ref string content, string tocHtml)
+    => content = _insertionRegex.Replace(content, tocHtml);
 
 }

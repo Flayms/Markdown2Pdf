@@ -4,7 +4,7 @@ namespace Markdown2Pdf.Options;
 
 /// <summary>
 /// Options to create a Table of Contents for the PDF, generated from all headers. 
-/// The TOC will be inserted into all <c>&lt;!--TOC--&gt;</c> comments within the markdown document. 
+/// The TOC will be inserted into all <c>[TOC]</c>, <c>[[_TOC_]]</c> or <c>&lt;!-- toc --&gt;</c> comments within the markdown document. 
 /// </summary>
 public class TableOfContentsOptions {
 

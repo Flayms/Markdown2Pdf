@@ -59,7 +59,7 @@ var converter = new Markdown2PdfConverter(options);
 | `IsLandscape`                 | Paper orientation.                                                                                                                                       | `false`                     |
 | `Format`                      | The paper format for the PDF.                                                                                                                            | `A4`                        |
 | `Scale`                       | Scale of the content. Must be between 0.1 and 2.                                                                                                         | `1`                         |
-| `TableOfContents`             | Creates a TOC out of the markdown headers and writes it into `<!--TOC-->` comments within the markdown document. [More Information](#table-of-contents). | `null`                      |
+| `TableOfContents`             | Creates a TOC from the markdown headers. [More Information](#table-of-contents).                                                                         | `null`                      |
 
 ## Header and Footer
 
@@ -76,7 +76,19 @@ options.CustomHeadContent = "<style>h1, h2, h3 { page-break-before: always; }</s
 
 ## Table of contents
 
-To add a table of contents insert `<!--TOC-->` into the markdown file and use the `Markdown2PdfOptions.TableOfContents` option.
+To add a table of contents insert
+* `[TOC]` (Gitlab Syntax)
+* `[[_TOC_]]` (Gitlab Syntax)
+* or `<!-- toc -->` (Comment)
+
+into the markdown document and use the `Markdown2PdfOptions.TableOfContents` option:
+
+```md
+# My Document
+
+[TOC]
+...
+```
 
 Example creating a TOC:
 
