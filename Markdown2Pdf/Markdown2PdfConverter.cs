@@ -181,12 +181,11 @@ public class Markdown2PdfConverter {
   }
 
   internal string GenerateHtml(string markdownContent) {
-    var toc = (TableOfContentsCreator?)null;
-    var tocHtml = string.Empty;
-    
     if (this.Options.TableOfContents != null) {
-      toc = new(this.Options.TableOfContents);
-      tocHtml = toc.ToHtml(markdownContent);
+      var toc = new TableOfContentsCreator(this.Options.TableOfContents);
+      var tocHtml = toc.ToHtml(markdownContent);
+      File.WriteAllText("test.md", markdownContent);
+      toc.InsertInto(ref markdownContent, tocHtml);
     }
 
     var pipeline = new MarkdownPipelineBuilder()
@@ -195,7 +194,6 @@ public class Markdown2PdfConverter {
       .Build();
 
     var htmlContent = Markdown.ToHtml(markdownContent, pipeline);
-    toc?.InsertInto(ref htmlContent, tocHtml);
 
     var templateModel = this._CreateTemplateModel(htmlContent);
 
