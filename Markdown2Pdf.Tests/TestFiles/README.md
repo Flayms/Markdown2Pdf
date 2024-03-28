@@ -6,7 +6,7 @@ This is a demo of all the Markdown2Pdf features.
 
 # h1 Heading
 ## h2 Heading
-### h3 Heading
+### h3 Heading <!-- omit from toc -->
 #### h4 Heading
 ##### h5 Heading
 ###### h6 Heading
@@ -128,6 +128,6 @@ C -->|Two| E[iPhone]
 C -->|Three| F[Car]
 ```
 
-# <img src="md2pdf.png" alt="Logo" Width=64px/> ._-This - is a &@! heading __ with . and ! -
+## <img src="md2pdf.png" alt="Logo" Width=64px/> ._-This - is a &@! heading __ with . and ! -
 
 <!--TOC-->
