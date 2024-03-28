@@ -77,14 +77,18 @@ public partial class HtmlTests {
   }
 
   [Test]
-  [TestCase("""<ol><li><a href="#h2-heading">h2 Heading</a><ol>""")]
+  [TestCase("""</a></li><li><a href="#h2-heading">h2 Heading</a><ol>""")]
   [TestCase("""</a></li></ol></li></ol><li><a href="#horizontal-rules">Horizontal Rules</a></li>""")]
   [TestCase("""<a href="#this-is-a-heading_with.and">""")]
   [TestCase("""<a href="#emojis">""")]
-  public void TestTableOfContents(string content) {
+  public void TableOfContents_Should_Contain(string content) {
     // arrange
     var options = new Markdown2PdfOptions {
-      TableOfContents = new TableOfContents(true, 4)
+      TableOfContents = new TableOfContentsOptions {
+        IsOrdered = true,
+        MinDepthLevel = 2,
+        MaxDepthLevel = 5
+      }
     };
     var converter = new Markdown2PdfConverter(options);
 
@@ -96,6 +100,31 @@ public partial class HtmlTests {
 
     // assert
     Assert.That(html, Does.Contain(content));
+  }
+
+  [Test]
+  [TestCase("""<a href="#h1-heading">""")] // smaller than MinDepth
+  [TestCase("""<a href="#h6-heading">""")] // bigger than MaxDepth
+  [TestCase("""<a href="#h3-heading">""")] // omitted with comment
+  public void TableOfContents_Should_Not_Contain(string content) {
+    // arrange
+    var options = new Markdown2PdfOptions {
+      TableOfContents = new TableOfContentsOptions {
+        IsOrdered = true,
+        MinDepthLevel = 2,
+        MaxDepthLevel = 5
+      }
+    };
+    var converter = new Markdown2PdfConverter(options);
+
+    // act
+    var html = converter.GenerateHtml(File.ReadAllText(Utils.readmeFile));
+
+    // remove line endings for easier comparison
+    html = Utils.LineBreakRegex().Replace(html, string.Empty);
+
+    // assert
+    Assert.That(html, Does.Not.Contain(content));
   }
 
   [TearDown]
