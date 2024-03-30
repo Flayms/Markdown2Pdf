@@ -84,8 +84,15 @@ internal class TableOfContentsCreator(TableOfContentsOptions options) {
           var difference = fixedLinkDepth - lastDepth;
 
           // open nestings
-          for (var i = 0; i < difference; ++i)
-            tocBuilder.Append(NL + openList + NL + "<li>");
+          for (var i = 0; i < difference; ++i) {
+
+            // only provide bullets for elements that actually have text
+            var extraStyle = difference > 1 && i != difference - 1
+              ? " style='list-style:none'"
+              : string.Empty;
+
+            tocBuilder.Append(NL + openList + NL + $"<li{extraStyle}>");
+          }
           break;
 
         case var depth when depth == lastDepth: // same height
