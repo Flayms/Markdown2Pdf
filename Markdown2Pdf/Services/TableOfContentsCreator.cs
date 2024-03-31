@@ -18,7 +18,8 @@ internal class TableOfContentsCreator(TableOfContentsOptions options) {
     public override readonly string ToString() => $"<a href=\"{this.LinkAddress}\">{this.Title}</a>";
   }
 
-  private readonly bool _isOrdered = options.IsOrdered;
+  private readonly bool _isOrdered = options.ListStyle == ListStyle.OrderedDefault
+    || options.ListStyle== ListStyle.Decimal;
 
   // Substract 1 to adjust to 0 based values
   private readonly int _minDepthLevel = options.MinDepthLevel -1;
@@ -86,7 +87,7 @@ internal class TableOfContentsCreator(TableOfContentsOptions options) {
           // open nestings
           for (var i = 0; i < difference; ++i) {
 
-            // only provide bullets for elements that actually have text
+            // only provide ListStyle for elements that actually have text
             var extraStyle = difference > 1 && i != difference - 1
               ? " style='list-style:none'"
               : string.Empty;

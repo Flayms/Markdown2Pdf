@@ -85,7 +85,7 @@ public partial class HtmlTests {
     // arrange
     var options = new Markdown2PdfOptions {
       TableOfContents = new TableOfContentsOptions {
-        IsOrdered = true,
+        ListStyle = ListStyle.OrderedDefault,
         MinDepthLevel = 2,
         MaxDepthLevel = 5
       }
@@ -110,7 +110,7 @@ public partial class HtmlTests {
     // arrange
     var options = new Markdown2PdfOptions {
       TableOfContents = new TableOfContentsOptions {
-        IsOrdered = true,
+        ListStyle = ListStyle.OrderedDefault,
         MinDepthLevel = 2,
         MaxDepthLevel = 5
       }

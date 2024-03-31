@@ -11,10 +11,8 @@ public class TableOfContentsOptions {
   private const int _MIN_DEPTH_LEVEL = 1;
   private const int _MAX_DEPTH_LEVEL = 6;
 
-  /// <summary>
-  /// If <see langword="true"/>, will generate an Ordered List, otherwise an Unordered List.
-  /// </summary>
-  public bool IsOrdered { get; set; } = true;
+  /// <inheritdoc cref="Options.ListStyle"/>
+  public ListStyle ListStyle { get; set; } = ListStyle.OrderedDefault;
 
 
   private int? _minDepthLevel;
@@ -57,4 +55,30 @@ public class TableOfContentsOptions {
     }
   }
 
+}
+
+/// <summary>
+/// Decides which characters to use before the TOC items.
+/// </summary>
+public enum ListStyle {
+
+  /// <summary>
+  /// Just display the TOC items without any preceeding characters.
+  /// </summary>
+  None,
+
+  /// <summary>
+  /// Use the current themes default list-style for ordered lists.
+  /// </summary>
+  OrderedDefault,
+
+  /// <summary>
+  /// Use the current themes default list-style for unordered lists.
+  /// </summary>
+  Unordered,
+
+  /// <summary>
+  /// Preceed the TOC items with numbers separated by points (e.g. 1.1, 1.2, 1.2.1...).
+  /// </summary>
+  Decimal
 }

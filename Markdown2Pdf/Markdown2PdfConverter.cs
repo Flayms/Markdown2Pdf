@@ -44,6 +44,7 @@ public class Markdown2PdfConverter {
 
   private readonly EmbeddedResourceService _embeddedResourceService = new();
   private const string _STYLE_KEY = "stylePath";
+  private const string _TOC_LIST_STYLE_KEY = "tocListStyle";
   private const string _CUSTOM_HEAD_KEY = "customHeadContent";
   private const string _BODY_KEY = "body";
   private const string _CODE_HIGHLIGHT_THEME_NAME_KEY = "highlightjs_theme_name";
@@ -54,6 +55,8 @@ public class Markdown2PdfConverter {
   private const string _TEMPLATE_WITH_SCRIPTS_FILE_NAME = "ContentTemplate.html";
   private const string _TEMPLATE_NO_SCRIPTS_FILE_NAME = "ContentTemplate_NoScripts.html";
   private const string _HEADER_FOOTER_STYLES_FILE_NAME = "Header-Footer-Styles.html";
+  private const string _TOC_DECIMAL_STYLE_FILE_NAME = "TableOfContentsDecimalStyle.css";
+  private const string _TOC_LIST_STYLE_NONE = ".table-of-contents ul { list-style: none; }";
 
 
   /// <summary>
@@ -225,6 +228,15 @@ public class Markdown2PdfConverter {
       ? string.Empty
       : _DISABLE_AUTO_LANGUAGE_DETECTION_VALUE;
     templateModel.Add(_DISABLE_AUTO_LANGUAGE_DETECTION_KEY, languageDetectionValue);
+
+
+
+    var tableOfContentsDecimalStyle = this.Options.TableOfContents?.ListStyle switch {
+      ListStyle.None => _TOC_LIST_STYLE_NONE,
+      ListStyle.Decimal => this._embeddedResourceService.GetResourceContent(_TOC_DECIMAL_STYLE_FILE_NAME),
+      _ => string.Empty,
+    };
+    templateModel.Add(_TOC_LIST_STYLE_KEY, tableOfContentsDecimalStyle);
 
     templateModel.Add(_CODE_HIGHLIGHT_THEME_NAME_KEY, this.Options.CodeHighlightTheme.ToString());
     templateModel.Add(_CUSTOM_HEAD_KEY, this.Options.CustomHeadContent ?? string.Empty);
