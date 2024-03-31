@@ -18,7 +18,8 @@ internal class TableOfContentsCreator(TableOfContentsOptions options) {
     public override readonly string ToString() => $"<a href=\"{this.LinkAddress}\">{this.Title}</a>";
   }
 
-  private readonly bool _isOrdered = options.IsOrdered;
+  private readonly bool _isOrdered = options.ListStyle == ListStyle.OrderedDefault
+    || options.ListStyle== ListStyle.Decimal;
 
   // Substract 1 to adjust to 0 based values
   private readonly int _minDepthLevel = options.MinDepthLevel -1;

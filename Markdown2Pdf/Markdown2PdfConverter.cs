@@ -44,6 +44,8 @@ public class Markdown2PdfConverter {
 
   private readonly EmbeddedResourceService _embeddedResourceService = new();
   private const string _STYLE_KEY = "stylePath";
+  private const string _TOC_DECIMAL_STYLE = "TableOfContentsDecimalStyle.css";
+  private const string _TOC_DECIMAL_KEY = "tocDecimalStyle";
   private const string _CUSTOM_HEAD_KEY = "customHeadContent";
   private const string _BODY_KEY = "body";
   private const string _CODE_HIGHLIGHT_THEME_NAME_KEY = "highlightjs_theme_name";
@@ -225,6 +227,11 @@ public class Markdown2PdfConverter {
       ? string.Empty
       : _DISABLE_AUTO_LANGUAGE_DETECTION_VALUE;
     templateModel.Add(_DISABLE_AUTO_LANGUAGE_DETECTION_KEY, languageDetectionValue);
+
+    var tableOfContentsDecimalStyle = this.Options.TableOfContents?.ListStyle == ListStyle.Decimal
+      ? this._embeddedResourceService.GetResourceContent(_TOC_DECIMAL_STYLE)
+      : string.Empty;
+    templateModel.Add(_TOC_DECIMAL_KEY, tableOfContentsDecimalStyle);
 
     templateModel.Add(_CODE_HIGHLIGHT_THEME_NAME_KEY, this.Options.CodeHighlightTheme.ToString());
     templateModel.Add(_CUSTOM_HEAD_KEY, this.Options.CustomHeadContent ?? string.Empty);

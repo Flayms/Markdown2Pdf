@@ -15,7 +15,7 @@ var options = new Markdown2PdfOptions {
   },
   KeepHtml = true,
   TableOfContents = new TableOfContentsOptions {
-    IsOrdered = true,
+    ListStyle = ListStyle.Decimal,
     MinDepthLevel = 2,
     MaxDepthLevel = 6
   }

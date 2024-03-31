@@ -110,7 +110,7 @@ public class PdfTests {
     var options = new Markdown2PdfOptions {
       FooterHtml = File.ReadAllText(Utils.footerFile),
       TableOfContents = new TableOfContentsOptions {
-        IsOrdered = true,
+        ListStyle = ListStyle.OrderedDefault,
         MaxDepthLevel = 4
       }
     };
