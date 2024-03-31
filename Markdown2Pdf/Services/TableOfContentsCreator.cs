@@ -47,8 +47,15 @@ internal class TableOfContentsCreator {
     || options.ListStyle == ListStyle.Decimal;
     this._minDepthLevel = options.MinDepthLevel - 1;
     this._maxDepthLevel = options.MaxDepthLevel - 1;
-    convertionEvents.OnTemplateModelCreating += this._AddListStylesToTemplate;
     this._embeddedResourceService = embeddedResourceService;
+
+    convertionEvents.BeforeMarkdownConversion += this._AddToMarkdown;
+    convertionEvents.OnTemplateModelCreating += this._AddListStylesToTemplate;
+  }
+
+  private void _AddToMarkdown(object sender, MarkdownArgs e) {
+      var tocHtml = this._ToHtml(e.MarkdownContent);
+      e.MarkdownContent = this._InsertInto(e.MarkdownContent, tocHtml);
   }
 
   private void _AddListStylesToTemplate(object _, TemplateModelArgs e) {
@@ -86,7 +93,7 @@ internal class TableOfContentsCreator {
     return links;
   }
 
-  internal string ToHtml(string markdownContent) {
+  private string _ToHtml(string markdownContent) {
     var NL = Environment.NewLine;
     var links = _CreateLinks(markdownContent);
     var minLinkDepth = links.Min(l => l.Depth);
@@ -150,7 +157,6 @@ internal class TableOfContentsCreator {
     return tocBuilder.ToString();
   }
 
-  internal void InsertInto(ref string content, string tocHtml)
-    => content = _insertionRegex.Replace(content, tocHtml);
-
+  private string _InsertInto(string content, string tocHtml)
+    => _insertionRegex.Replace(content, tocHtml);
 }

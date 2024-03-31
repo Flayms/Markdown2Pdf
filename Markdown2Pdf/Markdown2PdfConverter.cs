@@ -38,8 +38,6 @@ public class Markdown2PdfConverter : IConvertionEvents {
   };
 
   private readonly EmbeddedResourceService _embeddedResourceService = new();
-  private readonly TableOfContentsCreator? _tocCreator;
-  private readonly ThemeService _themeService;
 
   private const string _CUSTOM_HEAD_KEY = "customHeadContent";
   private const string _BODY_KEY = "body";
@@ -59,12 +57,12 @@ public class Markdown2PdfConverter : IConvertionEvents {
   /// <param name="options">Optional options to specify how to convert the markdown.</param>
   public Markdown2PdfConverter(Markdown2PdfOptions? options = null) {
     this.Options = options ?? new Markdown2PdfOptions();
-    this._tocCreator = this.Options.TableOfContents != null
+    _ = this.Options.TableOfContents != null
       ? new TableOfContentsCreator(this.Options.TableOfContents, this, this._embeddedResourceService)
       : null;
 
     var moduleOptions = this.Options.ModuleOptions;
-    this._themeService = new ThemeService(this.Options.Theme, moduleOptions, this);
+    _ = new ThemeService(this.Options.Theme, moduleOptions, this);
 
     // adjust local dictionary paths
     if (moduleOptions is NodeModuleOptions nodeModuleOptions) {
@@ -78,6 +76,12 @@ public class Markdown2PdfConverter : IConvertionEvents {
       : _TEMPLATE_WITH_SCRIPTS_FILE_NAME;
 
     this.ContentTemplate = this._embeddedResourceService.GetResourceContent(templateName);
+  }
+
+  private event EventHandler<MarkdownArgs>? _beforeMarkdownConversion;
+  event EventHandler<MarkdownArgs> IConvertionEvents.BeforeMarkdownConversion {
+    add => _beforeMarkdownConversion += value;
+    remove => _beforeMarkdownConversion -= value;
   }
 
   private event EventHandler<TemplateModelArgs>? _onTemplateModelCreating;
@@ -175,11 +179,9 @@ public class Markdown2PdfConverter : IConvertionEvents {
   }
 
   internal string GenerateHtml(string markdownContent) {
-    if (this._tocCreator != null) {
-      var tocHtml = this._tocCreator.ToHtml(markdownContent);
-      File.WriteAllText("test.md", markdownContent);
-      this._tocCreator.InsertInto(ref markdownContent, tocHtml);
-    }
+    var markdownArgs = new MarkdownArgs(ref markdownContent);
+    this._beforeMarkdownConversion?.Invoke(this, markdownArgs);
+    markdownContent = markdownArgs.MarkdownContent;
 
     var pipeline = new MarkdownPipelineBuilder()
       .UseAdvancedExtensions()
@@ -266,7 +268,8 @@ public class Markdown2PdfConverter : IConvertionEvents {
   /// </summary>
   /// <param name="html">The header / footer html to add the styles to.</param>
   /// <returns>The html with added styles.</returns>
-  private string _AddHeaderFooterStylesToHtml(string html) => this._embeddedResourceService.GetResourceContent(_HEADER_FOOTER_STYLES_FILE_NAME) + html;
+  private string _AddHeaderFooterStylesToHtml(string html)
+    => this._embeddedResourceService.GetResourceContent(_HEADER_FOOTER_STYLES_FILE_NAME) + html;
 
   /// <summary>
   /// Inserts the document title into all elements containing the document-title class.
@@ -297,7 +300,7 @@ public class Markdown2PdfConverter : IConvertionEvents {
   private async Task<IBrowser> _CreateBrowserAsync() {
     var launchOptions = new LaunchOptions {
       Headless = true,
-      Args = new[] { "--no-sandbox" }, // needed for running inside docker
+      Args = ["--no-sandbox"], // needed for running inside docker
     };
 
     if (this.Options.ChromePath != null) {
