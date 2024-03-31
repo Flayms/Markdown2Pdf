@@ -1,5 +1,4 @@
-﻿using Markdown2Pdf.Services;
-using PuppeteerSharp.Media;
+﻿using PuppeteerSharp.Media;
 
 namespace Markdown2Pdf.Options;
 

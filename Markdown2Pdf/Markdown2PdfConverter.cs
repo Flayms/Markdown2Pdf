@@ -17,7 +17,7 @@ namespace Markdown2Pdf;
 /// <summary>
 /// Use this to parse markdown to PDF.
 /// </summary>
-public class Markdown2PdfConverter {
+public class Markdown2PdfConverter : IConvertionEvents {
 
   /// <summary>
   /// All the options this converter uses for generating the PDF.
@@ -37,14 +37,10 @@ public class Markdown2PdfConverter {
     {"fontawesome", new ("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css", "font-awesome/css/font-awesome.min.css") }
   };
 
-  private readonly IReadOnlyDictionary<ThemeType, ModuleInformation> _themeSourceMapping = new Dictionary<ThemeType, ModuleInformation>() {
-    {ThemeType.Github, new("https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.1/github-markdown-light.min.css", "github-markdown-css/github-markdown-light.css") },
-    {ThemeType.Latex, new("https://latex.now.sh/style.css", "latex.css/style.min.css") },
-  };
-
   private readonly EmbeddedResourceService _embeddedResourceService = new();
-  private const string _STYLE_KEY = "stylePath";
-  private const string _TOC_LIST_STYLE_KEY = "tocListStyle";
+  private readonly TableOfContentsCreator? _tocCreator;
+  private readonly ThemeService _themeService;
+
   private const string _CUSTOM_HEAD_KEY = "customHeadContent";
   private const string _BODY_KEY = "body";
   private const string _CODE_HIGHLIGHT_THEME_NAME_KEY = "highlightjs_theme_name";
@@ -55,8 +51,6 @@ public class Markdown2PdfConverter {
   private const string _TEMPLATE_WITH_SCRIPTS_FILE_NAME = "ContentTemplate.html";
   private const string _TEMPLATE_NO_SCRIPTS_FILE_NAME = "ContentTemplate_NoScripts.html";
   private const string _HEADER_FOOTER_STYLES_FILE_NAME = "Header-Footer-Styles.html";
-  private const string _TOC_DECIMAL_STYLE_FILE_NAME = "TableOfContentsDecimalStyle.css";
-  private const string _TOC_LIST_STYLE_NONE = ".table-of-contents ul { list-style: none; }";
 
 
   /// <summary>
@@ -65,15 +59,18 @@ public class Markdown2PdfConverter {
   /// <param name="options">Optional options to specify how to convert the markdown.</param>
   public Markdown2PdfConverter(Markdown2PdfOptions? options = null) {
     this.Options = options ?? new Markdown2PdfOptions();
+    this._tocCreator = this.Options.TableOfContents != null
+      ? new TableOfContentsCreator(this.Options.TableOfContents, this, this._embeddedResourceService)
+      : null;
 
     var moduleOptions = this.Options.ModuleOptions;
+    this._themeService = new ThemeService(this.Options.Theme, moduleOptions, this);
 
     // adjust local dictionary paths
     if (moduleOptions is NodeModuleOptions nodeModuleOptions) {
       var path = nodeModuleOptions.ModulePath;
 
-      this._packagelocationMapping = this._UpdateDic(this._packagelocationMapping, path);
-      this._themeSourceMapping = this._UpdateDic(this._themeSourceMapping, path);
+      this._packagelocationMapping = ModuleInformation.UpdateDic(this._packagelocationMapping, path);
     }
 
     var templateName = this.Options.ModuleOptions == ModuleOptions.None
@@ -83,16 +80,10 @@ public class Markdown2PdfConverter {
     this.ContentTemplate = this._embeddedResourceService.GetResourceContent(templateName);
   }
 
-  private IReadOnlyDictionary<TKey, ModuleInformation> _UpdateDic<TKey>(IReadOnlyDictionary<TKey, ModuleInformation> dicToUpdate, string path) {
-    var updatedLocationMapping = new Dictionary<TKey, ModuleInformation>();
-
-    foreach (var kvp in dicToUpdate) {
-      var key = kvp.Key;
-      var absoluteNodePath = Path.Combine(path, kvp.Value.NodePath);
-      updatedLocationMapping[key] = new(kvp.Value.RemotePath, absoluteNodePath);
-    }
-
-    return updatedLocationMapping;
+  private event EventHandler<TemplateModelArgs>? _onTemplateModelCreating;
+  event EventHandler<TemplateModelArgs>? IConvertionEvents.OnTemplateModelCreating {
+    add => _onTemplateModelCreating += value;
+    remove => _onTemplateModelCreating -= value;
   }
 
   /// <inheritdoc cref="Convert(FileInfo, FileInfo)"/>
@@ -184,11 +175,10 @@ public class Markdown2PdfConverter {
   }
 
   internal string GenerateHtml(string markdownContent) {
-    if (this.Options.TableOfContents != null) {
-      var toc = new TableOfContentsCreator(this.Options.TableOfContents);
-      var tocHtml = toc.ToHtml(markdownContent);
+    if (this._tocCreator != null) {
+      var tocHtml = this._tocCreator.ToHtml(markdownContent);
       File.WriteAllText("test.md", markdownContent);
-      toc.InsertInto(ref markdownContent, tocHtml);
+      this._tocCreator.InsertInto(ref markdownContent, tocHtml);
     }
 
     var pipeline = new MarkdownPipelineBuilder()
@@ -212,35 +202,16 @@ public class Markdown2PdfConverter {
     foreach (var kvp in this._packagelocationMapping)
       templateModel.Add(kvp.Key, isRemote ? kvp.Value.RemotePath : kvp.Value.NodePath);
 
-    switch (this.Options.Theme) {
-      case PredefinedTheme predefinedTheme when predefinedTheme.Type != ThemeType.None: {
-        var value = this._themeSourceMapping[predefinedTheme.Type];
-        templateModel.Add(_STYLE_KEY, isRemote ? value.RemotePath : value.NodePath);
-        break;
-      }
-
-      case CustomTheme customTheme:
-        templateModel.Add(_STYLE_KEY, customTheme.CssPath);
-        break;
-    }
-
     var languageDetectionValue = this.Options.EnableAutoLanguageDetection
       ? string.Empty
       : _DISABLE_AUTO_LANGUAGE_DETECTION_VALUE;
     templateModel.Add(_DISABLE_AUTO_LANGUAGE_DETECTION_KEY, languageDetectionValue);
 
-
-
-    var tableOfContentsDecimalStyle = this.Options.TableOfContents?.ListStyle switch {
-      ListStyle.None => _TOC_LIST_STYLE_NONE,
-      ListStyle.Decimal => this._embeddedResourceService.GetResourceContent(_TOC_DECIMAL_STYLE_FILE_NAME),
-      _ => string.Empty,
-    };
-    templateModel.Add(_TOC_LIST_STYLE_KEY, tableOfContentsDecimalStyle);
-
     templateModel.Add(_CODE_HIGHLIGHT_THEME_NAME_KEY, this.Options.CodeHighlightTheme.ToString());
     templateModel.Add(_CUSTOM_HEAD_KEY, this.Options.CustomHeadContent ?? string.Empty);
     templateModel.Add(_BODY_KEY, htmlContent);
+
+    this._onTemplateModelCreating?.Invoke(this, new TemplateModelArgs(templateModel));
 
     return templateModel;
   }
