@@ -11,6 +11,7 @@ public class TableOfContentsOptions {
   private const int _MIN_DEPTH_LEVEL = 1;
   private const int _MAX_DEPTH_LEVEL = 6;
 
+  /// <inheritdoc cref="Options.ListStyle"/>
   public ListStyle ListStyle { get; set; } = ListStyle.OrderedDefault;
 
 

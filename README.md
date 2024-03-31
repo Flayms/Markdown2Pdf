@@ -94,7 +94,7 @@ Example creating a TOC:
 
 ```cs
 options.TableOfContents = new TableOfContentsOptions {
-  IsOrdered = true,
+  ListStyle = ListStyle.Decimal,
 
   // Include all heading levels from 2 to 4.
   MinDepthLevel = 2,
