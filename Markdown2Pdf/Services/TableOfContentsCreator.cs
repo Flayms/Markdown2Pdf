@@ -87,7 +87,7 @@ internal class TableOfContentsCreator(TableOfContentsOptions options) {
           // open nestings
           for (var i = 0; i < difference; ++i) {
 
-            // only provide bullets for elements that actually have text
+            // only provide ListStyle for elements that actually have text
             var extraStyle = difference > 1 && i != difference - 1
               ? " style='list-style:none'"
               : string.Empty;

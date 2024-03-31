@@ -61,11 +61,10 @@ public class TableOfContentsOptions {
 /// </summary>
 public enum ListStyle {
 
-  // TODO: implement
   /// <summary>
   /// Just display the TOC items without any preceeding characters.
   /// </summary>
-  //None,
+  None,
 
   /// <summary>
   /// Use the current themes default list-style for ordered lists.
