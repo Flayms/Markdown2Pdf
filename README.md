@@ -109,6 +109,8 @@ A header can be omitted from the toc by ending it with `<!-- omit from toc -->`:
 
 The TOC gets generated within a `<nav class="table-of-contents">`. This can be used to apply extra custom styles.
 
+`TableOfContentsOptions.HasColoredLinks`: If set, Headers in TOC get default link markup.
+
 ## Modules
 
 This library uses node_modules packages.
