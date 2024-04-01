@@ -9,12 +9,14 @@
     display: table;
     counter-increment: item;
     margin-bottom: 0.6em;
+    width: 100%;
   }
 
     .table-of-contents ol > li:before {
       content: counters(item, ".") ". ";
       display: table-cell;
       padding-right: 0.6em;
+      width: 0;
     }
 
 .table-of-contents li ol > li {

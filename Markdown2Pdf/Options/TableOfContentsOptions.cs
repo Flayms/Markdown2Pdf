@@ -19,6 +19,11 @@ public class TableOfContentsOptions {
   /// </summary>
   public bool HasColoredLinks { get; set; }
 
+  /// <summary>
+  /// Determines if the TOC should include page numbers (Default: <c>true</c>).
+  /// </summary>
+  public bool HasPageNumbers { get; set; } = true;
+
 
   private int? _minDepthLevel;
 

@@ -15,11 +15,11 @@ internal class TableOfContentsCreator {
     public string LinkAddress { get; } = linkAddress;
     public int Depth { get; } = Depth;
 
-    public override readonly string ToString() => $"<a href=\"{this.LinkAddress}\">{this.Title}</a>";
+    public readonly string ToHtml() => $"<a href=\"{this.LinkAddress}\">{this.Title}</a>";
+    public readonly string ToHtml(int pageNumber) => $"<a href=\"{this.LinkAddress}\"><span>{this.Title}</span><span>{pageNumber}</span></a>";
   }
 
-  private readonly ListStyle _listStyle;
-  private readonly bool _hasColoredLinks;
+  private readonly TableOfContentsOptions _options;
   private readonly bool _isOrdered;
 
   // Substract 1 to adjust to 0 based values
@@ -31,8 +31,7 @@ internal class TableOfContentsCreator {
   private const string _OMIT_IN_TOC_IDENTIFIER = "<!-- omit from toc -->";
   private const string _HTML_CLASS_NAME = "table-of-contents";
 
-  private const string _LIST_STYLE_KEY = "tocListStyle";
-  private const string _LINK_STYLE_KEY = "tocLinkStyle";
+  private const string _TOC_STYLE_KEY = "tocStyle";
   private const string _DECIMAL_STYLE_FILE_NAME = "TableOfContentsDecimalStyle.css";
   private const string _LIST_STYLE_NONE = ".table-of-contents ul { list-style: none; }";
 
@@ -44,8 +43,7 @@ internal class TableOfContentsCreator {
     RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline);
 
   public TableOfContentsCreator(TableOfContentsOptions options, IConvertionEvents convertionEvents, EmbeddedResourceService embeddedResourceService) {
-    this._listStyle = options.ListStyle;
-    this._hasColoredLinks = options.HasColoredLinks;
+    this._options = options;
     this._isOrdered = options.ListStyle == ListStyle.OrderedDefault
       || options.ListStyle == ListStyle.Decimal;
     this._minDepthLevel = options.MinDepthLevel - 1;
@@ -62,17 +60,19 @@ internal class TableOfContentsCreator {
   }
 
   private void _AddStylesToTemplate(object _, TemplateModelArgs e) {
-    var tableOfContentsDecimalStyle = this._listStyle switch {
+    var tableOfContentsDecimalStyle = this._options.ListStyle switch {
       ListStyle.None => _LIST_STYLE_NONE,
       ListStyle.Decimal => this._embeddedResourceService.GetResourceContent(_DECIMAL_STYLE_FILE_NAME),
       _ => string.Empty,
     };
-    e.TemplateModel.Add(_LIST_STYLE_KEY, tableOfContentsDecimalStyle);
 
-    var linkStyle = this._hasColoredLinks
-      ? string.Empty
-      : ".table-of-contents a { all: unset; }";
-    e.TemplateModel.Add(_LINK_STYLE_KEY, linkStyle);
+    if (this._options.HasColoredLinks)
+      tableOfContentsDecimalStyle += Environment.NewLine + ".table-of-contents a { all: unset; }";
+
+    if (this._options.HasPageNumbers)
+      tableOfContentsDecimalStyle += Environment.NewLine + ".table-of-contents a { display: flex; justify-content: space-between; }";
+
+    e.TemplateModel.Add(_TOC_STYLE_KEY, tableOfContentsDecimalStyle);
   }
 
   private IEnumerable<Link> _CreateLinks(string markdownContent) {
@@ -154,7 +154,9 @@ internal class TableOfContentsCreator {
       }
 
       lastDepth = fixedLinkDepth;
-      tocBuilder.Append(link);
+
+      var linkText = this._options.HasPageNumbers ? link.ToHtml(7) : link.ToHtml();
+      tocBuilder.Append(linkText);
     }
 
     for (var i = 0; i <= lastDepth; ++i)
