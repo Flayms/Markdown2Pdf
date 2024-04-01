@@ -20,7 +20,7 @@ internal class TemplateFiller {
       var keyName = token.Replace("@", string.Empty).Replace("(", string.Empty).Replace(")", string.Empty);
 
       if (!model.TryGetValue(keyName, out var value))
-        throw new Exception($"The given model has no value provided for the templatekey \"{keyName}\".");
+        value = string.Empty;
 
       filled = filled.Replace(token, value);
     }

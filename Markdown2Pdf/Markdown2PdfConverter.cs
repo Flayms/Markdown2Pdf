@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Markdig;
-using Markdown2Pdf.Models;
 using Markdown2Pdf.Options;
 using Markdown2Pdf.Services;
 using PuppeteerSharp;
@@ -29,14 +28,6 @@ public class Markdown2PdfConverter : IConvertionEvents {
   /// </summary>
   public string ContentTemplate { get; set; }
 
-  private readonly IReadOnlyDictionary<string, ModuleInformation> _packagelocationMapping = new Dictionary<string, ModuleInformation>() {
-    {"mathjax", new ("https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js", "mathjax/es5/tex-mml-chtml.js") },
-    {"mermaid", new ("https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js", "mermaid/dist/mermaid.min.js") },
-    {"highlightjs", new ("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js", "@highlightjs/cdn-assets/highlight.min.js") },
-    {"highlightjs_style", new ("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles", "@highlightjs/cdn-assets/styles") },
-    {"fontawesome", new ("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css", "font-awesome/css/font-awesome.min.css") }
-  };
-
   private readonly EmbeddedResourceService _embeddedResourceService = new();
 
   private const string _CUSTOM_HEAD_KEY = "customHeadContent";
@@ -50,6 +41,7 @@ public class Markdown2PdfConverter : IConvertionEvents {
   private const string _TEMPLATE_NO_SCRIPTS_FILE_NAME = "ContentTemplate_NoScripts.html";
   private const string _HEADER_FOOTER_STYLES_FILE_NAME = "Header-Footer-Styles.html";
 
+  private readonly object?[] _services = new object[3];
 
   /// <summary>
   /// Instantiate a new <see cref="Markdown2PdfConverter"/>.
@@ -57,25 +49,18 @@ public class Markdown2PdfConverter : IConvertionEvents {
   /// <param name="options">Optional options to specify how to convert the markdown.</param>
   public Markdown2PdfConverter(Markdown2PdfOptions? options = null) {
     this.Options = options ?? new Markdown2PdfOptions();
-    _ = this.Options.TableOfContents != null
-      ? new TableOfContentsCreator(this.Options.TableOfContents, this, this._embeddedResourceService)
-      : null;
-
     var moduleOptions = this.Options.ModuleOptions;
-    _ = new ThemeService(this.Options.Theme, moduleOptions, this);
-
-    // adjust local dictionary paths
-    if (moduleOptions is NodeModuleOptions nodeModuleOptions) {
-      var path = nodeModuleOptions.ModulePath;
-
-      this._packagelocationMapping = ModuleInformation.UpdateDic(this._packagelocationMapping, path);
-    }
 
     var templateName = this.Options.ModuleOptions == ModuleOptions.None
       ? _TEMPLATE_NO_SCRIPTS_FILE_NAME
       : _TEMPLATE_WITH_SCRIPTS_FILE_NAME;
-
     this.ContentTemplate = this._embeddedResourceService.GetResourceContent(templateName);
+
+    _services[0] = this.Options.TableOfContents != null
+      ? new TableOfContentsCreator(this.Options.TableOfContents, this, this._embeddedResourceService)
+      : null;
+    _services[1] = new ThemeService(this.Options.Theme, moduleOptions, this);
+    _services[2] = new ModuleService(this.Options.ModuleOptions, this);
   }
 
   private event EventHandler<MarkdownArgs>? _beforeMarkdownConversion;
@@ -198,17 +183,10 @@ public class Markdown2PdfConverter : IConvertionEvents {
   private Dictionary<string, string> _CreateTemplateModel(string htmlContent) {
     var templateModel = new Dictionary<string, string>();
 
-    // load correct module paths
-    var isRemote = this.Options.ModuleOptions.ModuleLocation == ModuleLocation.Remote;
-
-    foreach (var kvp in this._packagelocationMapping)
-      templateModel.Add(kvp.Key, isRemote ? kvp.Value.RemotePath : kvp.Value.NodePath);
-
     var languageDetectionValue = this.Options.EnableAutoLanguageDetection
       ? string.Empty
       : _DISABLE_AUTO_LANGUAGE_DETECTION_VALUE;
     templateModel.Add(_DISABLE_AUTO_LANGUAGE_DETECTION_KEY, languageDetectionValue);
-
     templateModel.Add(_CODE_HIGHLIGHT_THEME_NAME_KEY, this.Options.CodeHighlightTheme.ToString());
     templateModel.Add(_CUSTOM_HEAD_KEY, this.Options.CustomHeadContent ?? string.Empty);
     templateModel.Add(_BODY_KEY, htmlContent);
