@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Markdig;
-using Markdown2Pdf.Models;
 using Markdown2Pdf.Options;
 using Markdown2Pdf.Services;
 using PuppeteerSharp;
@@ -17,7 +16,7 @@ namespace Markdown2Pdf;
 /// <summary>
 /// Use this to parse markdown to PDF.
 /// </summary>
-public class Markdown2PdfConverter {
+public class Markdown2PdfConverter : IConvertionEvents {
 
   /// <summary>
   /// All the options this converter uses for generating the PDF.
@@ -29,22 +28,8 @@ public class Markdown2PdfConverter {
   /// </summary>
   public string ContentTemplate { get; set; }
 
-  private readonly IReadOnlyDictionary<string, ModuleInformation> _packagelocationMapping = new Dictionary<string, ModuleInformation>() {
-    {"mathjax", new ("https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js", "mathjax/es5/tex-mml-chtml.js") },
-    {"mermaid", new ("https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js", "mermaid/dist/mermaid.min.js") },
-    {"highlightjs", new ("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js", "@highlightjs/cdn-assets/highlight.min.js") },
-    {"highlightjs_style", new ("https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles", "@highlightjs/cdn-assets/styles") },
-    {"fontawesome", new ("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css", "font-awesome/css/font-awesome.min.css") }
-  };
-
-  private readonly IReadOnlyDictionary<ThemeType, ModuleInformation> _themeSourceMapping = new Dictionary<ThemeType, ModuleInformation>() {
-    {ThemeType.Github, new("https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.1/github-markdown-light.min.css", "github-markdown-css/github-markdown-light.css") },
-    {ThemeType.Latex, new("https://latex.now.sh/style.css", "latex.css/style.min.css") },
-  };
-
   private readonly EmbeddedResourceService _embeddedResourceService = new();
-  private const string _STYLE_KEY = "stylePath";
-  private const string _TOC_LIST_STYLE_KEY = "tocListStyle";
+
   private const string _CUSTOM_HEAD_KEY = "customHeadContent";
   private const string _BODY_KEY = "body";
   private const string _CODE_HIGHLIGHT_THEME_NAME_KEY = "highlightjs_theme_name";
@@ -55,9 +40,8 @@ public class Markdown2PdfConverter {
   private const string _TEMPLATE_WITH_SCRIPTS_FILE_NAME = "ContentTemplate.html";
   private const string _TEMPLATE_NO_SCRIPTS_FILE_NAME = "ContentTemplate_NoScripts.html";
   private const string _HEADER_FOOTER_STYLES_FILE_NAME = "Header-Footer-Styles.html";
-  private const string _TOC_DECIMAL_STYLE_FILE_NAME = "TableOfContentsDecimalStyle.css";
-  private const string _TOC_LIST_STYLE_NONE = ".table-of-contents ul { list-style: none; }";
 
+  private readonly object?[] _services = new object[3];
 
   /// <summary>
   /// Instantiate a new <see cref="Markdown2PdfConverter"/>.
@@ -65,34 +49,30 @@ public class Markdown2PdfConverter {
   /// <param name="options">Optional options to specify how to convert the markdown.</param>
   public Markdown2PdfConverter(Markdown2PdfOptions? options = null) {
     this.Options = options ?? new Markdown2PdfOptions();
-
     var moduleOptions = this.Options.ModuleOptions;
-
-    // adjust local dictionary paths
-    if (moduleOptions is NodeModuleOptions nodeModuleOptions) {
-      var path = nodeModuleOptions.ModulePath;
-
-      this._packagelocationMapping = this._UpdateDic(this._packagelocationMapping, path);
-      this._themeSourceMapping = this._UpdateDic(this._themeSourceMapping, path);
-    }
 
     var templateName = this.Options.ModuleOptions == ModuleOptions.None
       ? _TEMPLATE_NO_SCRIPTS_FILE_NAME
       : _TEMPLATE_WITH_SCRIPTS_FILE_NAME;
-
     this.ContentTemplate = this._embeddedResourceService.GetResourceContent(templateName);
+
+    _services[0] = this.Options.TableOfContents != null
+      ? new TableOfContentsCreator(this.Options.TableOfContents, this, this._embeddedResourceService)
+      : null;
+    _services[1] = new ThemeService(this.Options.Theme, moduleOptions, this);
+    _services[2] = new ModuleService(this.Options.ModuleOptions, this);
   }
 
-  private IReadOnlyDictionary<TKey, ModuleInformation> _UpdateDic<TKey>(IReadOnlyDictionary<TKey, ModuleInformation> dicToUpdate, string path) {
-    var updatedLocationMapping = new Dictionary<TKey, ModuleInformation>();
+  private event EventHandler<MarkdownArgs>? _beforeMarkdownConversion;
+  event EventHandler<MarkdownArgs> IConvertionEvents.BeforeMarkdownConversion {
+    add => _beforeMarkdownConversion += value;
+    remove => _beforeMarkdownConversion -= value;
+  }
 
-    foreach (var kvp in dicToUpdate) {
-      var key = kvp.Key;
-      var absoluteNodePath = Path.Combine(path, kvp.Value.NodePath);
-      updatedLocationMapping[key] = new(kvp.Value.RemotePath, absoluteNodePath);
-    }
-
-    return updatedLocationMapping;
+  private event EventHandler<TemplateModelArgs>? _onTemplateModelCreating;
+  event EventHandler<TemplateModelArgs>? IConvertionEvents.OnTemplateModelCreating {
+    add => _onTemplateModelCreating += value;
+    remove => _onTemplateModelCreating -= value;
   }
 
   /// <inheritdoc cref="Convert(FileInfo, FileInfo)"/>
@@ -184,12 +164,9 @@ public class Markdown2PdfConverter {
   }
 
   internal string GenerateHtml(string markdownContent) {
-    if (this.Options.TableOfContents != null) {
-      var toc = new TableOfContentsCreator(this.Options.TableOfContents);
-      var tocHtml = toc.ToHtml(markdownContent);
-      File.WriteAllText("test.md", markdownContent);
-      toc.InsertInto(ref markdownContent, tocHtml);
-    }
+    var markdownArgs = new MarkdownArgs(ref markdownContent);
+    this._beforeMarkdownConversion?.Invoke(this, markdownArgs);
+    markdownContent = markdownArgs.MarkdownContent;
 
     var pipeline = new MarkdownPipelineBuilder()
       .UseAdvancedExtensions()
@@ -206,41 +183,15 @@ public class Markdown2PdfConverter {
   private Dictionary<string, string> _CreateTemplateModel(string htmlContent) {
     var templateModel = new Dictionary<string, string>();
 
-    // load correct module paths
-    var isRemote = this.Options.ModuleOptions.ModuleLocation == ModuleLocation.Remote;
-
-    foreach (var kvp in this._packagelocationMapping)
-      templateModel.Add(kvp.Key, isRemote ? kvp.Value.RemotePath : kvp.Value.NodePath);
-
-    switch (this.Options.Theme) {
-      case PredefinedTheme predefinedTheme when predefinedTheme.Type != ThemeType.None: {
-        var value = this._themeSourceMapping[predefinedTheme.Type];
-        templateModel.Add(_STYLE_KEY, isRemote ? value.RemotePath : value.NodePath);
-        break;
-      }
-
-      case CustomTheme customTheme:
-        templateModel.Add(_STYLE_KEY, customTheme.CssPath);
-        break;
-    }
-
     var languageDetectionValue = this.Options.EnableAutoLanguageDetection
       ? string.Empty
       : _DISABLE_AUTO_LANGUAGE_DETECTION_VALUE;
     templateModel.Add(_DISABLE_AUTO_LANGUAGE_DETECTION_KEY, languageDetectionValue);
-
-
-
-    var tableOfContentsDecimalStyle = this.Options.TableOfContents?.ListStyle switch {
-      ListStyle.None => _TOC_LIST_STYLE_NONE,
-      ListStyle.Decimal => this._embeddedResourceService.GetResourceContent(_TOC_DECIMAL_STYLE_FILE_NAME),
-      _ => string.Empty,
-    };
-    templateModel.Add(_TOC_LIST_STYLE_KEY, tableOfContentsDecimalStyle);
-
     templateModel.Add(_CODE_HIGHLIGHT_THEME_NAME_KEY, this.Options.CodeHighlightTheme.ToString());
     templateModel.Add(_CUSTOM_HEAD_KEY, this.Options.CustomHeadContent ?? string.Empty);
     templateModel.Add(_BODY_KEY, htmlContent);
+
+    this._onTemplateModelCreating?.Invoke(this, new TemplateModelArgs(templateModel));
 
     return templateModel;
   }
@@ -295,7 +246,8 @@ public class Markdown2PdfConverter {
   /// </summary>
   /// <param name="html">The header / footer html to add the styles to.</param>
   /// <returns>The html with added styles.</returns>
-  private string _AddHeaderFooterStylesToHtml(string html) => this._embeddedResourceService.GetResourceContent(_HEADER_FOOTER_STYLES_FILE_NAME) + html;
+  private string _AddHeaderFooterStylesToHtml(string html)
+    => this._embeddedResourceService.GetResourceContent(_HEADER_FOOTER_STYLES_FILE_NAME) + html;
 
   /// <summary>
   /// Inserts the document title into all elements containing the document-title class.
@@ -326,7 +278,7 @@ public class Markdown2PdfConverter {
   private async Task<IBrowser> _CreateBrowserAsync() {
     var launchOptions = new LaunchOptions {
       Headless = true,
-      Args = new[] { "--no-sandbox" }, // needed for running inside docker
+      Args = ["--no-sandbox"], // needed for running inside docker
     };
 
     if (this.Options.ChromePath != null) {
