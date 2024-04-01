@@ -1,9 +1,9 @@
-﻿using Markdown2Pdf.Models;
+﻿using System.Collections.Generic;
+using Markdown2Pdf.Models;
 using Markdown2Pdf.Options;
-using System;
-using System.Collections.Generic;
 
 namespace Markdown2Pdf.Services;
+
 internal class ThemeService {
 
   private const string _STYLE_KEY = "stylePath";

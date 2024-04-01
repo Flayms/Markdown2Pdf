@@ -54,8 +54,8 @@ internal class TableOfContentsCreator {
   }
 
   private void _AddToMarkdown(object sender, MarkdownArgs e) {
-      var tocHtml = this._ToHtml(e.MarkdownContent);
-      e.MarkdownContent = this._InsertInto(e.MarkdownContent, tocHtml);
+    var tocHtml = this._ToHtml(e.MarkdownContent);
+    e.MarkdownContent = this._InsertInto(e.MarkdownContent, tocHtml);
   }
 
   private void _AddListStylesToTemplate(object _, TemplateModelArgs e) {

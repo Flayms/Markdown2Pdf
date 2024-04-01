@@ -66,7 +66,7 @@ internal partial class Utils {
         var text = ContentOrderTextExtractor.GetText(page);
 
         if (text.Contains(searchText))
-         ++sum;
+          ++sum;
       }
     }
 

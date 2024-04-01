@@ -213,6 +213,10 @@ dotnet_naming_rule.private_field_should_be_underscorecamelcase.severity = sugges
 dotnet_naming_rule.private_field_should_be_underscorecamelcase.symbols = private_field
 dotnet_naming_rule.private_field_should_be_underscorecamelcase.style = underscorecamelcase
 
+dotnet_naming_rule.private_event_should_be_underscorecamelcase.severity = suggestion
+dotnet_naming_rule.private_event_should_be_underscorecamelcase.symbols = private_event
+dotnet_naming_rule.private_event_should_be_underscorecamelcase.style = underscorecamelcase
+
 dotnet_naming_rule.non_private_field_should_be_camelcase.severity = suggestion
 dotnet_naming_rule.non_private_field_should_be_camelcase.symbols = non_private_field
 dotnet_naming_rule.non_private_field_should_be_camelcase.style = camelcase
@@ -262,6 +266,10 @@ dotnet_naming_symbols.non_private_constant.required_modifiers = const
 dotnet_naming_symbols.non_private_field.applicable_kinds = field
 dotnet_naming_symbols.non_private_field.applicable_accessibilities = public, internal, protected, protected_internal, private_protected, local
 dotnet_naming_symbols.non_private_field.required_modifiers = 
+
+dotnet_naming_symbols.private_event.applicable_kinds = event
+dotnet_naming_symbols.private_event.applicable_accessibilities = private
+dotnet_naming_symbols.private_event.required_modifiers = 
 
 # Naming styles
 

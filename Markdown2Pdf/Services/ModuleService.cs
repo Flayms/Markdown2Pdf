@@ -1,11 +1,10 @@
-﻿using Markdown2Pdf.Models;
+﻿using System.Collections.Generic;
+using Markdown2Pdf.Models;
 using Markdown2Pdf.Options;
-using System;
-using System.Collections.Generic;
 
 namespace Markdown2Pdf.Services;
-internal class ModuleService {
 
+internal class ModuleService {
 
   private readonly IReadOnlyDictionary<string, ModuleInformation> _packagelocationMapping = new Dictionary<string, ModuleInformation>() {
     {"mathjax", new ("https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js", "mathjax/es5/tex-mml-chtml.js") },
