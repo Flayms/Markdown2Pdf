@@ -19,6 +19,7 @@ internal class TableOfContentsCreator {
   }
 
   private readonly ListStyle _listStyle;
+  private readonly bool _hasColoredLinks;
   private readonly bool _isOrdered;
 
   // Substract 1 to adjust to 0 based values
@@ -30,9 +31,10 @@ internal class TableOfContentsCreator {
   private const string _OMIT_IN_TOC_IDENTIFIER = "<!-- omit from toc -->";
   private const string _HTML_CLASS_NAME = "table-of-contents";
 
-  private const string _TOC_LIST_STYLE_KEY = "tocListStyle";
-  private const string _TOC_DECIMAL_STYLE_FILE_NAME = "TableOfContentsDecimalStyle.css";
-  private const string _TOC_LIST_STYLE_NONE = ".table-of-contents ul { list-style: none; }";
+  private const string _LIST_STYLE_KEY = "tocListStyle";
+  private const string _LINK_STYLE_KEY = "tocLinkStyle";
+  private const string _DECIMAL_STYLE_FILE_NAME = "TableOfContentsDecimalStyle.css";
+  private const string _LIST_STYLE_NONE = ".table-of-contents ul { list-style: none; }";
 
   private static readonly Regex _headerReg = new("^(?<hashes>#{1,6}) +(?<title>[^\r\n]*)",
     RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.ExplicitCapture);
@@ -43,14 +45,15 @@ internal class TableOfContentsCreator {
 
   public TableOfContentsCreator(TableOfContentsOptions options, IConvertionEvents convertionEvents, EmbeddedResourceService embeddedResourceService) {
     this._listStyle = options.ListStyle;
+    this._hasColoredLinks = options.HasColoredLinks;
     this._isOrdered = options.ListStyle == ListStyle.OrderedDefault
-    || options.ListStyle == ListStyle.Decimal;
+      || options.ListStyle == ListStyle.Decimal;
     this._minDepthLevel = options.MinDepthLevel - 1;
     this._maxDepthLevel = options.MaxDepthLevel - 1;
     this._embeddedResourceService = embeddedResourceService;
 
     convertionEvents.BeforeMarkdownConversion += this._AddToMarkdown;
-    convertionEvents.OnTemplateModelCreating += this._AddListStylesToTemplate;
+    convertionEvents.OnTemplateModelCreating += this._AddStylesToTemplate;
   }
 
   private void _AddToMarkdown(object sender, MarkdownArgs e) {
@@ -58,13 +61,18 @@ internal class TableOfContentsCreator {
     e.MarkdownContent = this._InsertInto(e.MarkdownContent, tocHtml);
   }
 
-  private void _AddListStylesToTemplate(object _, TemplateModelArgs e) {
+  private void _AddStylesToTemplate(object _, TemplateModelArgs e) {
     var tableOfContentsDecimalStyle = this._listStyle switch {
-      ListStyle.None => _TOC_LIST_STYLE_NONE,
-      ListStyle.Decimal => this._embeddedResourceService.GetResourceContent(_TOC_DECIMAL_STYLE_FILE_NAME),
+      ListStyle.None => _LIST_STYLE_NONE,
+      ListStyle.Decimal => this._embeddedResourceService.GetResourceContent(_DECIMAL_STYLE_FILE_NAME),
       _ => string.Empty,
     };
-    e.TemplateModel.Add(_TOC_LIST_STYLE_KEY, tableOfContentsDecimalStyle);
+    e.TemplateModel.Add(_LIST_STYLE_KEY, tableOfContentsDecimalStyle);
+
+    var linkStyle = this._hasColoredLinks
+      ? string.Empty
+      : ".table-of-contents a { all: unset; }";
+    e.TemplateModel.Add(_LINK_STYLE_KEY, linkStyle);
   }
 
   private IEnumerable<Link> _CreateLinks(string markdownContent) {

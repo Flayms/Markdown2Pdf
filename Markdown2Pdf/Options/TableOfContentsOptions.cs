@@ -14,6 +14,11 @@ public class TableOfContentsOptions {
   /// <inheritdoc cref="Options.ListStyle"/>
   public ListStyle ListStyle { get; set; } = ListStyle.OrderedDefault;
 
+  /// <summary>
+  /// Determines if the TOC links should have the default link color (instead of looking like normal text).
+  /// </summary>
+  public bool HasColoredLinks { get; set; }
+
 
   private int? _minDepthLevel;
 
