@@ -12,13 +12,18 @@ namespace Markdown2Pdf.Services;
 
 internal class TableOfContentsCreator {
 
-  private readonly struct Link(string title, string linkAddress, int Depth) {
+  private class Link(string title, string linkAddress, int Depth) {
     public string Title { get; } = title;
     public string LinkAddress { get; } = linkAddress;
     public int Depth { get; } = Depth;
 
-    public readonly string ToHtml() => $"<a href=\"{this.LinkAddress}\">{this.Title}</a>";
-    public readonly string ToHtml(int pageNumber) => $"<a href=\"{this.LinkAddress}\"><span>{this.Title}</span><span>{pageNumber}</span></a>";
+    public string ToHtml() => $"<a href=\"{this.LinkAddress}\">{this.Title}</a>";
+    public string ToHtml(int pageNumber) => $"<a href=\"{this.LinkAddress}\"><span>{this.Title}</span><span>{pageNumber}</span></a>";
+  }
+
+  private class LinkWithPageNumber(Link link, int pageNumber)
+    : Link(link.Title, link.LinkAddress, link.Depth) {
+    public int PageNumber { get; } = pageNumber;
   }
 
   private readonly TableOfContentsOptions _options;
@@ -33,7 +38,7 @@ internal class TableOfContentsCreator {
   private readonly EmbeddedResourceService _embeddedResourceService;
 
   private Link[]? _links;
-  private Dictionary<Link, int>? _linkPageMapping;
+  private LinkWithPageNumber[]? _linkPages;
 
   private const string _OMIT_IN_TOC_IDENTIFIER = "<!-- omit from toc -->";
   private const string _HTML_CLASS_NAME = "table-of-contents";
@@ -95,12 +100,23 @@ internal class TableOfContentsCreator {
     e.NeedsRerun = true;
 
     using var pdf = PdfDocument.Open(e.PdfPath);
-    this._linkPageMapping = _ParsePageNumbersFromPdf(pdf, this._links);
+    this._linkPages = _ParsePageNumbersFromPdf(pdf, this._links).ToArray();
+
+    // Fill in values that could not be found
+    var length = this._links.Length;
+    for (var i = 0; i < length; ++i) {
+      if (this._linkPages[i] != null)
+        continue;
+
+      this._linkPages[i] = i == 0
+        ? new(this._links[i], 1) // Assume first page
+        : new(this._links[i], this._linkPages[i - 1].PageNumber); // Assume same as previous
+    }
   }
 
-  private static Dictionary<Link, int> _ParsePageNumbersFromPdf(PdfDocument pdf, IEnumerable<Link> links) {
-    var linkPageNumbers = new Dictionary<Link, int>();
-    var linksToFind = new List<Link>(links);
+  private static IEnumerable<LinkWithPageNumber> _ParsePageNumbersFromPdf(PdfDocument pdf, Link[] links) {
+    var linkPages = new LinkWithPageNumber[links.Count()];
+    var linksToFind = links.ToList();
 
     foreach (var page in pdf.GetPages()) {
       var text = ContentOrderTextExtractor.GetText(page);
@@ -111,16 +127,16 @@ internal class TableOfContentsCreator {
           if (link.Title != line)
             continue;
 
-          linkPageNumbers[link] = page.Number;
+          linkPages[Array.IndexOf(links, link)] = new(link, page.Number);
           linksToFind.Remove(link);
           if (linksToFind.Count() == 0)
-            return linkPageNumbers; // All links found
+            return linkPages; // All links found
 
           break; // Found link, continue with next line
         }
     }
 
-    return linkPageNumbers;
+    return linkPages;
   }
 
   private IEnumerable<Link> _CreateLinks(string markdownContent) {
@@ -216,15 +232,14 @@ internal class TableOfContentsCreator {
     return html + _nl + "<li>";
   }
 
-  private int _lastPageNumber = -1;
   private string _CreateLinkText(Link link) {
     if (!this._options.HasPageNumbers)
       return link.ToHtml();
 
-    if (this._linkPageMapping == null || !this._linkPageMapping.TryGetValue(link, out var pageNumber))
-      return link.ToHtml(this._lastPageNumber);
+    if (this._linkPages == null)
+      return link.ToHtml(-1); // Placeholder
 
-    this._lastPageNumber = pageNumber;
+    var pageNumber = this._linkPages.First(l => l.LinkAddress == link.LinkAddress).PageNumber;
     return link.ToHtml(pageNumber);
   }
 
