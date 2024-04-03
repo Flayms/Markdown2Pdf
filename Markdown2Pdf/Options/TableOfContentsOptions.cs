@@ -22,7 +22,7 @@ public class TableOfContentsOptions {
   /// <summary>
   /// Determines if the TOC should include page numbers (Default: <c>true</c>).
   /// </summary>
-  public bool HasPageNumbers { get; set; } = true;
+  public bool HasPageNumbers { get; set; }
 
 
   private int? _minDepthLevel;

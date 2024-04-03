@@ -5,6 +5,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Markdig.Helpers;
 using Markdown2Pdf.Options;
+using UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor;
+using UglyToad.PdfPig;
 
 namespace Markdown2Pdf.Services;
 
@@ -28,6 +30,9 @@ internal class TableOfContentsCreator {
 
   private readonly EmbeddedResourceService _embeddedResourceService;
 
+  private Link[] _links;
+  private Dictionary<Link, int>? _pageNumbers;
+
   private const string _OMIT_IN_TOC_IDENTIFIER = "<!-- omit from toc -->";
   private const string _HTML_CLASS_NAME = "table-of-contents";
 
@@ -41,6 +46,7 @@ internal class TableOfContentsCreator {
   private static readonly Regex _emojiReg = new(":(\\w+):", RegexOptions.Compiled);
   private static readonly Regex _insertionRegex = new("""^(\[TOC]|\[\[_TOC_]]|<!-- toc -->)\r?$""",
     RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Multiline);
+  private static readonly Regex _lineBreakRegex = new("\r\n?|\n", RegexOptions.Compiled);
 
   public TableOfContentsCreator(TableOfContentsOptions options, IConvertionEvents convertionEvents, EmbeddedResourceService embeddedResourceService) {
     this._options = options;
@@ -52,6 +58,9 @@ internal class TableOfContentsCreator {
 
     convertionEvents.BeforeMarkdownConversion += this._AddToMarkdown;
     convertionEvents.OnTemplateModelCreating += this._AddStylesToTemplate;
+
+    if (options.HasPageNumbers)
+      convertionEvents.OnPdfCreatedEvent += this._ReadPageNumbers;
   }
 
   private void _AddToMarkdown(object sender, MarkdownArgs e) {
@@ -73,6 +82,31 @@ internal class TableOfContentsCreator {
       tableOfContentsDecimalStyle += Environment.NewLine + ".table-of-contents a { display: flex; justify-content: space-between; }";
 
     e.TemplateModel.Add(_TOC_STYLE_KEY, tableOfContentsDecimalStyle);
+  }
+
+  private void _ReadPageNumbers(object _, PdfArgs e) { //todo: what if link not found
+    e.NeedsRerun = true;
+
+    using (var pdf = PdfDocument.Open(e.PdfPath)) {
+      var structure = pdf.Structure;
+      var resut = pdf.TryGetBookmarks(out var bookmarks);
+      var pageNumbers = new Dictionary<Link, int>();
+
+      foreach (var page in pdf.GetPages()) {
+        var text = ContentOrderTextExtractor.GetText(page);
+        var lines = _lineBreakRegex.Split(text);
+
+        //todo: optimize
+        foreach (var line in lines) {
+          foreach (var link in this._links) {
+            if (link.Title == line)
+              pageNumbers[link] = page.Number;
+          }
+        }
+      }
+
+      this._pageNumbers = pageNumbers;
+    }
   }
 
   private IEnumerable<Link> _CreateLinks(string markdownContent) {
@@ -103,7 +137,7 @@ internal class TableOfContentsCreator {
 
   private string _ToHtml(string markdownContent) {
     var NL = Environment.NewLine;
-    var links = _CreateLinks(markdownContent);
+    var links = this._links = _CreateLinks(markdownContent).ToArray();
     var minLinkDepth = links.Min(l => l.Depth);
     var minDepth = Math.Max(this._minDepthLevel, minLinkDepth); // ensure that there's no unneeded nesting
 
@@ -155,7 +189,16 @@ internal class TableOfContentsCreator {
 
       lastDepth = fixedLinkDepth;
 
-      var linkText = this._options.HasPageNumbers ? link.ToHtml(7) : link.ToHtml();
+      //todo: optimize
+      string linkText;
+      if (this._options.HasPageNumbers) {
+        if (this._pageNumbers != null && this._pageNumbers.TryGetValue(link, out var pageNumber)) {
+          linkText = link.ToHtml(pageNumber);
+        } else
+          linkText = link.ToHtml(-1); //todo: placeholder
+      } else
+        linkText = link.ToHtml();
+
       tocBuilder.Append(linkText);
     }
 
@@ -169,4 +212,5 @@ internal class TableOfContentsCreator {
 
   private string _InsertInto(string content, string tocHtml)
     => _insertionRegex.Replace(content, tocHtml);
+
 }
