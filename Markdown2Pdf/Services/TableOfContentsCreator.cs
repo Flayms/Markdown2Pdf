@@ -23,6 +23,8 @@ internal class TableOfContentsCreator {
 
   private readonly TableOfContentsOptions _options;
   private readonly bool _isOrdered;
+  private readonly string _openListElement;
+  private readonly string _closeListElement;
 
   // Substract 1 to adjust to 0 based values
   private readonly int _minDepthLevel;
@@ -30,15 +32,15 @@ internal class TableOfContentsCreator {
 
   private readonly EmbeddedResourceService _embeddedResourceService;
 
-  private Link[] _links;
-  private Dictionary<Link, int>? _pageNumbers;
+  private Link[]? _links;
+  private Dictionary<Link, int>? _linkPageMapping;
 
   private const string _OMIT_IN_TOC_IDENTIFIER = "<!-- omit from toc -->";
   private const string _HTML_CLASS_NAME = "table-of-contents";
-
   private const string _TOC_STYLE_KEY = "tocStyle";
   private const string _DECIMAL_STYLE_FILE_NAME = "TableOfContentsDecimalStyle.css";
   private const string _LIST_STYLE_NONE = ".table-of-contents ul { list-style: none; }";
+  private static readonly string _nl = Environment.NewLine;
 
   private static readonly Regex _headerReg = new("^(?<hashes>#{1,6}) +(?<title>[^\r\n]*)",
     RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.ExplicitCapture);
@@ -55,6 +57,8 @@ internal class TableOfContentsCreator {
     this._minDepthLevel = options.MinDepthLevel - 1;
     this._maxDepthLevel = options.MaxDepthLevel - 1;
     this._embeddedResourceService = embeddedResourceService;
+    this._openListElement = this._isOrdered ? "<ol>" : "<ul>";
+    this._closeListElement = this._isOrdered ? "</ol>" : "</ul>";
 
     convertionEvents.BeforeMarkdownConversion += this._AddToMarkdown;
     convertionEvents.OnTemplateModelCreating += this._AddStylesToTemplate;
@@ -84,29 +88,39 @@ internal class TableOfContentsCreator {
     e.TemplateModel.Add(_TOC_STYLE_KEY, tableOfContentsDecimalStyle);
   }
 
-  private void _ReadPageNumbers(object _, PdfArgs e) { //todo: what if link not found
+  private void _ReadPageNumbers(object _, PdfArgs e) { // TODO: what if link not found
+    if (this._links == null)
+      throw new InvalidOperationException("Links have not been created yet.");
+
     e.NeedsRerun = true;
 
-    using (var pdf = PdfDocument.Open(e.PdfPath)) {
-      var structure = pdf.Structure;
-      var resut = pdf.TryGetBookmarks(out var bookmarks);
-      var pageNumbers = new Dictionary<Link, int>();
+    using var pdf = PdfDocument.Open(e.PdfPath);
+    this._linkPageMapping = _ParsePageNumbersFromPdf(pdf, this._links);
+  }
 
-      foreach (var page in pdf.GetPages()) {
-        var text = ContentOrderTextExtractor.GetText(page);
-        var lines = _lineBreakRegex.Split(text);
+  private static Dictionary<Link, int> _ParsePageNumbersFromPdf(PdfDocument pdf, IEnumerable<Link> links) {
+    var linkPageNumbers = new Dictionary<Link, int>();
+    var linksToFind = new List<Link>(links);
 
-        //todo: optimize
-        foreach (var line in lines) {
-          foreach (var link in this._links) {
-            if (link.Title == line)
-              pageNumbers[link] = page.Number;
-          }
+    foreach (var page in pdf.GetPages()) {
+      var text = ContentOrderTextExtractor.GetText(page);
+      var lines = _lineBreakRegex.Split(text);
+
+      foreach (var line in lines)
+        foreach (var link in linksToFind) {
+          if (link.Title != line)
+            continue;
+
+          linkPageNumbers[link] = page.Number;
+          linksToFind.Remove(link);
+          if (linksToFind.Count() == 0)
+            return linkPageNumbers; // All links found
+
+          break; // Found link, continue with next line
         }
-      }
-
-      this._pageNumbers = pageNumbers;
     }
+
+    return linkPageNumbers;
   }
 
   private IEnumerable<Link> _CreateLinks(string markdownContent) {
@@ -136,78 +150,82 @@ internal class TableOfContentsCreator {
   }
 
   private string _ToHtml(string markdownContent) {
-    var NL = Environment.NewLine;
     var links = this._links = _CreateLinks(markdownContent).ToArray();
     var minLinkDepth = links.Min(l => l.Depth);
     var minDepth = Math.Max(this._minDepthLevel, minLinkDepth); // ensure that there's no unneeded nesting
 
     var lastDepth = -1; // start at -1 to open the list on first element
-
-    var openList = this._isOrdered ? "<ol>" : "<ul>";
-    var closeList = this._isOrdered ? "</ol>" : "</ul>";
     var tocBuilder = new StringBuilder();
 
     tocBuilder.Append($"<nav class=\"{_HTML_CLASS_NAME}\">");
 
     foreach (var link in links) {
-      var fixedLinkDepth = link.Depth - minDepth; // Reduce nesting by minDepth
-      if (fixedLinkDepth < 0)
+      var fixedDepth = link.Depth - minDepth; // Start counting from minDepth
+      if (fixedDepth < 0)
         continue;
 
-      switch (fixedLinkDepth) {
-        case var depth when depth > lastDepth: // nested element
-          var difference = fixedLinkDepth - lastDepth;
+      var htmlListTags = string.Empty;
+      htmlListTags = fixedDepth switch {
+        var depth when depth > lastDepth => this._CreateNestingTags(fixedDepth, lastDepth),
+        var depth when depth == lastDepth => this._CreateSameDepthTags(),
+        _ => this._CreatedDenestingTags(fixedDepth, lastDepth),
+      };
 
-          // open nestings
-          for (var i = 0; i < difference; ++i) {
+      tocBuilder.Append(htmlListTags);
+      lastDepth = fixedDepth;
 
-            // only provide ListStyle for elements that actually have text
-            var extraStyle = difference > 1 && i != difference - 1
-              ? " style='list-style:none'"
-              : string.Empty;
-
-            tocBuilder.Append(NL + openList + NL + $"<li{extraStyle}>");
-          }
-          break;
-
-        case var depth when depth == lastDepth: // same height
-          // close previous element
-          tocBuilder.AppendLine("</li>");
-          tocBuilder.Append("<li>");
-          break;
-
-        default: // depth < lastDepth
-          difference = lastDepth - fixedLinkDepth;
-
-          // close previous elements
-          for (var i = 0; i < difference; ++i)
-            tocBuilder.Append(NL + "</li>" + NL + closeList);
-
-          tocBuilder.Append(NL + "<li>");
-          break;
-      }
-
-      lastDepth = fixedLinkDepth;
-
-      //todo: optimize
-      string linkText;
-      if (this._options.HasPageNumbers) {
-        if (this._pageNumbers != null && this._pageNumbers.TryGetValue(link, out var pageNumber)) {
-          linkText = link.ToHtml(pageNumber);
-        } else
-          linkText = link.ToHtml(-1); //todo: placeholder
-      } else
-        linkText = link.ToHtml();
-
-      tocBuilder.Append(linkText);
+      tocBuilder.Append(_CreateLinkText(link));
     }
 
+    // close open tags
     for (var i = 0; i <= lastDepth; ++i)
-      tocBuilder.Append(NL + "</li>" + NL + closeList);
+      tocBuilder.Append(_nl + "</li>" + _nl + this._closeListElement);
 
-    tocBuilder.Append(NL + "</nav>");
+    tocBuilder.Append(_nl + "</nav>");
 
     return tocBuilder.ToString();
+  }
+
+  private string _CreateNestingTags(int depth, int lastDepth) {
+    var difference = depth - lastDepth;
+    var html = string.Empty;
+
+    // open nestings
+    for (var i = 0; i < difference; ++i) {
+
+      // only provide ListStyle for elements that actually have text
+      var extraStyle = difference > 1 && i != difference - 1
+        ? " style='list-style:none'"
+        : string.Empty;
+
+      html += _nl + this._openListElement + _nl + $"<li{extraStyle}>";
+    }
+
+    return html;
+  }
+
+  private string _CreateSameDepthTags() => "</li>" + _nl + "<li>";
+
+  private string _CreatedDenestingTags(int depth, int lastDepth) {
+    var difference = lastDepth - depth;
+    var html = string.Empty;
+
+    for (var i = 0; i < difference; ++i)
+      html += _nl + "</li>" + _nl + this._closeListElement;
+    
+    return html + _nl + "<li>";
+  }
+
+  private int _lastPageNumber = -1;
+  private string _CreateLinkText(Link link) {
+    if (!this._options.HasPageNumbers)
+      return link.ToHtml();
+
+    if (this._linkPageMapping == null || !this._linkPageMapping.TryGetValue(link, out var pageNumber))
+      return link.ToHtml(this._lastPageNumber);
+
+    this._lastPageNumber = pageNumber;
+    return link.ToHtml(pageNumber);
   }
 
   private string _InsertInto(string content, string tocHtml)
