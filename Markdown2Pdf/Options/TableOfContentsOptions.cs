@@ -19,6 +19,13 @@ public class TableOfContentsOptions {
   /// </summary>
   public bool HasColoredLinks { get; set; }
 
+  /// <summary>
+  /// Determines if the TOC should include page numbers.
+  /// </summary>
+  /// <remarks>
+  /// If this is set, the PDF will be generated twice to calculate the page numbers.
+  /// </remarks>
+  public bool HasPageNumbers { get; set; }
 
   private int? _minDepthLevel;
 

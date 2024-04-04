@@ -75,6 +75,12 @@ public class Markdown2PdfConverter : IConvertionEvents {
     remove => _onTemplateModelCreating -= value;
   }
 
+  private event EventHandler<PdfArgs>? _onPdfCreatedEvent;
+  event EventHandler<PdfArgs>? IConvertionEvents.OnPdfCreatedEvent {
+    add => _onPdfCreatedEvent += value;
+    remove => _onPdfCreatedEvent -= value;
+  }
+
   /// <inheritdoc cref="Convert(FileInfo, FileInfo)"/>
   /// <remarks>The PDF will be saved in the same location as the markdown file with the naming convention "markdownFileName.pdf".</remarks>
   /// <returns>The newly created PDF-file.</returns>
@@ -148,6 +154,16 @@ public class Markdown2PdfConverter : IConvertionEvents {
   /// <param name="markdownContent">String holding all markdown data.</param>
   /// <param name="markdownFilePath">Path to the first markdown file.</param>
   private async Task _Convert(string outputFilePath, string markdownContent, string markdownFilePath) {
+    // Rerun logic
+    await this._ConvertInternal(outputFilePath, markdownContent, markdownFilePath);
+    var args = new PdfArgs(outputFilePath);
+    this._onPdfCreatedEvent?.Invoke(this, args);
+
+    if (args.NeedsRerun)
+      await this._ConvertInternal(outputFilePath, markdownContent, markdownFilePath);
+  }
+
+  private async Task _ConvertInternal(string outputFilePath, string markdownContent, string markdownFilePath) {
     // generate html
     var html = this.GenerateHtml(markdownContent);
 
@@ -162,6 +178,7 @@ public class Markdown2PdfConverter : IConvertionEvents {
     if (!this.Options.KeepHtml)
       File.Delete(htmlPath);
   }
+
 
   internal string GenerateHtml(string markdownContent) {
     var markdownArgs = new MarkdownArgs(ref markdownContent);
