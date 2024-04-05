@@ -17,7 +17,10 @@ var options = new Markdown2PdfOptions {
   TableOfContents = new TableOfContentsOptions {
     ListStyle = ListStyle.Decimal,
     MinDepthLevel = 2,
-    MaxDepthLevel = 6
+    MaxDepthLevel = 6,
+    PageNumberOptions = new PageNumberOptions {
+      TabLeader = Leader.Dots,
+    }
   }
 };
 

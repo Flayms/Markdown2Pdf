@@ -19,14 +19,6 @@ public class TableOfContentsOptions {
   /// </summary>
   public bool HasColoredLinks { get; set; }
 
-  /// <summary>
-  /// Determines if the TOC should include page numbers.
-  /// </summary>
-  /// <remarks>
-  /// If this is set, the PDF will be generated twice to calculate the page numbers.
-  /// </remarks>
-  public bool HasPageNumbers { get; set; }
-
   private int? _minDepthLevel;
 
   /// <summary>
@@ -67,30 +59,21 @@ public class TableOfContentsOptions {
     }
   }
 
+  /// <summary>
+  /// If set, the TOC will be generated with page numbers.
+  /// </summary>
+  /// <remarks>
+  /// This causes the PDF to be generated twice to calculate the page numbers.
+  /// </remarks>
+  public PageNumberOptions? PageNumberOptions { get; set; }
+
 }
 
 /// <summary>
-/// Decides which characters to use before the TOC items.
+/// Options for the page numbers in the Table of Contents.
 /// </summary>
-public enum ListStyle {
+public class PageNumberOptions {
 
-  /// <summary>
-  /// Just display the TOC items without any preceeding characters.
-  /// </summary>
-  None,
-
-  /// <summary>
-  /// Use the current themes default list-style for ordered lists.
-  /// </summary>
-  OrderedDefault,
-
-  /// <summary>
-  /// Use the current themes default list-style for unordered lists.
-  /// </summary>
-  Unordered,
-
-  /// <summary>
-  /// Preceed the TOC items with numbers separated by points (e.g. 1.1, 1.2, 1.2.1...).
-  /// </summary>
-  Decimal
+  /// <inheritdoc cref="Leader"/>
+  public Leader TabLeader { get; set; } = Leader.Dots;  
 }

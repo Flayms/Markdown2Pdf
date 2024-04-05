@@ -109,12 +109,15 @@ A header can be omitted from the toc by ending it with `<!-- omit from toc -->`:
 
 The TOC gets generated within a `<nav class="table-of-contents">`. This can be used to apply extra custom styles.
 
-### Further Options
+### Options
 
-| Option | Description |
-| --- | --- |
-| `TableOfContentsOptions.HasColoredLinks` | If set, Headers in TOC get default link markup. |
-| `TableOfContentsOptions.HasPageNumbers` | Determines if the TOC should include Page-Numbers. |
+| Option | Description | Default |
+| --- | --- | --- |
+| `ListStyle` | Decides which characters to use before the TOC titles. | `ListStyle.OrderedDefault` |
+| `MinDepthLevel` | The minimum level of heading depth to include in the TOC. | `1` |
+| `MaxDepthLevel` | The maximum level of heading depth to include in the TOC. | `6` |
+| `HasColoredLinks` | If set, the titles in the TOC get default link markup. | `false` |
+| `PageNumberOptions` | If set, the TOC will be generated with page numbers. | `null` |
 
 ## Modules
 
