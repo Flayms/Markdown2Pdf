@@ -18,7 +18,11 @@ internal class TableOfContentsCreator {
     public int Depth { get; } = Depth;
 
     public string ToHtml() => $"<a href=\"{this.LinkAddress}\">{this.Title}</a>";
-    public string ToHtml(int pageNumber) => $"<a href=\"{this.LinkAddress}\"><span>{this.Title}</span><span>{pageNumber}</span></a>";
+    public string ToHtml(int pageNumber) => $"" +
+      $"<a href=\"{this.LinkAddress}\">" +
+      $"<span class=\"title\">{this.Title}</span>" +
+      $"<span class=\"page-number\">{pageNumber}</span>" +
+      $"</a>";
   }
 
   private class LinkWithPageNumber(Link link, int pageNumber)
@@ -44,6 +48,7 @@ internal class TableOfContentsCreator {
   private const string _HTML_CLASS_NAME = "table-of-contents";
   private const string _TOC_STYLE_KEY = "tocStyle";
   private const string _DECIMAL_STYLE_FILE_NAME = "TableOfContentsDecimalStyle.css";
+  private const string _PAGE_NUMBER_STYLE_FILE_NAME = "TableOfContentsPageNumberStyle.css";
   private const string _LIST_STYLE_NONE = ".table-of-contents ul { list-style: none; }";
   private static readonly string _nl = Environment.NewLine;
 
@@ -88,7 +93,7 @@ internal class TableOfContentsCreator {
       tableOfContentsDecimalStyle += Environment.NewLine + ".table-of-contents a { all: unset; }";
 
     if (this._options.HasPageNumbers)
-      tableOfContentsDecimalStyle += Environment.NewLine + ".table-of-contents a { display: flex; justify-content: space-between; }";
+      tableOfContentsDecimalStyle += Environment.NewLine + this._embeddedResourceService.GetResourceContent(_PAGE_NUMBER_STYLE_FILE_NAME);
 
     e.TemplateModel.Add(_TOC_STYLE_KEY, tableOfContentsDecimalStyle);
   }

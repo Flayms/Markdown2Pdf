@@ -28,6 +28,11 @@
 	  <None Remove="templates\ContentTemplate_NoScripts.html" />
 	  <None Remove="templates\Header-Footer-Styles.html" />
 	  <None Remove="templates\TableOfContentsDecimalStyle.css" />
+	  <None Remove="templates\TableOfContentsPageNumberStyle.css" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="templates\TableOfContentsPageNumberStyle.css" />
 	</ItemGroup>
 
 	<ItemGroup>
