@@ -19,9 +19,13 @@ public class TableOfContentsOptions {
   /// </summary>
   public bool HasColoredLinks { get; set; }
 
-  /// <inheritdoc cref="Options.PageNumberOptions"/>
+  /// <summary>
+  /// If set, the TOC will be generated with page numbers.
+  /// </summary>
+  /// <remarks>
+  /// This causes the PDF to be generated twice to calculate the page numbers.
+  /// </remarks>
   public PageNumberOptions? PageNumberOptions { get; set; }
-  internal bool HasPageNumbers => this.PageNumberOptions?.HasPageNumbers ?? false;
 
   private int? _minDepthLevel;
 
@@ -65,14 +69,11 @@ public class TableOfContentsOptions {
 
 }
 
+/// <summary>
+/// Options for the page numbers in the Table of Contents.
+/// </summary>
 public class PageNumberOptions {
-  /// <summary>
-  /// Determines if the TOC should include page numbers.
-  /// </summary>
-  /// <remarks>
-  /// If this is set, the PDF will be generated twice to calculate the page numbers.
-  /// </remarks>
-  public bool HasPageNumbers { get; set; }
 
+  /// <inheritdoc cref="Leader"/>
   public Leader TabLeader { get; set; } = Leader.Dot;  
 }
