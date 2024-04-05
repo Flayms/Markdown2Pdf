@@ -1,4 +1,6 @@
-﻿namespace Markdown2Pdf.Options;
+﻿using System.ComponentModel;
+
+namespace Markdown2Pdf.Options;
 
 /// <summary>
 /// The character to use to lead from the TOC title to the page number.
@@ -7,13 +9,24 @@ public enum Leader {
   ///<summary>
   /// No leader.
   /// </summary>
+  [Description("")]
   None,
+
   /// <summary>
   /// Use dots for the leader.
   /// </summary>
-  Dot,
+  [Description("dots")]
+  Dots,
+
   /// <summary>
-  /// Use underscores for the leader.
+  /// Use an underline for the leader.
   /// </summary>
-  Underscore
+  [Description("underline")]
+  Underline,
+
+  /// <summary>
+  /// Use dashes for the leader.
+  /// </summary>
+  [Description("dashes")]
+  Dashes,
 }

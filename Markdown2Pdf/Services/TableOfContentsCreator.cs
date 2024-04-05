@@ -7,6 +7,8 @@ using Markdig.Helpers;
 using Markdown2Pdf.Options;
 using UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor;
 using UglyToad.PdfPig;
+using System.ComponentModel;
+using System.Reflection;
 
 namespace Markdown2Pdf.Services;
 
@@ -73,7 +75,7 @@ internal class TableOfContentsCreator {
     convertionEvents.BeforeMarkdownConversion += this._AddToMarkdown;
     convertionEvents.OnTemplateModelCreating += this._AddStylesToTemplate;
 
-    if (options.HasPageNumbers)
+    if (options.PageNumberOptions != null)
       convertionEvents.OnPdfCreatedEvent += this._ReadPageNumbers;
   }
 
@@ -89,10 +91,10 @@ internal class TableOfContentsCreator {
       _ => string.Empty,
     };
 
-    if (this._options.HasColoredLinks)
+    if (!this._options.HasColoredLinks)
       tableOfContentsDecimalStyle += Environment.NewLine + ".table-of-contents a { all: unset; }";
 
-    if (this._options.HasPageNumbers)
+    if (this._options.PageNumberOptions != null)
       tableOfContentsDecimalStyle += Environment.NewLine + this._embeddedResourceService.GetResourceContent(_PAGE_NUMBER_STYLE_FILE_NAME);
 
     e.TemplateModel.Add(_TOC_STYLE_KEY, tableOfContentsDecimalStyle);
@@ -178,7 +180,14 @@ internal class TableOfContentsCreator {
     var lastDepth = -1; // start at -1 to open the list on first element
     var tocBuilder = new StringBuilder();
 
-    tocBuilder.Append($"<nav class=\"{_HTML_CLASS_NAME}\">");
+    var htmlClasses = _HTML_CLASS_NAME;
+    if (this._options.PageNumberOptions != null) {
+      var leader = this._options.PageNumberOptions.TabLeader;
+      var leaderClass = _GetDescription(leader);
+      htmlClasses += $" {leaderClass}";
+    }
+
+    tocBuilder.Append($"<nav class=\"{htmlClasses}\">");
 
     foreach (var link in links) {
       var fixedDepth = link.Depth - minDepth; // Start counting from minDepth
@@ -238,7 +247,7 @@ internal class TableOfContentsCreator {
   }
 
   private string _CreateLinkText(Link link) {
-    if (!this._options.HasPageNumbers)
+    if (this._options.PageNumberOptions == null)
       return link.ToHtml();
 
     if (this._linkPages == null)
@@ -250,5 +259,12 @@ internal class TableOfContentsCreator {
 
   private string _InsertInto(string content, string tocHtml)
     => _insertionRegex.Replace(content, tocHtml);
+
+  private static string _GetDescription(Enum value) {
+    var fieldInfo = value.GetType().GetField(value.ToString());
+    var attribute = fieldInfo.GetCustomAttribute<DescriptionAttribute>();
+
+    return attribute != null ? attribute.Description : value.ToString();
+  }
 
 }

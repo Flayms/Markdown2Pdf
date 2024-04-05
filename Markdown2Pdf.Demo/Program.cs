@@ -19,7 +19,7 @@ var options = new Markdown2PdfOptions {
     MinDepthLevel = 2,
     MaxDepthLevel = 6,
     PageNumberOptions = new PageNumberOptions {
-      TabLeader = Leader.Dot
+      TabLeader = Leader.Dots,
     }
   }
 };

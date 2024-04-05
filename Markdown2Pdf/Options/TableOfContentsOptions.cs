@@ -75,5 +75,5 @@ public class TableOfContentsOptions {
 public class PageNumberOptions {
 
   /// <inheritdoc cref="Leader"/>
-  public Leader TabLeader { get; set; } = Leader.Dot;  
+  public Leader TabLeader { get; set; } = Leader.Dots;  
 }

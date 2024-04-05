@@ -32,10 +32,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Include="templates\TableOfContentsPageNumberStyle.css" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <EmbeddedResource Include="templates\ContentTemplate_NoScripts.html" />
 	</ItemGroup>
 
@@ -45,6 +41,7 @@
 	  </EmbeddedResource>
 	  <EmbeddedResource Include="templates\Header-Footer-Styles.html" />
 	  <EmbeddedResource Include="templates\TableOfContentsDecimalStyle.css" />
+	  <EmbeddedResource Include="templates\TableOfContentsPageNumberStyle.css" />
 	</ItemGroup>
 
 	<ItemGroup>
