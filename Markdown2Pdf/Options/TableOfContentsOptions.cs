@@ -19,14 +19,6 @@ public class TableOfContentsOptions {
   /// </summary>
   public bool HasColoredLinks { get; set; }
 
-  /// <summary>
-  /// If set, the TOC will be generated with page numbers.
-  /// </summary>
-  /// <remarks>
-  /// This causes the PDF to be generated twice to calculate the page numbers.
-  /// </remarks>
-  public PageNumberOptions? PageNumberOptions { get; set; }
-
   private int? _minDepthLevel;
 
   /// <summary>
@@ -66,6 +58,14 @@ public class TableOfContentsOptions {
       this._maxDepthLevel = value;
     }
   }
+
+  /// <summary>
+  /// If set, the TOC will be generated with page numbers.
+  /// </summary>
+  /// <remarks>
+  /// This causes the PDF to be generated twice to calculate the page numbers.
+  /// </remarks>
+  public PageNumberOptions? PageNumberOptions { get; set; }
 
 }
 
