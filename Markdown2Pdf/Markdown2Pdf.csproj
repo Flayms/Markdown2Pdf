@@ -60,9 +60,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Markdig" Version="0.34.0" />
+		<PackageReference Include="Markdig" Version="0.36.2" />
 		<PackageReference Include="PdfPig" Version="0.1.8" />
-		<PackageReference Include="PuppeteerSharp" Version="14.0.0" />
+		<PackageReference Include="PuppeteerSharp" Version="16.0.0" />
 	</ItemGroup>
 
 </Project>
