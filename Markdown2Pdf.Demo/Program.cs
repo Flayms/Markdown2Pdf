@@ -13,7 +13,15 @@ var options = new Markdown2PdfOptions {
     Left = "50px",
     Right = "50px"
   },
-  KeepHtml = true
+  KeepHtml = true,
+  TableOfContents = new TableOfContentsOptions {
+    ListStyle = ListStyle.Decimal,
+    MinDepthLevel = 2,
+    MaxDepthLevel = 6,
+    PageNumberOptions = new PageNumberOptions {
+      TabLeader = Leader.Dots,
+    }
+  }
 };
 
 var converter = new Markdown2PdfConverter(options);

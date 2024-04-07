@@ -76,6 +76,6 @@ public class Markdown2PdfOptions {
   /// <inheritdoc cref="PuppeteerSharp.PdfOptions.Scale"/>
   public decimal Scale { get; set; } = 1;
 
-  /// <inheritdoc cref="Options.TableOfContents"/>
-  public TableOfContents? TableOfContents { get; set; } = null;
+  /// <inheritdoc cref="TableOfContentsOptions"/>
+  public TableOfContentsOptions? TableOfContents { get; set; } = null;
 }

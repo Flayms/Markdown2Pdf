@@ -2,7 +2,9 @@
 
 This is a demo of all the Markdown2Pdf features.
 
-<!--TOC-->
+## Table of Contents <!-- omit from toc -->
+
+[TOC]
 
 ## Common Markdown Functionality
 
@@ -125,7 +127,7 @@ Latex $\color{green}Color \color{blue}\text{ works}$
 graph TD
 A[Christmas] -->|Get money| B(Go shopping)
 B --> C{Let me think}
-C -->|One| D[Laptop]
-C -->|Two| E[iPhone]
-C -->|Three| F[Car]
+C -->|One| D["fa:fa-laptop Laptop&nbsp;"]
+C -->|Two| E["fa:fa-mobile iPhone"]
+C -->|Three| F["fa:fa-car Car&nbsp;"]
 ```

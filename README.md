@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://www.nuget.org/packages/Markdown2Pdf" target="_blank">
-    <img alt="Nuget" src="https://img.shields.io/nuget/v/Markdown2Pdf">
+    <img alt="Nuget" src="https://img.shields.io/nuget/v/Markdown2Pdf" />
   </a>
   
   <a href="https://github.com/Flayms/Markdown2Pdf/actions/workflows/build-and-release.yml" target="_blank">
@@ -15,9 +15,16 @@
   <br>
 </p>
 
-.NET library for converting Markdown to PDF. Uses [Markdig](https://github.com/xoofx/markdig) for converting markdown to html and then [Puppeteer Sharp](https://github.com/hardkoded/puppeteer-sharp) to convert that output to PDF. For a cross-platform cli-wrapper checkout [Markdown2Pdf.Console](https://github.com/Flayms/Markdown2Pdf.Console).
+.NET library for converting Markdown to PDF. Uses [Markdig](https://github.com/xoofx/markdig) for converting markdown to html and then [Puppeteer Sharp](https://github.com/hardkoded/puppeteer-sharp) to convert that output to PDF.
 
-A demo can be found [here!](./assets/demo.pdf)
+For a cross-platform cli-application using this package checkout [Markdown2Pdf.Console](https://github.com/Flayms/Markdown2Pdf.Console).
+
+
+<div align="center">
+  <img src="./assets/screenshot.jpg" alt="demo" Width=450px/>
+</div>
+
+A full demo PDF can be found [here!](./assets/demo.pdf)
 
 ## Usage
 
@@ -41,23 +48,23 @@ var options = new Markdown2PdfOptions {
 var converter = new Markdown2PdfConverter(options);
 ```
 
-| Option | Description | Default |
-| --- | --- | --- |
-| `ModuleOptions` | Options that decide from where to load additional modules. | `ModuleOptions.Remote` |
-| `Theme` |The styling to apply to the document. | `Theme.Github` |
-| `CodeHighlightTheme` | The theme to use for highlighting code blocks. | `CodeHighlightTheme.Github` |
-| `EnableAutoLanguageDetection` | Auto detect the language for code blocks without specfied language. | `false` |
-| `HeaderUrl` | Path to an html-file to use as the document header. [More Information](#header-and-footer). | `null` |
-| `FooterUrl` | Path to an html-file to use as the document footer. [More Information](#header-and-footer). | `null` |
-| `DocumentTitle` | The title of this document. Can be injected into the header / footer by adding the class `document-title` to the element. | `null` |
-| `CustomHeadContent` | A `string` containing any content valid inside a html `<head>` to apply extra scripting / styling to the document.. [More Information](#customization).| `null` |
-| `ChromePath` | Path to chrome or chromium executable or self-downloads it if `null`. | `null` |
-| `KeepHtml` | `true` if the created html should not be deleted. | `false` |
-| `MarginOptions` | Css-margins for the sides of the document. | `null` |
-| `IsLandscape` | Paper orientation. | `false` |
-| `Format` | The paper format for the PDF. | `A4` |
-| `Scale` | Scale of the content. Must be between 0.1 and 2. | `1` |
-| `TableOfContents` | Creates a TOC out of the markdown headers and writes it into a `<!--TOC-->` comment within the markdown document. [More Information](#table-of-contents). | `null` |
+| Option                        | Description                                                                                                                                             | Default                     |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| `ModuleOptions`               | Options that decide from where to load additional modules. [More Information](#modules).                                                                | `ModuleOptions.Remote`      |
+| `Theme`                       | The styling to apply to the document.                                                                                                                   | `Theme.Github`              |
+| `CodeHighlightTheme`          | The theme to use for highlighting code blocks.                                                                                                          | `CodeHighlightTheme.Github` |
+| `EnableAutoLanguageDetection` | Auto detect the language for code blocks without specfied language.                                                                                     | `false`                     |
+| `HeaderUrl`                   | Path to an html-file to use as the document header. [More Information](#header-and-footer).                                                             | `null`                      |
+| `FooterUrl`                   | Path to an html-file to use as the document footer. [More Information](#header-and-footer).                                                             | `null`                      |
+| `DocumentTitle`               | The title of this document. Can be injected into the header / footer by adding the class `document-title` to the element.                               | `null`                      |
+| `CustomHeadContent`           | A `string` containing any content valid inside a html `<head>` to apply extra scripting / styling to the document.. [More Information](#customization). | `null`                      |
+| `ChromePath`                  | Path to chrome or chromium executable or self-downloads it if `null`.                                                                                   | `null`                      |
+| `KeepHtml`                    | `true` if the created html should not be deleted.                                                                                                       | `false`                     |
+| `MarginOptions`               | Css-margins for the sides of the document.                                                                                                              | `null`                      |
+| `IsLandscape`                 | Paper orientation.                                                                                                                                      | `false`                     |
+| `Format`                      | The paper format for the PDF.                                                                                                                           | `A4`                        |
+| `Scale`                       | Scale of the content. Must be between 0.1 and 2.                                                                                                        | `1`                         |
+| `TableOfContents`             | Creates a TOC from the markdown headers. [More Information](#table-of-contents).                                                                        | `null`                      |
 
 ## Header and Footer
 
@@ -74,13 +81,48 @@ options.CustomHeadContent = "<style>h1, h2, h3 { page-break-before: always; }</s
 
 ## Table of contents
 
-To add a table of content insert `<!--TOC-->` to markdown file and add TableOfContent to options.
+To add a table of contents insert
+* `[TOC]` (Gitlab Syntax)
+* `[[_TOC_]]` (Gitlab Syntax)
+* or `<!-- toc -->` (Comment)
 
-Example adding table of content with a depth of 4 levels:
+into the markdown document and use the `Markdown2PdfOptions.TableOfContents` option:
+
+```md
+# My Document
+
+[TOC]
+...
+```
+
+Example creating a TOC:
 
 ```cs
-options.TableOfContents = new TableOfContents(true, 4);
+options.TableOfContents = new TableOfContentsOptions {
+  ListStyle = ListStyle.Decimal,
+
+  // Include all heading levels from 2 to 4.
+  MinDepthLevel = 2,
+  MaxDepthLevel = 4
+};
 ```
+
+A header can be omitted from the toc by ending it with `<!-- omit from toc -->`:
+```md
+## This header won't be displayed in the TOC <!-- omit from toc -->
+```
+
+The TOC gets generated within a `<nav class="table-of-contents">`. This can be used to apply extra custom styles.
+
+### Options
+
+| Option              | Description                                               | Default                    |
+| ------------------- | --------------------------------------------------------- | -------------------------- |
+| `ListStyle`         | Decides which characters to use before the TOC titles.    | `ListStyle.OrderedDefault` |
+| `MinDepthLevel`     | The minimum level of heading depth to include in the TOC. | `1`                        |
+| `MaxDepthLevel`     | The maximum level of heading depth to include in the TOC. | `6`                        |
+| `HasColoredLinks`   | If set, the titles in the TOC get default link markup.    | `false`                    |
+| `PageNumberOptions` | If set, the TOC will be generated with page numbers.      | `null`                     |
 
 ## Modules
 
@@ -92,6 +134,7 @@ You can also use a local installation by installing the following packages and s
 ```bash
 npm i mathjax@3
 npm i mermaid@10
+npm i font-awesome
 npm i @highlightjs/cdn-assets@11
 npm i github-markdown-css
 npm i latex.css
@@ -99,13 +142,14 @@ npm i latex.css
 
 > **Note:** For this you need to have *npm* installed and added to `PATH`.
 
-| Module | Description |
-| --- | --- |
-| [MathJax](https://github.com/mathjax/MathJax) | Latex-Math rendering |
-| [Mermaid](https://github.com/mermaid-js/mermaid) | Diagrams |
-| [Highlight.js](https://github.com/highlightjs/highlight.js) | Syntax highlighting |
-| [github-markdown-css](https://github.com/sindresorhus/github-markdown-css) | Github-Theme |
-| [latex-css](https://github.com/vincentdoerig/latex-css) | Latex-Theme |
+| Module                                                                     | Description                               |
+| -------------------------------------------------------------------------- | ----------------------------------------- |
+| [MathJax](https://github.com/mathjax/MathJax)                              | Latex-Math rendering                      |
+| [Mermaid](https://github.com/mermaid-js/mermaid)                           | Diagrams                                  |
+| [Font-Awesome](https://fontawesome.com/)                                   | Icons (Supported within mermaid diagrams) |
+| [Highlight.js](https://github.com/highlightjs/highlight.js)                | Syntax highlighting                       |
+| [github-markdown-css](https://github.com/sindresorhus/github-markdown-css) | Github-Theme                              |
+| [latex-css](https://github.com/vincentdoerig/latex-css)                    | Latex-Theme                               |
 
 ### Further modification
 
@@ -113,7 +157,7 @@ To get more control over the HTML generation (e.g. to add your own JS-Scripts), 
 
 ## Running in Docker
 
-The bundled Chromium that get's installed by Puppeteer doesn't ship with all necessary dependencies (See [Running Puppeteer in Docker](https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#running-puppeteer-in-docker)).
+The bundled Chromium that gets installed by Puppeteer doesn't ship with all necessary dependencies (See [Running Puppeteer in Docker](https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#running-puppeteer-in-docker)).
 
 To resolve this install them in your `.dockerfile`:
 
@@ -127,6 +171,10 @@ RUN apt-get update \
       --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 ```
+
+## Why is Chromium needed
+
+Markdown was initially developed so that it can be converted to HTML. Resulting from that, a lot of its tooling exists within the JavaScript world. For instance, [Mermaid](https://github.com/mermaid-js/mermaid) is only implemented in JavaScript, so we need a JS-engine to support it. This results in this package being slower but also able to support more features than other solutions that directly generate the PDF from Markdown.
 
 ## Contributing
 

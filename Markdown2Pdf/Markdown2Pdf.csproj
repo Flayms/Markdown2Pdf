@@ -27,6 +27,8 @@
 	<ItemGroup>
 	  <None Remove="templates\ContentTemplate_NoScripts.html" />
 	  <None Remove="templates\Header-Footer-Styles.html" />
+	  <None Remove="templates\TableOfContentsDecimalStyle.css" />
+	  <None Remove="templates\TableOfContentsPageNumberStyle.css" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -38,6 +40,8 @@
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </EmbeddedResource>
 	  <EmbeddedResource Include="templates\Header-Footer-Styles.html" />
+	  <EmbeddedResource Include="templates\TableOfContentsDecimalStyle.css" />
+	  <EmbeddedResource Include="templates\TableOfContentsPageNumberStyle.css" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -56,8 +60,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Markdig" Version="0.34.0" />
-		<PackageReference Include="PuppeteerSharp" Version="14.0.0" />
+		<PackageReference Include="Markdig" Version="0.36.2" />
+		<PackageReference Include="PdfPig" Version="0.1.8" />
+		<PackageReference Include="PuppeteerSharp" Version="16.0.0" />
 	</ItemGroup>
 
 </Project>

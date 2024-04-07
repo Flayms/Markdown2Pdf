@@ -34,6 +34,8 @@ public class ModuleOptions {
   /// </summary>
   /// <param name="modulePath">The path to the node_module directory.</param>
   public static ModuleOptions FromLocalPath(string modulePath) => new NodeModuleOptions(modulePath);
+
+  internal bool IsRemote => this.ModuleLocation == ModuleLocation.Remote;
 }
 
 /// <inheritdoc cref="ModuleOptions.ModuleLocation"/>
