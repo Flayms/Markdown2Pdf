@@ -154,7 +154,7 @@ To get more control over the HTML generation (e.g. to add your own JS-Scripts), 
 
 ## Running in Docker
 
-The bundled Chromium that get's installed by Puppeteer doesn't ship with all necessary dependencies (See [Running Puppeteer in Docker](https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#running-puppeteer-in-docker)).
+The bundled Chromium that gets installed by Puppeteer doesn't ship with all necessary dependencies (See [Running Puppeteer in Docker](https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#running-puppeteer-in-docker)).
 
 To resolve this install them in your `.dockerfile`:
 
