@@ -169,6 +169,10 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 ```
 
+## Why is Chromium needed
+
+Markdown was initially developed so that it can be converted to HTML. Resulting from that, a lot of its tooling exists within the JavaScript world. For instance, [Mermaid](https://github.com/mermaid-js/mermaid) is only implemented in JavaScript, so we need a JS-engine to support it. This results in this package being slower but also able to support more features than other solutions that directly generate the PDF from Markdown.
+
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md).
