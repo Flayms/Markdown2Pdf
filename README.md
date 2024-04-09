@@ -124,6 +124,8 @@ The TOC gets generated within a `<nav class="table-of-contents">`. This can be u
 | `HasColoredLinks`   | If set, the titles in the TOC get default link markup.    | `false`                    |
 | `PageNumberOptions` | If set, the TOC will be generated with page numbers.      | `null`                     |
 
+[more TOC details](\docs\TABLE_OF_CONTENTS.md)
+
 ## Modules
 
 This library uses node_modules packages.
