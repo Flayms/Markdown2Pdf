@@ -28,9 +28,16 @@ A full demo PDF can be found [here!](./assets/demo.pdf)
 
 ## Usage
 
+C#:
 ```cs
 var converter = new Markdown2PdfConverter();
 var resultPath = await converter.Convert("README.md");
+```
+
+VB.NET:
+```vb
+Dim converter As New Markdown2PdfConverter()
+Dim resultPath As String = Await converter.Convert("README.md")
 ```
 
 > An enumeration of markdown files can also be passed to the converter, combining them into one PDF. 
