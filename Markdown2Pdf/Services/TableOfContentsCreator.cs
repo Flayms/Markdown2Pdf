@@ -163,7 +163,7 @@ internal class TableOfContentsCreator {
       title = _htmlElementReg.Replace(title, string.Empty);
       title = _emojiReg.Replace(title, string.Empty).Trim();
 
-      var linkAddress = LinkHelper.Urilize(title, true);
+      var linkAddress = LinkHelper.Urilize(title, false);
       linkAddress = "#" + linkAddress.ToLower();
 
       links.Add(new Link(title, linkAddress, depth));
