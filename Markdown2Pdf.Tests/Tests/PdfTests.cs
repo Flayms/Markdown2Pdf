@@ -132,9 +132,9 @@ public class PdfTests {
     };
 
 
-    [Test]
-    [TestCaseSource(nameof(_GetTestCasesPdfPath))]
-    public async Task TestGeneratesPdfDifferentPath(string? targetFile) {
+  [Test]
+  [TestCaseSource(nameof(_GetTestCasesPdfPath))]
+  public async Task TestGeneratesPdfDifferentPath(string? targetFile) {
     // arrange
     var converter = new Markdown2PdfConverter();
     
@@ -146,6 +146,24 @@ public class PdfTests {
       Assert.That(pdfPath, Is.EqualTo(targetFile));
       Assert.That(File.Exists(pdfPath));
       Assert.That(Utils.PdfContains(pdfPath, "Hello World!"));
+    });
+  }
+
+  [Test]
+  [TestCaseSource(nameof(_GetTestCasesPdfPath))]
+  public async Task TestCombineTwoFilesDifferentPath(string? targetFile) {
+    // arrange
+    var markdownList = new List<string>() { Utils.helloWorldFile, Utils.readmeFile };
+    var converter = new Markdown2PdfConverter();
+
+    // act
+    var pdfPath = await converter.Convert(markdownList, targetFile);
+
+    // assert
+    Assert.Multiple(() => {
+      Assert.That(pdfPath, Is.EqualTo(targetFile));
+      Assert.That(Utils.PdfContains(pdfPath, "Hello World!"));
+      Assert.That(Utils.PdfContains(pdfPath, "Common Markdown Functionality"));
     });
   }
   [TearDown]
