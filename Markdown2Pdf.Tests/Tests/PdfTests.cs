@@ -29,13 +29,13 @@ public class PdfTests {
     });
   }
 
-  private static object?[] _GetTestCases() => new object?[] {
+  private static object?[] _GetTestCasesHeaderFooter() => new object?[] {
       new [] { File.ReadAllText(Utils.headerFile), null, "Header Text" },
       new [] { null, File.ReadAllText(Utils.footerFile), "Page 1/1" },
     };
 
   [Test]
-  [TestCaseSource(nameof(_GetTestCases))]
+  [TestCaseSource(nameof(_GetTestCasesHeaderFooter))]
   public async Task TestHeaderFooter2(string? headerContent, string? footerContent, string expected) {
     // arrange
     var options = new Markdown2PdfOptions {
@@ -126,6 +126,28 @@ public class PdfTests {
     });
   }
 
+  private static object?[] _GetTestCasesPdfPath() => new object?[] {
+      new [] { Utils.helloWorldFile.Replace("helloworld.md", "myhello.pdf"), },
+      new [] { Utils.helloWorldFile.Replace("helloworld.md",Path.Combine("test", "myhello.pdf")), },
+    };
+
+
+    [Test]
+    [TestCaseSource(nameof(_GetTestCasesPdfPath))]
+    public async Task TestGeneratesPdfDifferentPath(string? targetFile) {
+    // arrange
+    var converter = new Markdown2PdfConverter();
+    
+    // act
+    var pdfPath = await converter.Convert(Utils.helloWorldFile, targetFile);
+
+    // assert
+    Assert.Multiple(() => {
+      Assert.That(pdfPath, Is.EqualTo(targetFile));
+      Assert.That(File.Exists(pdfPath));
+      Assert.That(Utils.PdfContains(pdfPath, "Hello World!"));
+    });
+  }
   [TearDown]
   public void Teardown() => Utils.tempDir.Delete(true);
 
