@@ -110,7 +110,7 @@ public class Markdown2PdfConverter : IConvertionEvents {
   /// </summary>
   /// <param name="markdownFilePath">Path to the markdown file.</param>
   /// <param name="outputFilePath">File path for saving the PDF to.</param>
-  /// <remarks>The PDF will be saved in the location given from outputFilePath</remarks>
+  /// <remarks>The PDF will be saved at the path specified in <paramref name="outputFilePath"/>.</remarks>
   public async Task<string> Convert(string markdownFilePath, string outputFilePath) {
     markdownFilePath = Path.GetFullPath(markdownFilePath);
     outputFilePath = Path.GetFullPath(outputFilePath);
@@ -128,12 +128,12 @@ public class Markdown2PdfConverter : IConvertionEvents {
   /// </summary>
   /// <param name="markdownFilePaths">Enumerable with paths to the markdown files.</param>
   /// <remarks>The PDF will be saved in the same location of the first markdown file with the naming convention "markdownFileName.pdf".</remarks>
-  public async Task<string> Convert(IEnumerable<string> markdownFilesPath) {
-    var first = markdownFilesPath.First();
+  public async Task<string> Convert(IEnumerable<string> markdownFilePaths) {
+    var first = markdownFilePaths.First();
     var markdownDir = Path.GetDirectoryName(first);
     var outputFileName = Path.GetFileNameWithoutExtension(first) + ".pdf";
     var outputFilePath = Path.Combine(markdownDir, outputFileName);
-    await this.Convert(markdownFilesPath, outputFilePath);
+    await this.Convert(markdownFilePaths, outputFilePath);
 
     return outputFilePath;
   }
