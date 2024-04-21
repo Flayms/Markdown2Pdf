@@ -29,13 +29,13 @@ public class PdfTests {
     });
   }
 
-  private static object?[] _GetTestCases() => new object?[] {
+  private static object?[] _GetTestCasesHeaderFooter() => [
       new [] { File.ReadAllText(Utils.headerFile), null, "Header Text" },
       new [] { null, File.ReadAllText(Utils.footerFile), "Page 1/1" },
-    };
+    ];
 
   [Test]
-  [TestCaseSource(nameof(_GetTestCases))]
+  [TestCaseSource(nameof(_GetTestCasesHeaderFooter))]
   public async Task TestHeaderFooter2(string? headerContent, string? footerContent, string expected) {
     // arrange
     var options = new Markdown2PdfOptions {
@@ -126,6 +126,45 @@ public class PdfTests {
     });
   }
 
+  private static object[] _GetTestCasesPdfPath() => [
+      new [] { Path.Combine(Utils.tempDir.FullName, "myhello.pdf") },
+      new [] { Path.Combine(Utils.tempDir.FullName, "test", "myhello.pdf") },
+    ];
+
+  [Test]
+  [TestCaseSource(nameof(_GetTestCasesPdfPath))]
+  public async Task TestGeneratesPdfAtDifferentPath(string targetFile) {
+    // arrange
+    var converter = new Markdown2PdfConverter();
+
+    // act
+    var pdfPath = await converter.Convert(Utils.helloWorldFile, targetFile);
+
+    // assert
+    Assert.Multiple(() => {
+      Assert.That(pdfPath, Is.EqualTo(targetFile));
+      Assert.That(File.Exists(pdfPath));
+      Assert.That(Utils.PdfContains(pdfPath, "Hello World!"));
+    });
+  }
+
+  [Test]
+  [TestCaseSource(nameof(_GetTestCasesPdfPath))]
+  public async Task TestCombinesTwoFilesAtDifferentPath(string targetFile) {
+    // arrange
+    var markdownList = new List<string>() { Utils.helloWorldFile, Utils.readmeFile };
+    var converter = new Markdown2PdfConverter();
+
+    // act
+    var pdfPath = await converter.Convert(markdownList, targetFile);
+
+    // assert
+    Assert.Multiple(() => {
+      Assert.That(pdfPath, Is.EqualTo(targetFile));
+      Assert.That(Utils.PdfContains(pdfPath, "Hello World!"));
+      Assert.That(Utils.PdfContains(pdfPath, "Common Markdown Functionality"));
+    });
+  }
   [TearDown]
   public void Teardown() => Utils.tempDir.Delete(true);
 
