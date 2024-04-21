@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Markdig;
+using Markdig.Extensions.AutoIdentifiers;
 using Markdown2Pdf.Options;
 using Markdown2Pdf.Services;
 using PuppeteerSharp;
@@ -192,10 +193,15 @@ public class Markdown2PdfConverter : IConvertionEvents {
     this._beforeMarkdownConversion?.Invoke(this, markdownArgs);
     markdownContent = markdownArgs.MarkdownContent;
 
-    var pipeline = new MarkdownPipelineBuilder()
+    var pipelineBuilder = new MarkdownPipelineBuilder()
       .UseAdvancedExtensions()
-      .UseEmojiAndSmiley()
-      .Build();
+      .UseEmojiAndSmiley();
+
+    // Switch to AutoLink Option to allow non-ASCII characters
+    pipelineBuilder.Extensions.Remove(pipelineBuilder.Extensions.Find<AutoIdentifierExtension>()!);
+    pipelineBuilder.UseAutoIdentifiers(AutoIdentifierOptions.AutoLink);
+
+    var pipeline = pipelineBuilder.Build();
 
     var htmlContent = Markdown.ToHtml(markdownContent, pipeline);
 

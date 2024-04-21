@@ -81,6 +81,7 @@ public partial class HtmlTests {
   [TestCase("""</a></li></ol></li></ol><li><a href="#horizontal-rules">Horizontal Rules</a></li>""")]
   [TestCase("""<a href="#this-is-a-heading_with.and">""")]
   [TestCase("""<a href="#emojis">""")]
+  [TestCase("""<a href="#первый-заголовок">Первый заголовок</a>""")]
   public void TableOfContents_Should_Contain(string content) {
     // arrange
     var options = new Markdown2PdfOptions {
