@@ -29,10 +29,10 @@ public class PdfTests {
     });
   }
 
-  private static object?[] _GetTestCasesHeaderFooter() => new object?[] {
+  private static object?[] _GetTestCasesHeaderFooter() => [
       new [] { File.ReadAllText(Utils.headerFile), null, "Header Text" },
       new [] { null, File.ReadAllText(Utils.footerFile), "Page 1/1" },
-    };
+    ];
 
   [Test]
   [TestCaseSource(nameof(_GetTestCasesHeaderFooter))]
@@ -126,18 +126,17 @@ public class PdfTests {
     });
   }
 
-  private static object?[] _GetTestCasesPdfPath() => new object?[] {
-      new [] { Utils.helloWorldFile.Replace("helloworld.md", "myhello.pdf"), },
-      new [] { Utils.helloWorldFile.Replace("helloworld.md",Path.Combine("test", "myhello.pdf")), },
-    };
-
+  private static object[] _GetTestCasesPdfPath() => [
+      new [] { Path.Combine(Utils.tempDir.FullName, "myhello.pdf") },
+      new [] { Path.Combine(Utils.tempDir.FullName, "test", "myhello.pdf") },
+    ];
 
   [Test]
   [TestCaseSource(nameof(_GetTestCasesPdfPath))]
-  public async Task TestGeneratesPdfDifferentPath(string? targetFile) {
+  public async Task TestGeneratesPdfAtDifferentPath(string targetFile) {
     // arrange
     var converter = new Markdown2PdfConverter();
-    
+
     // act
     var pdfPath = await converter.Convert(Utils.helloWorldFile, targetFile);
 
@@ -151,7 +150,7 @@ public class PdfTests {
 
   [Test]
   [TestCaseSource(nameof(_GetTestCasesPdfPath))]
-  public async Task TestCombineTwoFilesDifferentPath(string? targetFile) {
+  public async Task TestCombinesTwoFilesAtDifferentPath(string targetFile) {
     // arrange
     var markdownList = new List<string>() { Utils.helloWorldFile, Utils.readmeFile };
     var converter = new Markdown2PdfConverter();

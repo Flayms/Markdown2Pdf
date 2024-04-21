@@ -187,7 +187,6 @@ public class Markdown2PdfConverter : IConvertionEvents {
       File.Delete(htmlPath);
   }
 
-
   internal string GenerateHtml(string markdownContent) {
     var markdownArgs = new MarkdownArgs(ref markdownContent);
     this._beforeMarkdownConversion?.Invoke(this, markdownArgs);
