@@ -29,6 +29,11 @@ public class Markdown2PdfConverter : IConvertionEvents {
   /// </summary>
   public string ContentTemplate { get; set; }
 
+  /// <summary>
+  /// Pdf file name without extension.
+  /// </summary>
+  public string? OutputFileName { get; private set; }
+
   private readonly EmbeddedResourceService _embeddedResourceService = new();
 
   private const string _CUSTOM_HEAD_KEY = "customHeadContent";
@@ -41,8 +46,6 @@ public class Markdown2PdfConverter : IConvertionEvents {
   private const string _TEMPLATE_WITH_SCRIPTS_FILE_NAME = "ContentTemplate.html";
   private const string _TEMPLATE_NO_SCRIPTS_FILE_NAME = "ContentTemplate_NoScripts.html";
   private const string _HEADER_FOOTER_STYLES_FILE_NAME = "Header-Footer-Styles.html";
-
-  private readonly object?[] _services = new object[3];
 
   /// <summary>
   /// Instantiate a new <see cref="Markdown2PdfConverter"/>.
@@ -57,11 +60,13 @@ public class Markdown2PdfConverter : IConvertionEvents {
       : _TEMPLATE_WITH_SCRIPTS_FILE_NAME;
     this.ContentTemplate = this._embeddedResourceService.GetResourceContent(templateName);
 
-    _services[0] = this.Options.TableOfContents != null
-      ? new TableOfContentsCreator(this.Options.TableOfContents, this, this._embeddedResourceService)
-      : null;
-    _services[1] = new ThemeService(this.Options.Theme, moduleOptions, this);
-    _services[2] = new ModuleService(this.Options.ModuleOptions, this);
+    // Services can be discarded because they stay alive through event attaching.
+    if (this.Options.TableOfContents != null)
+      _ = new TableOfContentsCreator(this.Options.TableOfContents, this, this._embeddedResourceService);
+
+    _ = new ThemeService(this.Options.Theme, moduleOptions, this);
+    _ = new ModuleService(this.Options.ModuleOptions, this);
+    _ = new MetadataService(this.Options, this);
   }
 
   private event EventHandler<MarkdownArgs>? _beforeMarkdownConversion;
@@ -173,6 +178,8 @@ public class Markdown2PdfConverter : IConvertionEvents {
   }
 
   private async Task _ConvertInternal(string outputFilePath, string markdownContent, string markdownFilePath) {
+    this.OutputFileName = Path.GetFileNameWithoutExtension(outputFilePath);
+
     // generate html
     var html = this.GenerateHtml(markdownContent);
 
