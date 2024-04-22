@@ -32,7 +32,7 @@ public class Markdown2PdfConverter : IConvertionEvents {
   /// <summary>
   /// Pdf file name without extension.
   /// </summary>
-  public string OutputFileName { get; private set; }
+  public string? OutputFileName { get; private set; }
 
   private readonly EmbeddedResourceService _embeddedResourceService = new();
 

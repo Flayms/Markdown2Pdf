@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Markdown2Pdf;
 internal interface IConvertionEvents {
-  public string OutputFileName { get; }
+  public string? OutputFileName { get; }
 
   internal event EventHandler<MarkdownArgs> BeforeMarkdownConversion;
   internal event EventHandler<TemplateModelArgs> OnTemplateModelCreating;
