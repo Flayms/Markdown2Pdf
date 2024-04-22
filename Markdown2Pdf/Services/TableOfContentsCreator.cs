@@ -104,8 +104,6 @@ internal class TableOfContentsCreator {
     if (this._links == null)
       throw new InvalidOperationException("Links have not been created yet.");
 
-    e.NeedsRerun = true;
-
     using var pdf = PdfDocument.Open(e.PdfPath);
     this._linkPages = _ParsePageNumbersFromPdf(pdf, this._links).ToArray();
 

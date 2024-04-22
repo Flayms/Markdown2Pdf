@@ -20,5 +20,4 @@ internal class TemplateModelArgs(Dictionary<string, string> templateModel) : Eve
 
 internal class PdfArgs(string pdfPath) : EventArgs {
   public string PdfPath { get; set; } = pdfPath;
-  public bool NeedsRerun { get; set; }
 }

@@ -124,7 +124,7 @@ public class Markdown2PdfConverter : IConvertionEvents {
 
     var markdownContent = File.ReadAllText(markdownFilePath);
 
-    await this._Convert(outputFilePath, markdownContent, markdownFilePath);
+    await this._ConvertWithTempRun(outputFilePath, markdownContent, markdownFilePath);
 
     return outputFilePath;
   }
@@ -156,20 +156,20 @@ public class Markdown2PdfConverter : IConvertionEvents {
     outputFilePath = Path.GetFullPath(outputFilePath);
     Directory.CreateDirectory(Path.GetDirectoryName(outputFilePath));
 
-    await this._Convert(outputFilePath, markdownContent, markdownFilePath);
+    await this._ConvertWithTempRun(outputFilePath, markdownContent, markdownFilePath);
 
     return outputFilePath;
   }
 
   /// <summary>
-  /// Converts the given list of markdown-files to PDF.
+  /// Encapsulates internal conversion logic, with option for 2 runs.
   /// </summary>
   /// <param name="outputFilePath">File path for saving the PDF to.</param>
   /// <param name="markdownContent">String holding all markdown data.</param>
   /// <param name="markdownFilePath">Path to the first markdown file.</param>
-  private async Task _Convert(string outputFilePath, string markdownContent, string markdownFilePath) {
-    // Rerun logic
-    if (Options.TableOfContents?.PageNumberOptions != null) { // If PageNumbers enabled, PDF needs to be generated twice
+  private async Task _ConvertWithTempRun(string outputFilePath, string markdownContent, string markdownFilePath) {
+    // If PageNumbers enabled, PDF needs to be generated twice
+    if (Options.TableOfContents?.PageNumberOptions != null) {
       var tempPath = _CreateTempFilePath(outputFilePath);
       await this._ConvertInternal(tempPath, markdownContent, markdownFilePath);
       this._onTempPdfCreatedEvent?.Invoke(this, new PdfArgs(tempPath)); // TODO: trigger at right time
