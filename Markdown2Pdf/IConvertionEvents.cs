@@ -7,7 +7,7 @@ internal interface IConvertionEvents {
 
   internal event EventHandler<MarkdownArgs> BeforeMarkdownConversion;
   internal event EventHandler<TemplateModelArgs> OnTemplateModelCreating;
-  internal event EventHandler<PdfArgs> OnPdfCreatedEvent;
+  internal event EventHandler<PdfArgs> OnTempPdfCreatedEvent;
 }
 
 internal class MarkdownArgs(ref string markdownContent) : EventArgs {

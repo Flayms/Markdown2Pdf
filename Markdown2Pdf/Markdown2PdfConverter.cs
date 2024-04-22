@@ -81,10 +81,10 @@ public class Markdown2PdfConverter : IConvertionEvents {
     remove => _onTemplateModelCreating -= value;
   }
 
-  private event EventHandler<PdfArgs>? _onPdfCreatedEvent;
-  event EventHandler<PdfArgs>? IConvertionEvents.OnPdfCreatedEvent {
-    add => _onPdfCreatedEvent += value;
-    remove => _onPdfCreatedEvent -= value;
+  private event EventHandler<PdfArgs>? _onTempPdfCreatedEvent;
+  event EventHandler<PdfArgs>? IConvertionEvents.OnTempPdfCreatedEvent {
+    add => _onTempPdfCreatedEvent += value;
+    remove => _onTempPdfCreatedEvent -= value;
   }
 
   /// <inheritdoc cref="Convert(FileInfo, FileInfo)"/>
@@ -169,12 +169,19 @@ public class Markdown2PdfConverter : IConvertionEvents {
   /// <param name="markdownFilePath">Path to the first markdown file.</param>
   private async Task _Convert(string outputFilePath, string markdownContent, string markdownFilePath) {
     // Rerun logic
-    await this._ConvertInternal(outputFilePath, markdownContent, markdownFilePath);
-    var args = new PdfArgs(outputFilePath);
-    this._onPdfCreatedEvent?.Invoke(this, args);
+    if (Options.TableOfContents?.PageNumberOptions != null) { // If PageNumbers enabled, PDF needs to be generated twice
+      var tempPath = _CreateTempFilePath(outputFilePath);
+      await this._ConvertInternal(tempPath, markdownContent, markdownFilePath);
+      this._onTempPdfCreatedEvent?.Invoke(this, new PdfArgs(tempPath)); // TODO: trigger at right time
+      File.Delete(tempPath);
+    }
 
-    if (args.NeedsRerun)
-      await this._ConvertInternal(outputFilePath, markdownContent, markdownFilePath);
+    await this._ConvertInternal(outputFilePath, markdownContent, markdownFilePath);
+  }
+
+  private static string _CreateTempFilePath(string outputFilePath) {
+    var outputDir = Path.GetDirectoryName(outputFilePath)!;
+    return Path.Combine(outputDir, $"~temp{DateTime.UtcNow:yyyyMMddHHmmssfff}.TEMPPDF");
   }
 
   private async Task _ConvertInternal(string outputFilePath, string markdownContent, string markdownFilePath) {

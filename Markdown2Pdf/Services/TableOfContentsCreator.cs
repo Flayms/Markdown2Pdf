@@ -76,7 +76,7 @@ internal class TableOfContentsCreator {
     convertionEvents.OnTemplateModelCreating += this._AddStylesToTemplate;
 
     if (options.PageNumberOptions != null)
-      convertionEvents.OnPdfCreatedEvent += this._ReadPageNumbers;
+      convertionEvents.OnTempPdfCreatedEvent += this._ReadPageNumbers;
   }
 
   private void _AddToMarkdown(object sender, MarkdownArgs e) {
