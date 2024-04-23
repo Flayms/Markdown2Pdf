@@ -1,0 +1,54 @@
+name: update-wiki
+on:
+    push:
+        branches:
+            - main
+env:
+  # Specifies dotnet SDK Version
+  DOTNET_VERSION: '8.0.x'
+
+jobs:
+  ci:
+    name: update-wiki-job
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+
+    # Checks out the source code at the latest commit
+    - name: checkout source
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        path: ${{github.repository}}
+
+    - name: checkout wiki
+      uses: actions/checkout@v3
+      with:
+        repository: ${{github.repository}}.wiki
+        path: ${{github.repository}}.wiki
+
+    # Installs the .NET SDK on the build machine
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    # Generate the Wiki with docfx from the XML documentation comments
+    - name: Create Wiki
+      shell: pwsh
+      run: |
+        Push-Location ${{github.repository}}
+        pwsh ".github/workflows/build_wiki.ps1"
+        Pop-Location
+
+    - name: Commit and push changes
+      run: |
+        cd ${{github.repository}}.wiki
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add .
+        git commit -m "Add changes"
+        git push
