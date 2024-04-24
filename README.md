@@ -15,7 +15,7 @@
   <br>
 </p>
 
-.NET library for converting Markdown to PDF. Uses [Markdig](https://github.com/xoofx/markdig) for converting markdown to html and then [Puppeteer Sharp](https://github.com/hardkoded/puppeteer-sharp) to convert that output to PDF.
+.NET library for converting Markdown to PDF. Uses [Markdig](https://github.com/xoofx/markdig) for converting markdown to HTML and then [Puppeteer Sharp](https://github.com/hardkoded/puppeteer-sharp) to convert that output to PDF.
 
 For a cross-platform cli-application using this package checkout [Markdown2Pdf.Console](https://github.com/Flayms/Markdown2Pdf.Console).
 
@@ -48,8 +48,8 @@ To further specify the conversion process, pass `Markdown2PdfOptions` to the con
 
 ```cs
 var options = new Markdown2PdfOptions {
-  HeaderUrl = "header.html",
-  FooterUrl = "footer.html",
+  HeaderHtml = "<div class=\"document-title\" style=\"background-color: #5eafed; width: 100%; padding: 5px\"></div>",
+  FooterHtml = "<div style=\"background-color: #5eafed; width: 100%; padding: 5px\">Page <span class=\"pageNumber\"></span>/<span class=\"totalPages\"></span></div>",
   DocumentTitle = "Example PDF",
 };
 var converter = new Markdown2PdfConverter(options);
@@ -61,12 +61,12 @@ var converter = new Markdown2PdfConverter(options);
 | `Theme`                       | The styling to apply to the document.                                                                                                                   | `Theme.Github`              |
 | `CodeHighlightTheme`          | The theme to use for highlighting code blocks.                                                                                                          | `CodeHighlightTheme.Github` |
 | `EnableAutoLanguageDetection` | Auto detect the language for code blocks without specfied language.                                                                                     | `false`                     |
-| `HeaderUrl`                   | Path to an html-file to use as the document header. [More Information](#header-and-footer).                                                             | `null`                      |
-| `FooterUrl`                   | Path to an html-file to use as the document footer. [More Information](#header-and-footer).                                                             | `null`                      |
+| `HeaderHtml`                  | HTML-string to use as the document header. [More Information](#header-and-footer).                                                                      | `null`                      |
+| `FooterHtml`                  | HTML-string to use as the document footer. [More Information](#header-and-footer).                                                                      | `null`                      |
 | `DocumentTitle`               | The title of this document. Can be injected into the header / footer by adding the class `document-title` to the element.                               | `null`                      |
-| `CustomHeadContent`           | A `string` containing any content valid inside a html `<head>` to apply extra scripting / styling to the document.. [More Information](#customization). | `null`                      |
+| `CustomHeadContent`           | A `string` containing any content valid inside a HTML `<head>` to apply extra scripting / styling to the document.. [More Information](#customization). | `null`                      |
 | `ChromePath`                  | Path to chrome or chromium executable or self-downloads it if `null`.                                                                                   | `null`                      |
-| `KeepHtml`                    | `true` if the created html should not be deleted.                                                                                                       | `false`                     |
+| `KeepHtml`                    | `true` if the created HTML should not be deleted.                                                                                                       | `false`                     |
 | `MarginOptions`               | Css-margins for the sides of the document.                                                                                                              | `null`                      |
 | `IsLandscape`                 | Paper orientation.                                                                                                                                      | `false`                     |
 | `Format`                      | The paper format for the PDF.                                                                                                                           | `A4`                        |
@@ -75,7 +75,7 @@ var converter = new Markdown2PdfConverter(options);
 
 ## Header and Footer
 
-With the `Markdown2PdfOptions.HeaderUrl` and `Markdown2PdfOptions.FooterUrl` options a path to a local file containing html for the Header / Footer can be set.  
+With the `Markdown2PdfOptions.HeaderHtml` and `Markdown2PdfOptions.FooterHtml` options a string containing HTML for the Header / Footer can be set.  
 Html-elements with the classes `date`, `title`, `document-title`, `url`, `pageNumber` will get their content replaced based on the information. Note that `document-title` can be set with the option `Markdown2PdfOptions.DocumentTitle`.
 
 ## Customization
