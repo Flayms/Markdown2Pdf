@@ -1,0 +1,49 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "files": [
+            "**/Markdown2Pdf/Markdown2Pdf.csproj"
+          ],
+          "exclude": [ "**/bin/**", "**/obj/**" ],
+          "src": "./"
+        }
+      ],
+      "dest": "../Markdown2Pdf.wiki",
+      "outputFormat": "markdown",
+      "enumSortOrder": "declaringOrder"
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [
+        ],
+        "exclude": [
+          "_site/**",
+          "**/node_modules/**",
+          "**.md"
+        ]
+      }
+    ],
+    "resource": [
+      {
+        "files": [
+          "assets/**"
+        ]
+      }
+    ],
+    "output": "../Markdown2Pdf.wiki/_site",
+    "template": [
+      "default",
+      "modern"
+    ],
+    "globalMetadata": {
+      "_appName": "Markdown2Pdf",
+      "_appTitle": "Markdown2Pdf",
+      "_enableSearch": true,
+      "pdf": false
+    }
+  }
+}

@@ -15,22 +15,41 @@ using PuppeteerSharp.Media;
 namespace Markdown2Pdf;
 
 /// <summary>
-/// Use this to parse markdown to PDF.
+/// The main <see langword="class"/> for converting markdown to PDF.<br/>
 /// </summary>
+/// <example>
+/// The following code example shows how to convert a file "README.md" in the current directory to PDF.
+/// The output will be saved as "README.pdf" in the same directory.
+/// <code>
+/// var converter = new Markdown2PdfConverter();
+/// var resultPath = await converter.Convert("README.md");
+/// </code>
+/// To further specify the conversion process, <see cref="Markdown2PdfOptions"/> can be passed to the converter.
+/// <code>
+/// var options = new Markdown2PdfOptions {
+///   HeaderHtml = File.ReadAllText("header.html"),
+///   FooterHtml = File.ReadAllText("footer.html"),
+///   DocumentTitle = "Example PDF",
+/// };
+/// var converter = new Markdown2PdfConverter(options);
+/// </code>
+/// </example>
 public class Markdown2PdfConverter : IConvertionEvents {
 
   /// <summary>
-  /// All the options this converter uses for generating the PDF.
+  /// Contains all options this converter uses for generating the PDF.
   /// </summary>
+  /// <remarks>Can be set with the constructor <see cref="Markdown2PdfConverter(Markdown2PdfOptions)"/>.</remarks>
   public Markdown2PdfOptions Options { get; }
 
   /// <summary>
-  /// The template used for generating the html which then gets converted into PDF.
+  /// The template used for generating the HTML which then gets converted into PDF.
   /// </summary>
+  /// <remarks>Modify this to get more control over the HTML generation (e.g. to add your own JS-Scripts).</remarks>
   public string ContentTemplate { get; set; }
 
   /// <summary>
-  /// Pdf file name without extension.
+  /// The PDF file name without extension.
   /// </summary>
   public string? OutputFileName { get; private set; }
 
@@ -48,7 +67,7 @@ public class Markdown2PdfConverter : IConvertionEvents {
   private const string _HEADER_FOOTER_STYLES_FILE_NAME = "Header-Footer-Styles.html";
 
   /// <summary>
-  /// Instantiate a new <see cref="Markdown2PdfConverter"/>.
+  /// Instantiates a new <see cref="Markdown2PdfConverter"/>.
   /// </summary>
   /// <param name="options">Optional options to specify how to convert the markdown.</param>
   public Markdown2PdfConverter(Markdown2PdfOptions? options = null) {
@@ -89,7 +108,7 @@ public class Markdown2PdfConverter : IConvertionEvents {
 
   /// <inheritdoc cref="Convert(FileInfo, FileInfo)"/>
   /// <remarks>The PDF will be saved in the same location as the markdown file with the naming convention "markdownFileName.pdf".</remarks>
-  /// <returns>The newly created PDF-file.</returns>
+  /// <returns>The newly created PDF file.</returns>
   public async Task<FileInfo> Convert(FileInfo markdownFile) => new(await this.Convert(markdownFile.FullName));
 
   /// <summary>
@@ -101,7 +120,6 @@ public class Markdown2PdfConverter : IConvertionEvents {
 
   /// <inheritdoc cref="Convert(string, string)"/>
   /// <remarks>The PDF will be saved in the same location as the markdown file with the naming convention "markdownFileName.pdf".</remarks>
-  /// <returns>Filepath to the generated pdf.</returns>
   public async Task<string> Convert(string markdownFilePath) {
     var markdownDir = Path.GetDirectoryName(Path.GetFullPath(markdownFilePath));
     var outputFileName = Path.GetFileNameWithoutExtension(markdownFilePath) + ".pdf";
@@ -112,11 +130,12 @@ public class Markdown2PdfConverter : IConvertionEvents {
   }
 
   /// <summary>
-  /// Converts the given markdown-file to PDF.
+  /// Converts the given markdown file to PDF.
   /// </summary>
   /// <param name="markdownFilePath">Path to the markdown file.</param>
   /// <param name="outputFilePath">File path for saving the PDF to.</param>
   /// <remarks>The PDF will be saved at the path specified in <paramref name="outputFilePath"/>.</remarks>
+  /// <returns>Filepath to the generated pdf.</returns>
   public async Task<string> Convert(string markdownFilePath, string outputFilePath) {
     markdownFilePath = Path.GetFullPath(markdownFilePath);
     outputFilePath = Path.GetFullPath(outputFilePath);
@@ -124,15 +143,12 @@ public class Markdown2PdfConverter : IConvertionEvents {
 
     var markdownContent = File.ReadAllText(markdownFilePath);
 
-    await this._ConvertWithTempRun(outputFilePath, markdownContent, markdownFilePath);
+    await this._Convert(outputFilePath, markdownContent, markdownFilePath);
 
     return outputFilePath;
   }
 
-  /// <summary>
-  /// Converts the given enumerable of markdown-files to PDF.
-  /// </summary>
-  /// <param name="markdownFilePaths">Enumerable with paths to the markdown files.</param>
+  /// <inheritdoc cref="Convert(IEnumerable{string}, string)"/>
   /// <remarks>The PDF will be saved in the same location of the first markdown file with the naming convention "markdownFileName.pdf".</remarks>
   public async Task<string> Convert(IEnumerable<string> markdownFilePaths) {
     var first = markdownFilePaths.First();
@@ -145,9 +161,9 @@ public class Markdown2PdfConverter : IConvertionEvents {
   }
 
   /// <summary>
-  /// Converts the given enumerable of markdown-files to PDF.
+  /// Converts the given enumerable of markdown files to PDF.
   /// </summary>
-  /// <param name="markdownFilePaths">Enumerable with paths to the markdown files.</param>
+  /// <param name="markdownFilePaths">Enumerable with paths of the markdown files.</param>
   /// <param name="outputFilePath">File path for saving the PDF to.</param>
   public async Task<string> Convert(IEnumerable<string> markdownFilePaths, string outputFilePath) {
     var markdownContent = string.Join(Environment.NewLine, markdownFilePaths.Select(File.ReadAllText));
@@ -156,20 +172,22 @@ public class Markdown2PdfConverter : IConvertionEvents {
     outputFilePath = Path.GetFullPath(outputFilePath);
     Directory.CreateDirectory(Path.GetDirectoryName(outputFilePath));
 
-    await this._ConvertWithTempRun(outputFilePath, markdownContent, markdownFilePath);
+    await this._Convert(outputFilePath, markdownContent, markdownFilePath);
 
     return outputFilePath;
   }
 
   /// <summary>
-  /// Encapsulates internal conversion logic, with option for 2 runs.
+  /// Converts the given list of markdown files to PDF.
   /// </summary>
   /// <param name="outputFilePath">File path for saving the PDF to.</param>
   /// <param name="markdownContent">String holding all markdown data.</param>
-  /// <param name="markdownFilePath">Path to the first markdown file.</param>
-  private async Task _ConvertWithTempRun(string outputFilePath, string markdownContent, string markdownFilePath) {
-    // If PageNumbers enabled, PDF needs to be generated twice
-    if (Options.TableOfContents?.PageNumberOptions != null) {
+  /// <param name="markdownFilePath">Path of the first markdown file.</param>
+  private async Task _Convert(string outputFilePath, string markdownContent, string markdownFilePath) {
+    // Rerun logic
+    await this._ConvertInternal(outputFilePath, markdownContent, markdownFilePath);
+    var args = new PdfArgs(outputFilePath);
+    if (Options.TableOfContents?.PageNumberOptions != null) { // If PageNumbers enabled, PDF needs to be generated twice
       var tempPath = _CreateTempFilePath(outputFilePath);
       await this._ConvertInternal(tempPath, markdownContent, markdownFilePath);
       this._onTempPdfCreatedEvent?.Invoke(this, new PdfArgs(tempPath)); // TODO: trigger at right time
