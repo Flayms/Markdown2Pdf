@@ -7,7 +7,7 @@ internal interface IConvertionEvents {
 
   internal event EventHandler<MarkdownArgs> BeforeMarkdownConversion;
   internal event EventHandler<TemplateModelArgs> OnTemplateModelCreating;
-  internal event EventHandler<PdfArgs> OnPdfCreatedEvent;
+  internal event EventHandler<PdfArgs> OnTempPdfCreatedEvent;
 }
 
 internal class MarkdownArgs(ref string markdownContent) : EventArgs {
@@ -20,5 +20,4 @@ internal class TemplateModelArgs(Dictionary<string, string> templateModel) : Eve
 
 internal class PdfArgs(string pdfPath) : EventArgs {
   public string PdfPath { get; set; } = pdfPath;
-  public bool NeedsRerun { get; set; }
 }

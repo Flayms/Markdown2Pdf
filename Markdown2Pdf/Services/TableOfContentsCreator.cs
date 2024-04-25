@@ -76,7 +76,7 @@ internal class TableOfContentsCreator {
     convertionEvents.OnTemplateModelCreating += this._AddStylesToTemplate;
 
     if (options.PageNumberOptions != null)
-      convertionEvents.OnPdfCreatedEvent += this._ReadPageNumbers;
+      convertionEvents.OnTempPdfCreatedEvent += this._ReadPageNumbers;
   }
 
   private void _AddToMarkdown(object sender, MarkdownArgs e) {
@@ -103,8 +103,6 @@ internal class TableOfContentsCreator {
   private void _ReadPageNumbers(object _, PdfArgs e) { // TODO: what if link not found
     if (this._links == null)
       throw new InvalidOperationException("Links have not been created yet.");
-
-    e.NeedsRerun = true;
 
     using var pdf = PdfDocument.Open(e.PdfPath);
     this._linkPages = _ParsePageNumbersFromPdf(pdf, this._links).ToArray();
