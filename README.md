@@ -44,7 +44,7 @@ Dim resultPath As String = Await converter.Convert("README.md")
 
 ## Options
 
-To further specify the conversion process, pass `Markdown2PdfOptions` to the converter:
+To further specify the conversion process, pass [Markdown2PdfOptions](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Options.Markdown2PdfOptions) to the converter:
 
 ```cs
 var options = new Markdown2PdfOptions {
@@ -55,23 +55,23 @@ var options = new Markdown2PdfOptions {
 var converter = new Markdown2PdfConverter(options);
 ```
 
-| Option                        | Description                                                                                                                                             | Default                     |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
-| `ModuleOptions`               | Options that decide from where to load additional modules. [More Information](#modules).                                                                | `ModuleOptions.Remote`      |
-| `Theme`                       | The styling to apply to the document.                                                                                                                   | `Theme.Github`              |
-| `CodeHighlightTheme`          | The theme to use for highlighting code blocks.                                                                                                          | `CodeHighlightTheme.Github` |
-| `EnableAutoLanguageDetection` | Auto detect the language for code blocks without specfied language.                                                                                     | `false`                     |
-| `HeaderHtml`                  | HTML-string to use as the document header. [More Information](#header-and-footer).                                                                      | `null`                      |
-| `FooterHtml`                  | HTML-string to use as the document footer. [More Information](#header-and-footer).                                                                      | `null`                      |
-| `DocumentTitle`               | The title of this document. Can be injected into the header / footer by adding the class `document-title` to the element.                               | `null`                      |
-| `CustomHeadContent`           | A `string` containing any content valid inside a HTML `<head>` to apply extra scripting / styling to the document.. [More Information](#customization). | `null`                      |
-| `ChromePath`                  | Path to chrome or chromium executable or self-downloads it if `null`.                                                                                   | `null`                      |
-| `KeepHtml`                    | `true` if the created HTML should not be deleted.                                                                                                       | `false`                     |
-| `MarginOptions`               | Css-margins for the sides of the document.                                                                                                              | `null`                      |
-| `IsLandscape`                 | Paper orientation.                                                                                                                                      | `false`                     |
-| `Format`                      | The paper format for the PDF.                                                                                                                           | `A4`                        |
-| `Scale`                       | Scale of the content. Must be between 0.1 and 2.                                                                                                        | `1`                         |
-| `TableOfContents`             | Creates a TOC from the markdown headers. [More Information](#table-of-contents).                                                                        | `null`                      |
+| Option                                                                                                                                                     | Description                                                                                                                                             |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [ChromePath](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Options.Markdown2PdfOptions#-chromepath)                                             | Path to chrome or chromium executable or self-downloads it if `null`.                                                                                   |
+| [CodeHighlightTheme]([htPdfOptions#-chromepath](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Options.Markdown2PdfOptions#-codehighlighttheme)) | The theme to use for highlighting code blocks.                                                                                                          |
+| [CustomHeadContent](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Options.Markdown2PdfOptions#-customheadcontent)                               | A `string` containing any content valid inside a HTML `<head>` to apply extra scripting / styling to the document.. [More Information](#customization). |
+| [DocumentTitle](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Options.Markdown2PdfOptions#-documenttitle)                                       | The title of this document. Can be injected into the header / footer by adding the class `document-title` to the element.                               |
+| [EnableAutoLanguageDetection](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Options.Markdown2PdfOptions#-enableautolanguagedetection)           | Auto detect the language for code blocks without specfied language.                                                                                     |
+| [FooterHtml](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Options.Markdown2PdfOptions#-footerhtml)                                             | HTML-string to use as the document footer. [More Information](#header-and-footer).                                                                      |
+| [Format](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Options.Markdown2PdfOptions#-format)                                                     | The paper format for the PDF.                                                                                                                           |
+| [HeaderHtml](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Options.Markdown2PdfOptions#-headerhtml)                                             | HTML-string to use as the document header. [More Information](#header-and-footer).                                                                      |
+| [IsLandscape](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Options.Markdown2PdfOptions#-islandscape)                                           | Paper orientation.                                                                                                                                      |
+| [KeepHtml](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Options.Markdown2PdfOptions#-keephtml)                                                 | `true` if the created HTML should not be deleted.                                                                                                       |
+| [MarginOptions](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Options.Markdown2PdfOptions#-marginoptions)                                       | Css-margins for the sides of the document.                                                                                                              |
+| [ModuleOptions](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Options.Markdown2PdfOptions#-moduleoptions)                                       | Options that decide from where to load additional modules. [More Information](#modules).                                                                |
+| [Scale](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Options.Markdown2PdfOptions#-scale)                                                       | Scale of the content. Must be between 0.1 and 2.                                                                                                        |
+| [TableOfContents](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Options.Markdown2PdfOptions#-tableofcontents)                                   | Creates a TOC from the markdown headers. [More Information](#table-of-contents).                                                                        |
+| [Theme](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Options.Markdown2PdfOptions#-theme)                                                       | The styling to apply to the document.                                                                                                                   |
 
 ## Header and Footer
 
@@ -123,20 +123,20 @@ The TOC gets generated within a `<nav class="table-of-contents">`. This can be u
 
 ### Options
 
-| Option              | Description                                               | Default                    |
-| ------------------- | --------------------------------------------------------- | -------------------------- |
-| `ListStyle`         | Decides which characters to use before the TOC titles.    | `ListStyle.OrderedDefault` |
-| `MinDepthLevel`     | The minimum level of heading depth to include in the TOC. | `1`                        |
-| `MaxDepthLevel`     | The maximum level of heading depth to include in the TOC. | `6`                        |
-| `HasColoredLinks`   | If set, the titles in the TOC get default link markup.    | `false`                    |
-| `PageNumberOptions` | If set, the TOC will be generated with page numbers.      | `null`                     |
+| Option                                                                                                                          | Description                                               |
+| ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| [HasColoredLinks](hhttps://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Options.TableOfContentsOptions#-hascoloredlinks)    | If set, the titles in the TOC get default link markup.    |
+| [ListStyle](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Options.TableOfContentsOptions#-liststyle)                 | Decides which characters to use before the TOC titles.    |
+| [MaxDepthLevel](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Options.TableOfContentsOptions#-maxdepthlevel)         | The maximum level of heading depth to include in the TOC. |
+| [MinDepthLevel](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Options.TableOfContentsOptions#-mindepthlevel)         | The minimum level of heading depth to include in the TOC. |
+| [PageNumberOptions](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Options.TableOfContentsOptions#-pagenumberoptions) | If set, the TOC will be generated with page numbers.      |
 
 ## Modules
 
-This library uses node_modules packages.
+This library uses *node_modules* packages.
 By default they're loaded over the CDN they're hosted on e.g. https://cdn.jsdelivr.net.
 
-You can also use a local installation by installing the following packages and setting `Markdown2PdfOptions.ModuleOptions` to `ModuleOptions.FromLocalPath()`:
+You can also use a local installation by installing the following packages and setting [Markdown2PdfOptions.ModuleOptions](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Options.Markdown2PdfOptions#-moduleoptions) to [ModuleOptions.FromLocalPath()](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Options.ModuleOptions#-fromlocalpathstring):
 
 ```bash
 npm i mathjax@3
@@ -160,7 +160,7 @@ npm i latex.css
 
 ### Further modification
 
-To get more control over the HTML generation (e.g. to add your own JS-Scripts), modify the `converter.ContentTemplate`.
+To get more control over the HTML generation (e.g. to add your own JS-Scripts), modify the [converter.ContentTemplate](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Markdown2PdfConverter#-contenttemplate).
 
 ## Running in Docker
 

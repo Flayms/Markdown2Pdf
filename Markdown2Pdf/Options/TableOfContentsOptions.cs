@@ -7,7 +7,7 @@ namespace Markdown2Pdf.Options;
 /// The TOC will be inserted into all <c>[TOC]</c>, <c>[[_TOC_]]</c> or <c>&lt;!-- toc --&gt;</c> comments within the markdown document.<br/>
 /// <example>
 /// Example Markdown document with a TOC:
-/// <code>
+/// <code language="markdown">
 /// # My Document
 /// [TOC]
 /// ...
@@ -25,7 +25,16 @@ namespace Markdown2Pdf.Options;
 /// MaxDepthLevel = 4
 /// };
 /// </code>
+/// <example>
+/// A header can be omitted from the toc by ending it with <c>&#60;!-- omit from toc --&#62;</c>:
+/// <code language="markdown">
+/// ## This header won't be displayed in the TOC &#60;!-- omit from toc --&#62;
+/// </code>
+/// </example>
 /// </summary>
+/// <remarks>
+/// The TOC gets generated within a <c>&#60;nav class="table-of-contents"&#62;</c>. This can be used to apply extra custom styles.
+/// </remarks>
 public class TableOfContentsOptions {
 
   private const int _MIN_DEPTH_LEVEL = 1;
