@@ -41,6 +41,7 @@ jobs:
       shell: pwsh
       run: |
         Push-Location ${{github.repository}}
+        dotnet tool update -g docfx
         pwsh ".github/workflows/build_wiki.ps1"
         Pop-Location
 

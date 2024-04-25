@@ -20,7 +20,7 @@ public enum ListStyle {
   Unordered,
 
   /// <summary>
-  /// Preceed the TOC items with numbers separated by points (e.g. 1.1, 1.2, 1.2.1...).
+  /// Preceed the TOC items with numbers separated by points (e.g. <c>1.1</c>, <c>1.2</c>, <c>1.2.1</c>...).
   /// </summary>
   Decimal
 }

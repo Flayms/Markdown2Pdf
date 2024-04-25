@@ -6,18 +6,19 @@
           "files": [
             "**/Markdown2Pdf/Markdown2Pdf.csproj"
           ],
-          "src": "../"
+          "exclude": [ "**/bin/**", "**/obj/**" ],
+          "src": "./"
         }
       ],
       "dest": "../Markdown2Pdf.wiki",
-      "outputFormat": "markdown"
+      "outputFormat": "markdown",
+      "enumSortOrder": "declaringOrder"
     }
   ],
   "build": {
     "content": [
       {
         "files": [
-          "**/*.{md,yml}"
         ],
         "exclude": [
           "_site/**",
