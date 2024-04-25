@@ -25,7 +25,7 @@ function FixCodeBlocks($markdownContent) {
     [regex]$codeBlockRegex = '(?ms)<pre><code class="lang-(?<LangName>.+?)">(?<Code>.+?)<\/code><\/pre>'
     $foundMatches = $codeBlockRegex.Matches($markdownContent)
     foreach ($match in $foundMatches) {
-        $replacedValue = "``````$($match.Groups["LangName"].Value)`n$($match.Groups["Code"].Value)`n```````n"
+        $replacedValue = "`n``````$($match.Groups["LangName"].Value)`n$($match.Groups["Code"].Value)`n```````n"
         $markdownContent = $markdownContent.replace($match.Groups[0].Value, $replacedValue)
     }
 

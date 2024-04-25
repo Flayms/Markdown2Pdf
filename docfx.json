@@ -11,7 +11,8 @@
         }
       ],
       "dest": "../Markdown2Pdf.wiki",
-      "outputFormat": "markdown"
+      "outputFormat": "markdown",
+      "enumSortOrder": "declaringOrder"
     }
   ],
   "build": {
