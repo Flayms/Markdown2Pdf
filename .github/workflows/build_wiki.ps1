@@ -18,7 +18,7 @@ function FixXrefs($markdownContent) {
     [regex]$removeStartOfXrefRegex = '<xref href="(.+\.)*(?=\w+)'
     [regex]$removeEndOfXrefRegex = '(?<=.+)" .*></xref>'
 
-    return $markdownContent -replace $removeStartOfXrefRegex, "" -replace $removeEndOfXrefRegex, ""
+    return $markdownContent -replace $removeStartOfXrefRegex, "``" -replace $removeEndOfXrefRegex, "``"
 }
 
 function FixCodeBlocks($markdownContent) {
