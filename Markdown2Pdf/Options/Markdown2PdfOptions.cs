@@ -53,6 +53,14 @@ public class Markdown2PdfOptions {
   public string? DocumentTitle { get; set; }
 
   /// <summary>
+  /// The title information for the file proerties.
+  /// The title information for the file proerties.
+  /// The title information for the file proerties.this._
+  /// <value>Default: <see langword="null"/>.</value>
+  /// </summary>
+  public string? FilePropertiesTitle { get; set; }
+
+  /// <summary>
   /// A <see langword="string"/> containing any content valid inside a HTML <c>&lt;head&gt;</c> 
   /// to apply extra scripting / styling to the document.
   /// <value>Default: <see langword="null"/>.</value>

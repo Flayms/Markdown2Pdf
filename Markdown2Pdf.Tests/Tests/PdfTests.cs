@@ -165,6 +165,38 @@ public class PdfTests {
       Assert.That(Utils.PdfContains(pdfPath, "Common Markdown Functionality"));
     });
   }
+
+  private static object[] _GetTestCasesTitle() => [
+      new [] { null, null, "helloworld" },
+      new [] { "mydocumenttitle", null, "mydocumenttitle" },
+      new [] { null, "myfiletitle" , "myfiletitle"},
+      new [] { "mydocumenttitle", "myfiletitle" , "myfiletitle"},
+    ];
+
+  [Test]
+  [TestCaseSource(nameof(_GetTestCasesTitle))]
+  public async Task TestGeneratesPdfDifferentTitles(string documentTitle, string fileTitle, string resultTitle) {
+    // arrange
+
+    var options = new Markdown2PdfOptions {
+      DocumentTitle = documentTitle,
+      FilePropertiesTitle = fileTitle,
+    };
+
+    var converter = new Markdown2PdfConverter(options);
+
+
+    // act
+    var pdfPath = await converter.Convert(Utils.helloWorldFile);
+
+    // assert
+    Assert.Multiple(() => {
+      Assert.That(File.Exists(pdfPath));
+      Assert.That(Utils.PdfContains(pdfPath, "Hello World!"));
+      Assert.That(Utils.PdfProperties(pdfPath, "title"), Is.EqualTo(resultTitle));
+    });
+  }
+
   [TearDown]
   public void Teardown() => Utils.tempDir.Delete(true);
 

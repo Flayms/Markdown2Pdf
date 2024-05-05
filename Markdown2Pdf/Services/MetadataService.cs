@@ -12,7 +12,7 @@ internal class MetadataService {
   }
 
   private void _AddTitleToTemplate(object _, TemplateModelArgs e) {
-    var title = this._options.DocumentTitle ?? _events.OutputFileName!;
+    var title = this._options.FilePropertiesTitle ?? this._options.DocumentTitle ?? _events.OutputFileName!;
     e.TemplateModel.Add("title", title);
   }
 
