@@ -1,4 +1,5 @@
 ﻿using Markdown2Pdf.Options;
+using UglyToad.PdfPig;
 
 namespace Markdown2Pdf.Tests.Tests;
 
@@ -165,6 +166,33 @@ public class PdfTests {
       Assert.That(Utils.PdfContains(pdfPath, "Common Markdown Functionality"));
     });
   }
+
+  [Test]
+  [TestCase(null, null, "helloworld")]
+  [TestCase("testDocumentTitle", null, "testDocumentTitle")]
+  [TestCase(null, "myMetadataTitle", "myMetadataTitle")]
+  [TestCase("testDocumentTitle", "myMetadataTitle", "myMetadataTitle")]
+  public async Task TestThatPdfMetadataGetsSetCorrectly(string documentTitle, string metadataTitle, string expectedTitle) {
+    // arrange
+
+    var options = new Markdown2PdfOptions {
+      DocumentTitle = documentTitle,
+      MetadataTitle = metadataTitle,
+    };
+
+    var converter = new Markdown2PdfConverter(options);
+
+    // act
+    var pdfPath = await converter.Convert(Utils.helloWorldFile);
+    using var pdf = PdfDocument.Open(pdfPath);
+
+    // assert
+    Assert.Multiple(() => {
+      Assert.That(pdf.Information.Title, Is.EqualTo(expectedTitle));
+      Assert.That(pdf.Information.Author, Is.EqualTo(null));
+    });
+  }
+
   [TearDown]
   public void Teardown() => Utils.tempDir.Delete(true);
 

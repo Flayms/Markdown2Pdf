@@ -53,6 +53,13 @@ public class Markdown2PdfOptions {
   public string? DocumentTitle { get; set; }
 
   /// <summary>
+  /// The title in the metadata (PDF properties).
+  /// <value>Default: <see langword="null"/>.</value>
+  /// </summary>
+  /// <remarks>If not set, first <see cref="DocumentTitle"/> and then the Output-Filename are used as fallback values.</remarks>
+  public string? MetadataTitle { get; set; }
+
+  /// <summary>
   /// A <see langword="string"/> containing any content valid inside a HTML <c>&lt;head&gt;</c> 
   /// to apply extra scripting / styling to the document.
   /// <value>Default: <see langword="null"/>.</value>
