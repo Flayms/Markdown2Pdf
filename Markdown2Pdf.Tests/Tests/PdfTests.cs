@@ -1,4 +1,5 @@
 ﻿using Markdown2Pdf.Options;
+using UglyToad.PdfPig;
 
 namespace Markdown2Pdf.Tests.Tests;
 
@@ -166,34 +167,29 @@ public class PdfTests {
     });
   }
 
-  private static object[] _GetTestCasesTitle() => [
-      new [] { null, null, "helloworld" },
-      new [] { "mydocumenttitle", null, "mydocumenttitle" },
-      new [] { null, "myfiletitle" , "myfiletitle"},
-      new [] { "mydocumenttitle", "myfiletitle" , "myfiletitle"},
-    ];
-
   [Test]
-  [TestCaseSource(nameof(_GetTestCasesTitle))]
-  public async Task TestGeneratesPdfDifferentTitles(string documentTitle, string fileTitle, string resultTitle) {
+  [TestCase(null, null, "helloworld")]
+  [TestCase("testDocumentTitle", null, "testDocumentTitle")]
+  [TestCase(null, "myMetadataTitle", "myMetadataTitle")]
+  [TestCase("testDocumentTitle", "myMetadataTitle", "myMetadataTitle")]
+  public async Task TestThatPdfMetadataGetsSetCorrectly(string documentTitle, string metadataTitle, string expectedTitle) {
     // arrange
 
     var options = new Markdown2PdfOptions {
       DocumentTitle = documentTitle,
-      FilePropertiesTitle = fileTitle,
+      MetadataTitle = metadataTitle,
     };
 
     var converter = new Markdown2PdfConverter(options);
 
-
     // act
     var pdfPath = await converter.Convert(Utils.helloWorldFile);
+    using var pdf = PdfDocument.Open(pdfPath);
 
     // assert
     Assert.Multiple(() => {
-      Assert.That(File.Exists(pdfPath));
-      Assert.That(Utils.PdfContains(pdfPath, "Hello World!"));
-      Assert.That(Utils.PdfProperties(pdfPath, "title"), Is.EqualTo(resultTitle));
+      Assert.That(pdf.Information.Title, Is.EqualTo(expectedTitle));
+      Assert.That(pdf.Information.Author, Is.EqualTo(null));
     });
   }
 

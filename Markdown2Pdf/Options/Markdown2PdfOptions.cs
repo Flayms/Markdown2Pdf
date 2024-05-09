@@ -53,12 +53,11 @@ public class Markdown2PdfOptions {
   public string? DocumentTitle { get; set; }
 
   /// <summary>
-  /// The title information for the file proerties.
-  /// The title information for the file proerties.
-  /// The title information for the file proerties.this._
+  /// The title in the metadata (PDF properties).
   /// <value>Default: <see langword="null"/>.</value>
   /// </summary>
-  public string? FilePropertiesTitle { get; set; }
+  /// <remarks>If not set, first <see cref="DocumentTitle"/> and then the Output-Filename are used as fallback values.</remarks>
+  public string? MetadataTitle { get; set; }
 
   /// <summary>
   /// A <see langword="string"/> containing any content valid inside a HTML <c>&lt;head&gt;</c> 

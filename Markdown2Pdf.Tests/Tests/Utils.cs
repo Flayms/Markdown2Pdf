@@ -76,27 +76,4 @@ internal partial class Utils {
   [GeneratedRegex("\r\n?|\n")]
   internal static partial Regex LineBreakRegex();
 
-  /// <summary>
-  /// Searches a given file property in the PDF.
-  /// </summary>
-  /// <param name="fileName">The PDF to search in.</param>
-  /// <param name="property">The property to search for.</param>
-  /// <returns>The value of the given file property</returns>
-  internal static string PdfProperties(string fileName, string property) {
-
-    if (!File.Exists(fileName))
-      return "file not found";
-
-    using (var pdf = PdfDocument.Open(fileName)) {
-      switch (property) {
-        case "title":
-          return pdf.Information.Title;
-        case "author":
-          return pdf.Information.Author;
-        default:
-          return "Property " + property + " not given";
-      }
-    }
-
-  }
 }
