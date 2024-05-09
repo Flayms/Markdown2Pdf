@@ -1,6 +1,10 @@
 <p align="center">
   <a href="https://www.nuget.org/packages/Markdown2Pdf" target="_blank">
-    <img alt="Nuget" src="https://img.shields.io/nuget/v/Markdown2Pdf" />
+    <img alt="Nuget Version" src="https://img.shields.io/nuget/v/Markdown2Pdf" />
+  </a>
+
+  <a href="https://www.nuget.org/packages/Markdown2Pdf" target="_blank">
+    <img alt="NuGet Downloads" src="https://img.shields.io/nuget/dt/Markdown2Pdf">
   </a>
   
   <a href="https://github.com/Flayms/Markdown2Pdf/actions/workflows/build-and-release.yml" target="_blank">
