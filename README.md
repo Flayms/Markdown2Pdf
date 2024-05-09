@@ -1,6 +1,10 @@
 <p align="center">
   <a href="https://www.nuget.org/packages/Markdown2Pdf" target="_blank">
-    <img alt="Nuget" src="https://img.shields.io/nuget/v/Markdown2Pdf" />
+    <img alt="Nuget Version" src="https://img.shields.io/nuget/v/Markdown2Pdf" />
+  </a>
+
+  <a href="https://www.nuget.org/packages/Markdown2Pdf" target="_blank">
+    <img alt="NuGet Downloads" src="https://img.shields.io/nuget/dt/Markdown2Pdf">
   </a>
   
   <a href="https://github.com/Flayms/Markdown2Pdf/actions/workflows/build-and-release.yml" target="_blank">
@@ -41,6 +45,8 @@ Dim resultPath As String = Await converter.Convert("README.md")
 ```
 
 > An enumeration of markdown files can also be passed to the converter, combining them into one PDF. 
+
+Checkout the [Wiki](https://github.com/Flayms/Markdown2Pdf/wiki) for more documentation.
 
 ## Options
 
@@ -148,6 +154,11 @@ npm i latex.css
 ### Further modification
 
 To get more control over the HTML generation (e.g. to add your own JS-Scripts), modify the [converter.ContentTemplate](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Markdown2PdfConverter#-contenttemplate).
+
+## Unit-Tests
+
+For automated tests, the project [Markdown2Pdf.Tests](Markdown2Pdf.Tests/) exists.
+Before starting these, run [setup.ps1](Markdown2Pdf.Tests/setup.ps1).
 
 ## Running in Docker
 
