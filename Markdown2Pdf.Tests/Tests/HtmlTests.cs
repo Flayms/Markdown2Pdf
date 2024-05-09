@@ -12,40 +12,28 @@ public partial class HtmlTests {
   }
 
   [Test]
-  public async Task TestGeneralFunctionality() {
-    // arrange
-    var converter = new Markdown2PdfConverter();
-
-    // act
-    var pdfPath = await converter.Convert(Utils.helloWorldFile);
-
-    // assert
-    Assert.That(File.Exists(pdfPath));
-  }
-
-  [Test]
   [TestCase("", "class=\"markdown-body\"")]
   [TestCase("", "<script id=")]
   [TestCase("", "<link rel=\"stylesheet\" href=")]
   [TestCase("*Hello* **World!**", "<p><em>Hello</em> <strong>World!</strong></p>")]
-  public void TestConversionToHtml(string markdown, string expectedHtmlPart) {
-    // arrange
+  public void Generated_Html_Should_Contain(string markdown, string expectedHtmlPart) {
+    // Arrange
     var converter = new Markdown2PdfConverter();
 
-    // act
+    // Act
     var html = converter.GenerateHtml(markdown);
 
-    // assert
+    // Assert
     Assert.That(html, Does.Contain(expectedHtmlPart));
   }
 
   [Test]
-  public async Task TestModuleFunctionality([Values(
+  public async Task Should_Use_Modules([Values(
     "<mjx-math class=\"MJX-TEX\" aria-hidden=\"true\">",
     "<div class=\"mermaid\" data-processed=\"true\">",
     "<span class=\"hljs-keyword\">public</span>"
     )] string expectedHtmlContent, [Values(true, false)] bool runLocally) {
-    // arrange
+    // Arrange
     var options = new Markdown2PdfOptions {
       ModuleOptions = ModuleOptions.Remote
     };
@@ -63,7 +51,7 @@ public partial class HtmlTests {
 
     var converter = new Markdown2PdfConverter(options);
 
-    // act
+    // Act
     var html = converter.GenerateHtml(File.ReadAllText(Utils.readmeFile));
 
     // render html
@@ -71,7 +59,7 @@ public partial class HtmlTests {
     File.WriteAllText(tempHtmlPath, html);
     var renderedHtml = await Utils.RenderHtmlAsync(tempHtmlPath);
 
-    // assert
+    // Assert
     Assert.That(renderedHtml, Does.Contain(expectedHtmlContent));
   }
 
@@ -82,7 +70,7 @@ public partial class HtmlTests {
   [TestCase("""<a href="#emojis">""")]
   [TestCase("""<a href="#первый-заголовок">Первый заголовок</a>""")]
   public void TableOfContents_Should_Contain(string content) {
-    // arrange
+    // Arrange
     var options = new Markdown2PdfOptions {
       TableOfContents = new TableOfContentsOptions {
         ListStyle = ListStyle.OrderedDefault,
@@ -92,13 +80,13 @@ public partial class HtmlTests {
     };
     var converter = new Markdown2PdfConverter(options);
 
-    // act
+    // Act
     var html = converter.GenerateHtml(File.ReadAllText(Utils.readmeFile));
 
     // remove line endings for easier comparison
     html = Utils.LineBreakRegex().Replace(html, string.Empty);
 
-    // assert
+    // Assert
     Assert.That(html, Does.Contain(content));
   }
 
@@ -107,7 +95,7 @@ public partial class HtmlTests {
   [TestCase("""<a href="#h6-heading">""")] // bigger than MaxDepth
   [TestCase("""<a href="#h3-heading">""")] // omitted with comment
   public void TableOfContents_Should_Not_Contain(string content) {
-    // arrange
+    // Arrange
     var options = new Markdown2PdfOptions {
       TableOfContents = new TableOfContentsOptions {
         ListStyle = ListStyle.OrderedDefault,
@@ -117,13 +105,13 @@ public partial class HtmlTests {
     };
     var converter = new Markdown2PdfConverter(options);
 
-    // act
+    // Act
     var html = converter.GenerateHtml(File.ReadAllText(Utils.readmeFile));
 
     // remove line endings for easier comparison
     html = Utils.LineBreakRegex().Replace(html, string.Empty);
 
-    // assert
+    // Assert
     Assert.That(html, Does.Not.Contain(content));
   }
 
