@@ -56,8 +56,7 @@ public partial class HtmlTests {
         Assembly.GetExecutingAssembly().Location)!, "node_modules");
 
       Assert.That(Directory.Exists(nodeModuleLocation),
-        $"'{nodeModuleLocation}' Could not be found. " +
-        "Try running 'npm install' within the executing directory.");
+        $"'{nodeModuleLocation}' Could not be found. Try running 'setup.ps1'.");
 
       options.ModuleOptions = ModuleOptions.FromLocalPath(nodeModuleLocation);
     }
