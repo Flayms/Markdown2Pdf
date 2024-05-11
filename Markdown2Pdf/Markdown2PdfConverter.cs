@@ -88,8 +88,9 @@ public class Markdown2PdfConverter : IConvertionEvents {
     _ = new MetadataService(this.Options, this);
   }
 
-  public Markdown2PdfConverter(string markdownWithInlineOptionsFilePath) {
-
+  public static Markdown2PdfConverter CreateWithInlineOptionsFromFile(string markdownFilePath) {
+    InlineOptionsParser.TryParseYamlFrontMatter(markdownFilePath, out var options);
+    return new Markdown2PdfConverter(options);
   }
 
   private event EventHandler<MarkdownArgs>? _beforeMarkdownConversion;
@@ -231,6 +232,7 @@ public class Markdown2PdfConverter : IConvertionEvents {
 
     var pipelineBuilder = new MarkdownPipelineBuilder()
       .UseAdvancedExtensions()
+      .UseYamlFrontMatter()
       .UseEmojiAndSmiley();
 
     // Switch to AutoLink Option to allow non-ASCII characters
