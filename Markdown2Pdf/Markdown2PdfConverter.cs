@@ -88,6 +88,10 @@ public class Markdown2PdfConverter : IConvertionEvents {
     _ = new MetadataService(this.Options, this);
   }
 
+  public Markdown2PdfConverter(string markdownWithInlineOptionsFilePath) {
+
+  }
+
   private event EventHandler<MarkdownArgs>? _beforeMarkdownConversion;
   event EventHandler<MarkdownArgs> IConvertionEvents.BeforeMarkdownConversion {
     add => _beforeMarkdownConversion += value;
