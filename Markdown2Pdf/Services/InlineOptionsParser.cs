@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using Markdown2Pdf.Options;
 using YamlDotNet.Serialization;
@@ -24,8 +25,13 @@ internal class InlineOptionsParser {
   private static bool _TryReadYamlFrontMatter(string markdownFilePath, out string markdownContent) {
     using var reader = File.OpenText(markdownFilePath);
 
+    var identifiers = new Dictionary<string, string>() {
+      {"---", "---" },
+      {"<!--", "-->" },
+    };
+
     var firstLine = reader.ReadLine();
-    if (firstLine != "---") { // Start found // TODO: allow comments
+    if (!identifiers.TryGetValue(firstLine, out var endIdentifier)) {
       markdownContent = null!;
       return false;
     }
@@ -33,15 +39,12 @@ internal class InlineOptionsParser {
 
     string line;
     while ((line = reader.ReadLine()) != null) {
-      switch (line) {
-        case "---": // End found
-          markdownContent = sb.ToString();
-          return true;
-
-        default:
-          sb.AppendLine(line);
-          break;
+      if (line == endIdentifier) {
+        markdownContent = sb.ToString();
+        return true;
       }
+
+      sb.AppendLine(line);
     }
 
     // No end found

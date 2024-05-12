@@ -88,10 +88,55 @@ public class Markdown2PdfConverter : IConvertionEvents {
     _ = new MetadataService(this.Options, this);
   }
 
+  /// <summary>
+  /// Instantiates a new <see cref="Markdown2PdfConverter"/> with the options being
+  /// wrapped in a YAML Front Matter block at the start of the the markdown document.
+  /// </summary>
+  /// <param name="markdownFilePath">Path to the markdown file containing the YAML front Matter.</param>
+  /// <returns>The new <see cref="Markdown2PdfConverter"/>.</returns>
+  /// <example>
+  /// Use this at the beginning of the markdown file:
+  /// <code language="markdown">
+  /// ---
+  /// document-title: myDocumentTitle # string
+  /// metadata-title: myMetadataTitle # string
+  /// module-options: remote # or none or pathString
+  /// theme: github # or none or latex or cssPath
+  /// code-highlight-theme: github # enum value
+  /// enable-auto-language-detection: true # boolean
+  /// header-html: "&lt;div class='document-title' style='background-color: #5eafed; width: 100%; padding: 5px'&gt;&lt;/div&gt;"
+  /// # footer-html: "&lt;div&gt;hello footer&lt;/div&gt;"
+  /// # custom-head-content: "&lt;style&gt;h2 { page-break-before: always; }&lt;/style&gt;"
+  /// # chrome-path: "C:\Program Files\Google\Chrome\Application\chrome.exe"
+  /// keep-html: false
+  /// margin-options:
+  ///   top: 80px
+  ///   bottom: 50px
+  ///   left: 50px
+  ///   right: 50px
+  /// is-landscape: false
+  /// format: A4
+  /// scale: 1
+  /// table-of-contents:
+  ///   list-style: decimal
+  ///   min-depth-level: 2
+  ///   max-depth-level: 6
+  ///   page-number-options:
+  ///     tab-leader: dots
+  /// ---
+  /// 
+  /// # Here the normal markdown content starts
+  /// </code>
+  /// </example>
+  /// <remarks>
+  /// Instead of three dashes (---) an HTML comment (&lt;!-- --&gt;) can also be used to wrap the YAML.
+  /// </remarks>
   public static Markdown2PdfConverter CreateWithInlineOptionsFromFile(string markdownFilePath) {
     InlineOptionsParser.TryParseYamlFrontMatter(markdownFilePath, out var options);
     return new Markdown2PdfConverter(options);
   }
+
+  // TODO: FileInfo overload
 
   private event EventHandler<MarkdownArgs>? _beforeMarkdownConversion;
   event EventHandler<MarkdownArgs> IConvertionEvents.BeforeMarkdownConversion {
@@ -232,7 +277,7 @@ public class Markdown2PdfConverter : IConvertionEvents {
 
     var pipelineBuilder = new MarkdownPipelineBuilder()
       .UseAdvancedExtensions()
-      .UseYamlFrontMatter() // TODO: manually remove front matter
+      .UseYamlFrontMatter()
       .UseEmojiAndSmiley();
 
     // Switch to AutoLink Option to allow non-ASCII characters
