@@ -133,7 +133,7 @@ public class Markdown2PdfConverter : IConvertionEvents {
   /// Instead of three dashes (---) an HTML comment (&lt;!-- --&gt;) can also be used to wrap the YAML.
   /// </remarks>
   public static Markdown2PdfConverter CreateWithInlineOptionsFromFile(string markdownFilePath) {
-    InlineOptionsParser.TryParseYamlFrontMatter(markdownFilePath, out var options);
+    var options = InlineOptionsParser.ParseYamlFrontMatter(markdownFilePath);
     return new Markdown2PdfConverter(options);
   }
 

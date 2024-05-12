@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+﻿using Markdown2Pdf.Services;
 using PuppeteerSharp.Media;
 
 namespace Markdown2Pdf.Options;
@@ -25,18 +25,19 @@ internal class SerializableOptions {
     var options = new Markdown2PdfOptions();
 
     if (this.ModuleOptions != null) {
-      options.ModuleOptions = _TryGetPropertyValue<ModuleOptions>(this.ModuleOptions, out var moduleOptions)
+      options.ModuleOptions = PropertyService.TryGetPropertyValue<ModuleOptions>(this.ModuleOptions, out var moduleOptions)
         ? moduleOptions
         : Options.ModuleOptions.FromLocalPath(this.ModuleOptions);
     }
 
     if (this.Theme != null) {
-      options.Theme = _TryGetPropertyValue<Theme>(this.Theme, out var theme)
+      options.Theme = PropertyService.TryGetPropertyValue<Theme>(this.Theme, out var theme)
         ? theme
         : Options.Theme.Custom(this.Theme);
     }
 
-    if (this.CodeHighlightTheme != null && _TryGetPropertyValue<CodeHighlightTheme>(this.CodeHighlightTheme, out var codeHighlightTheme))
+    if (this.CodeHighlightTheme != null
+      && PropertyService.TryGetPropertyValue<CodeHighlightTheme>(this.CodeHighlightTheme, out var codeHighlightTheme))
       options.CodeHighlightTheme = codeHighlightTheme;
 
     if (this.EnableAutoLanguageDetection != null)
@@ -69,7 +70,7 @@ internal class SerializableOptions {
     if (this.IsLandscape != null)
       options.IsLandscape = this.IsLandscape.Value;
 
-    if (this.Format != null && _TryGetPropertyValue<PaperFormat>(this.Format, out var format))
+    if (this.Format != null && PropertyService.TryGetPropertyValue<PaperFormat>(this.Format, out var format))
       options.Format = format;
 
     if (this.Scale != null)
@@ -81,16 +82,4 @@ internal class SerializableOptions {
     return options;
   }
 
-  private static bool _TryGetPropertyValue<T>(string propertyName, out T propertyValue) {
-    var property = typeof(T).GetProperty(propertyName,
-    BindingFlags.Static | BindingFlags.Public | BindingFlags.IgnoreCase);
-
-    if (property == null) {
-      propertyValue = default!;
-      return false;
-    }
-
-    propertyValue = (T)property.GetValue(null, null)!;
-    return true;
-  }
 }
