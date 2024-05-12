@@ -232,7 +232,7 @@ public class Markdown2PdfConverter : IConvertionEvents {
 
     var pipelineBuilder = new MarkdownPipelineBuilder()
       .UseAdvancedExtensions()
-      .UseYamlFrontMatter()
+      .UseYamlFrontMatter() // TODO: manually remove front matter
       .UseEmojiAndSmiley();
 
     // Switch to AutoLink Option to allow non-ASCII characters

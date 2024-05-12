@@ -25,7 +25,7 @@ internal class InlineOptionsParser {
     using var reader = File.OpenText(markdownFilePath);
 
     var firstLine = reader.ReadLine();
-    if (firstLine != "---") { // Start found
+    if (firstLine != "---") { // Start found // TODO: allow comments
       markdownContent = null!;
       return false;
     }

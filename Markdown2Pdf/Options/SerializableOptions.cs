@@ -7,16 +7,16 @@ internal class SerializableOptions {
   public string? ModuleOptions { get; set; }
   public string? Theme { get; set; }
   public string? CodeHighlightTheme { get; set; }
-  public bool EnableAutoLanguageDetection { get; set; }
+  public bool? EnableAutoLanguageDetection { get; set; }
   public string? HeaderHtml { get; set; }
   public string? FooterHtml { get; set; }
   public string? DocumentTitle { get; set; }
   public string? MetadataTitle { get; set; }
   public string? CustomHeadContent { get; set; }
   public string? ChromePath { get; set; }
-  public bool KeepHtml { get; set; }
+  public bool? KeepHtml { get; set; }
   public MarginOptions? MarginOptions { get; set; }
-  public bool IsLandscape { get; set; }
+  public bool? IsLandscape { get; set; }
   public string? Format { get; set; }
   public decimal? Scale { get; set; }
   public TableOfContentsOptions? TableOfContents { get; set; } = null;
@@ -24,30 +24,23 @@ internal class SerializableOptions {
   public Markdown2PdfOptions ToMarkdown2PdfOptions() {
     var options = new Markdown2PdfOptions();
 
-    // TODO: use _TryGetPropertyValue
     if (this.ModuleOptions != null) {
-      options.ModuleOptions = this.ModuleOptions.ToLower() switch {
-        "none" => Options.ModuleOptions.None,
-        "remote" => Options.ModuleOptions.Remote,
-        _ => Options.ModuleOptions.FromLocalPath(this.ModuleOptions)
-      };
+      options.ModuleOptions = _TryGetPropertyValue<ModuleOptions>(this.ModuleOptions, out var moduleOptions)
+        ? moduleOptions
+        : Options.ModuleOptions.FromLocalPath(this.ModuleOptions);
     }
 
-    // TODO: use _TryGetPropertyValue
     if (this.Theme != null) {
-      options.Theme = this.Theme.ToLower() switch {
-        "none" => Options.Theme.None,
-        "github" => Options.Theme.Github,
-        "latex" => Options.Theme.Latex,
-        _ => Options.Theme.Custom(this.Theme)
-      };
+      options.Theme = _TryGetPropertyValue<Theme>(this.Theme, out var theme)
+        ? theme
+        : Options.Theme.Custom(this.Theme);
     }
 
     if (this.CodeHighlightTheme != null && _TryGetPropertyValue<CodeHighlightTheme>(this.CodeHighlightTheme, out var codeHighlightTheme))
       options.CodeHighlightTheme = codeHighlightTheme;
 
-    if (this.EnableAutoLanguageDetection)
-      options.EnableAutoLanguageDetection = true;
+    if (this.EnableAutoLanguageDetection != null)
+      options.EnableAutoLanguageDetection = this.EnableAutoLanguageDetection.Value;
 
     if (this.HeaderHtml != null)
       options.HeaderHtml = this.HeaderHtml;
@@ -67,14 +60,14 @@ internal class SerializableOptions {
     if (this.ChromePath != null)
       options.ChromePath = this.ChromePath;
 
-    if (this.KeepHtml)
-      options.KeepHtml = true;
+    if (this.KeepHtml != null)
+      options.KeepHtml = this.KeepHtml.Value;
 
-    if (this.MarginOptions != null) // TODO: double check
+    if (this.MarginOptions != null)
       options.MarginOptions = this.MarginOptions;
 
-    if (this.IsLandscape)
-      options.IsLandscape = true;
+    if (this.IsLandscape != null)
+      options.IsLandscape = this.IsLandscape.Value;
 
     if (this.Format != null && _TryGetPropertyValue<PaperFormat>(this.Format, out var format))
       options.Format = format;
@@ -82,7 +75,7 @@ internal class SerializableOptions {
     if (this.Scale != null)
       options.Scale = this.Scale.Value;
 
-    if (this.TableOfContents != null) // TODO: double check
+    if (this.TableOfContents != null)
       options.TableOfContents = this.TableOfContents;
 
     return options;
