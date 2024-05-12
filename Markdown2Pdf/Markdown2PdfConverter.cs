@@ -136,7 +136,10 @@ public class Markdown2PdfConverter : IConvertionEvents {
     return new Markdown2PdfConverter(options);
   }
 
-  // TODO: FileInfo overload
+  /// <inheritdoc cref="CreateWithInlineOptionsFromFile(string)"/>
+  /// <param name="markdownFile">Markdown file containing the YAML front Matter.</param>
+  public static Markdown2PdfConverter CreateWithInlineOptionsFromFile(FileInfo markdownFile)
+    => CreateWithInlineOptionsFromFile(markdownFile.FullName);
 
   private event EventHandler<MarkdownArgs>? _beforeMarkdownConversion;
   event EventHandler<MarkdownArgs> IConvertionEvents.BeforeMarkdownConversion {
