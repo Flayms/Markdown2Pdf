@@ -89,23 +89,24 @@ public class Markdown2PdfConverter : IConvertionEvents {
   }
 
   /// <summary>
-  /// Instantiates a new <see cref="Markdown2PdfConverter"/> with the options being
-  /// wrapped in a YAML Front Matter block at the start of the the markdown document.
+  /// Instantiates a new <see cref="Markdown2PdfConverter"/>. 
+  /// The <see cref="Markdown2PdfOptions"/> are loaded from a <i>YAML front matter block</i> 
+  /// at the start of the given markdown document.
   /// </summary>
-  /// <param name="markdownFilePath">Path to the markdown file containing the YAML front Matter.</param>
+  /// <param name="markdownFilePath">Path to the markdown file containing the <i>YAML front matter</i>.</param>
   /// <returns>The new <see cref="Markdown2PdfConverter"/>.</returns>
   /// <example>
   /// Use this at the beginning of the markdown file:
   /// <code language="markdown">
   /// ---
-  /// document-title: myDocumentTitle # string
-  /// metadata-title: myMetadataTitle # string
-  /// module-options: remote # or none or pathString
-  /// theme: github # or none or latex or cssPath
-  /// code-highlight-theme: github # enum value
-  /// enable-auto-language-detection: true # boolean
+  /// document-title: myDocumentTitle
+  /// metadata-title: myMetadataTitle
+  /// module-options: Remote # or None or path to node_module directory
+  /// theme: Github # or Latex or None or path to css file
+  /// code-highlight-theme: Github
+  /// enable-auto-language-detection: true
   /// header-html: "&lt;div class='document-title' style='background-color: #5eafed; width: 100%; padding: 5px'&gt;&lt;/div&gt;"
-  /// # footer-html: "&lt;div&gt;hello footer&lt;/div&gt;"
+  /// # footer-html: "&lt;div&gt;hello world&lt;/div&gt;"
   /// # custom-head-content: "&lt;style&gt;h2 { page-break-before: always; }&lt;/style&gt;"
   /// # chrome-path: "C:\Program Files\Google\Chrome\Application\chrome.exe"
   /// keep-html: false
@@ -137,7 +138,7 @@ public class Markdown2PdfConverter : IConvertionEvents {
   }
 
   /// <inheritdoc cref="CreateWithInlineOptionsFromFile(string)"/>
-  /// <param name="markdownFile">Markdown file containing the YAML front Matter.</param>
+  /// <param name="markdownFile">Markdown file containing the <i>YAML front matter</i>.</param>
   public static Markdown2PdfConverter CreateWithInlineOptionsFromFile(FileInfo markdownFile)
     => CreateWithInlineOptionsFromFile(markdownFile.FullName);
 

@@ -1,13 +1,13 @@
 <p align="center">
-  <a href="https://www.nuget.org/packages/Markdown2Pdf" target="_blank">
+  <a href="https://www.nuget.org/packages/Markdown2Pdf" target="_blank" style="all: unset;">
     <img alt="Nuget Version" src="https://img.shields.io/nuget/v/Markdown2Pdf" />
   </a>
 
-  <a href="https://www.nuget.org/packages/Markdown2Pdf" target="_blank">
+  <a href="https://www.nuget.org/packages/Markdown2Pdf" target="_blank" style="all: unset;">
     <img alt="NuGet Downloads" src="https://img.shields.io/nuget/dt/Markdown2Pdf">
   </a>
   
-  <a href="https://github.com/Flayms/Markdown2Pdf/actions/workflows/build-and-release.yml" target="_blank">
+  <a href="https://github.com/Flayms/Markdown2Pdf/actions/workflows/build-and-release.yml" target="_blank" style="all: unset;">
     <img src="https://github.com/Flayms/Markdown2Pdf/actions/workflows/build-and-release.yml/badge.svg?event=workflow_dispatch" alt="Build and Release" />
   </a>
 </p>
@@ -46,6 +46,8 @@ Dim resultPath As String = Await converter.Convert("README.md")
 
 > An enumeration of markdown files can also be passed to the converter, combining them into one PDF. 
 
+## Wiki
+
 Checkout the [Wiki](https://github.com/Flayms/Markdown2Pdf/wiki) for more documentation.
 
 ## Options
@@ -60,6 +62,15 @@ var options = new Markdown2PdfOptions {
 };
 var converter = new Markdown2PdfConverter(options);
 ```
+
+Alternatively the [Markdown2PdfOptions](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Options.Markdown2PdfOptions) can be loaded from a YAML Front Matter block at the start of the markdown file:
+
+```cs
+var converter = Markdown2PdfConverter.CreateWithInlineOptionsFromFile("README.md");
+var resultPath = await converter.Convert("README.md");
+```
+
+Usage examples for this can be found  [here](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Markdown2PdfConverter#-createwithinlineoptionsfromfilestring).
 
 | Option                                                                                                                                           | Description                                                                                                               |
 | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
