@@ -53,6 +53,24 @@ public class Markdown2PdfConverter : IConvertionEvents {
   /// </summary>
   public string? OutputFileName { get; private set; }
 
+  private event EventHandler<MarkdownArgs>? _beforeHtmlConversion;
+  event EventHandler<MarkdownArgs> IConvertionEvents.BeforeMarkdownConversion {
+    add => _beforeHtmlConversion += value;
+    remove => _beforeHtmlConversion -= value;
+  }
+
+  private event EventHandler<TemplateModelArgs>? _onTemplateModelCreating;
+  event EventHandler<TemplateModelArgs>? IConvertionEvents.OnTemplateModelCreating {
+    add => _onTemplateModelCreating += value;
+    remove => _onTemplateModelCreating -= value;
+  }
+
+  private event EventHandler<PdfArgs>? _onTempPdfCreatedEvent;
+  event EventHandler<PdfArgs>? IConvertionEvents.OnTempPdfCreatedEvent {
+    add => _onTempPdfCreatedEvent += value;
+    remove => _onTempPdfCreatedEvent -= value;
+  }
+
   private readonly EmbeddedResourceService _embeddedResourceService = new();
 
   private const string _CUSTOM_HEAD_KEY = "customHeadContent";
@@ -141,24 +159,6 @@ public class Markdown2PdfConverter : IConvertionEvents {
   /// <param name="markdownFile">Markdown file containing the <i>YAML front matter</i>.</param>
   public static Markdown2PdfConverter CreateWithInlineOptionsFromFile(FileInfo markdownFile)
     => CreateWithInlineOptionsFromFile(markdownFile.FullName);
-
-  private event EventHandler<MarkdownArgs>? _beforeMarkdownConversion;
-  event EventHandler<MarkdownArgs> IConvertionEvents.BeforeMarkdownConversion {
-    add => _beforeMarkdownConversion += value;
-    remove => _beforeMarkdownConversion -= value;
-  }
-
-  private event EventHandler<TemplateModelArgs>? _onTemplateModelCreating;
-  event EventHandler<TemplateModelArgs>? IConvertionEvents.OnTemplateModelCreating {
-    add => _onTemplateModelCreating += value;
-    remove => _onTemplateModelCreating -= value;
-  }
-
-  private event EventHandler<PdfArgs>? _onTempPdfCreatedEvent;
-  event EventHandler<PdfArgs>? IConvertionEvents.OnTempPdfCreatedEvent {
-    add => _onTempPdfCreatedEvent += value;
-    remove => _onTempPdfCreatedEvent -= value;
-  }
 
   /// <inheritdoc cref="Convert(FileInfo, FileInfo)"/>
   /// <remarks>The PDF will be saved in the same location as the markdown file with the naming convention "markdownFileName.pdf".</remarks>
@@ -276,7 +276,7 @@ public class Markdown2PdfConverter : IConvertionEvents {
 
   internal string GenerateHtml(string markdownContent) {
     var markdownArgs = new MarkdownArgs(ref markdownContent);
-    this._beforeMarkdownConversion?.Invoke(this, markdownArgs);
+    this._beforeHtmlConversion?.Invoke(this, markdownArgs);
     markdownContent = markdownArgs.MarkdownContent;
 
     var pipelineBuilder = new MarkdownPipelineBuilder()
