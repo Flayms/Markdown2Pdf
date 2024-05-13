@@ -54,7 +54,7 @@ public class Markdown2PdfConverter : IConvertionEvents {
   public string? OutputFileName { get; private set; }
 
   private event EventHandler<MarkdownArgs>? _beforeHtmlConversion;
-  event EventHandler<MarkdownArgs> IConvertionEvents.BeforeMarkdownConversion {
+  event EventHandler<MarkdownArgs> IConvertionEvents.BeforeHtmlConversion {
     add => _beforeHtmlConversion += value;
     remove => _beforeHtmlConversion -= value;
   }
