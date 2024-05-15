@@ -72,7 +72,7 @@ internal class TableOfContentsCreator {
     this._openListElement = this._isOrdered ? "<ol>" : "<ul>";
     this._closeListElement = this._isOrdered ? "</ol>" : "</ul>";
 
-    convertionEvents.BeforeMarkdownConversion += this._AddToMarkdown;
+    convertionEvents.BeforeHtmlConversion += this._AddToMarkdown;
     convertionEvents.OnTemplateModelCreating += this._AddStylesToTemplate;
 
     if (options.PageNumberOptions != null)

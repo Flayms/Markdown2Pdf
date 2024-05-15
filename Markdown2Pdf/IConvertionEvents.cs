@@ -5,7 +5,7 @@ namespace Markdown2Pdf;
 internal interface IConvertionEvents {
   public string? OutputFileName { get; }
 
-  internal event EventHandler<MarkdownArgs> BeforeMarkdownConversion;
+  internal event EventHandler<MarkdownArgs> BeforeHtmlConversion;
   internal event EventHandler<TemplateModelArgs> OnTemplateModelCreating;
   internal event EventHandler<PdfArgs> OnTempPdfCreatedEvent;
 }
