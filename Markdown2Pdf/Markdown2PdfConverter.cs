@@ -314,8 +314,8 @@ public class Markdown2PdfConverter : IConvertionEvents {
   }
 
   private async Task _GeneratePdfAsync(string htmlFilePath, string outputFilePath) {
-    using var browser = await this._CreateBrowserAsync();
-    var page = await browser.NewPageAsync();
+    await using var browser = await this._CreateBrowserAsync();
+    await using var page = await browser.NewPageAsync();
     var options = this.Options;
     var margins = options.MarginOptions;
 
