@@ -172,6 +172,9 @@ internal class TableOfContentsCreator {
 
   private string _ToHtml(string markdownContent) {
     var links = this._links = _CreateLinks(markdownContent).ToArray();
+    if (links.Length == 0)
+      return string.Empty;
+
     var minLinkDepth = links.Min(l => l.Depth);
     var minDepth = Math.Max(this._minDepthLevel, minLinkDepth); // ensure that there's no unneeded nesting
 
