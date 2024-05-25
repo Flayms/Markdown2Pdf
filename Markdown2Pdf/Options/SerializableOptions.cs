@@ -3,24 +3,48 @@ using PuppeteerSharp.Media;
 
 namespace Markdown2Pdf.Options;
 
-internal class SerializableOptions {
+/// <summary>
+/// The <see cref="Markdown2PdfOptions"/> in a serializable format.
+/// </summary>
+public class SerializableOptions {
+
+  /// <inheritdoc cref="Markdown2PdfOptions.ModuleOptions"/>
   public string? ModuleOptions { get; set; }
+  /// <inheritdoc cref="Markdown2PdfOptions.Theme"/>
   public string? Theme { get; set; }
+  /// <inheritdoc cref="Markdown2PdfOptions.CodeHighlightTheme"/>
   public string? CodeHighlightTheme { get; set; }
+  /// <inheritdoc cref="Markdown2PdfOptions.EnableAutoLanguageDetection"/>
   public bool? EnableAutoLanguageDetection { get; set; }
+  /// <inheritdoc cref="Markdown2PdfOptions.HeaderHtml"/>
   public string? HeaderHtml { get; set; }
+  /// <inheritdoc cref="Markdown2PdfOptions.FooterHtml"/>
   public string? FooterHtml { get; set; }
+  /// <inheritdoc cref="Markdown2PdfOptions.DocumentTitle"/>
   public string? DocumentTitle { get; set; }
+  /// <inheritdoc cref="Markdown2PdfOptions.MetadataTitle"/>
   public string? MetadataTitle { get; set; }
+  /// <inheritdoc cref="Markdown2PdfOptions.CustomHeadContent"/>
   public string? CustomHeadContent { get; set; }
+  /// <inheritdoc cref="Markdown2PdfOptions.ChromePath"/>
   public string? ChromePath { get; set; }
+  /// <inheritdoc cref="Markdown2PdfOptions.KeepHtml"/>
   public bool? KeepHtml { get; set; }
+  /// <inheritdoc cref="Markdown2PdfOptions.MarginOptions"/>
   public MarginOptions? MarginOptions { get; set; }
+  /// <inheritdoc cref="Markdown2PdfOptions.IsLandscape"/>
   public bool? IsLandscape { get; set; }
+  /// <inheritdoc cref="Markdown2PdfOptions.Format"/>
   public string? Format { get; set; }
+  /// <inheritdoc cref="Markdown2PdfOptions.Scale"/>
   public decimal? Scale { get; set; }
+  /// <inheritdoc cref="Markdown2PdfOptions.TableOfContents"/>
   public TableOfContentsOptions? TableOfContents { get; set; } = null;
 
+  /// <summary>
+  /// Converts this serializable options into proper <see cref="Markdown2PdfOptions"/>.
+  /// </summary>
+  /// <returns>The deserialized <see cref="Markdown2PdfOptions"/>.</returns>
   public Markdown2PdfOptions ToMarkdown2PdfOptions() {
     var options = new Markdown2PdfOptions();
 

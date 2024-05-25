@@ -120,7 +120,7 @@ internal class TableOfContentsCreator {
   }
 
   private static IEnumerable<LinkWithPageNumber> _ParsePageNumbersFromPdf(PdfDocument pdf, Link[] links) {
-    var linkPages = new LinkWithPageNumber[links.Count()];
+    var linkPages = new LinkWithPageNumber[links.Length];
     var linksToFind = links.ToList();
 
     foreach (var page in pdf.GetPages()) {

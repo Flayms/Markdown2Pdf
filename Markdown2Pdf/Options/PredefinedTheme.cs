@@ -1,15 +1,15 @@
 ﻿namespace Markdown2Pdf.Options;
 
-internal class PredefinedTheme : Theme {
+/// <summary>
+/// Use a predefined theme.
+/// </summary>
+/// <param name="type">The theme type to use.</param>
+internal class PredefinedTheme(ThemeType type) : Theme {
 
   /// <summary>
   /// The type of this theme.
   /// </summary>
-  public ThemeType Type { get; }
-
-  internal PredefinedTheme(ThemeType type) {
-    this.Type = type;
-  }
+  public ThemeType Type { get; } = type;
 }
 
 /// <summary>
