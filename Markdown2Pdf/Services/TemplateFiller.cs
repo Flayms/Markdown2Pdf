@@ -3,12 +3,23 @@ using System.Text.RegularExpressions;
 
 namespace Markdown2Pdf.Services;
 
-internal class TemplateFiller {
+/// <summary>
+/// Simple templating service.
+/// </summary>
+public class TemplateFiller {
 
-  // matches groups like @(myToken)
+  /// <summary>
+  /// matches groups like @(myToken).
+  /// </summary>
   private static readonly Regex _tokenRegex = new(@"(?<token>@\(.*?\))",
     RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture);
 
+  /// <summary>
+  /// Replaces all tokens of the form <i>@(key)</i> with the given values in the <paramref name="model"/>.
+  /// </summary>
+  /// <param name="template">The template to replace in.</param>
+  /// <param name="model">The model, containg the keys and values.</param>
+  /// <returns>The filled template.</returns>
   public static string FillTemplate(string template, Dictionary<string, string> model) {
     var matches = _tokenRegex.Matches(template);
 

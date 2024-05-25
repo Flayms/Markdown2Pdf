@@ -4,7 +4,10 @@ using System.Reflection;
 
 namespace Markdown2Pdf.Services;
 
-internal class EmbeddedResourceService {
+/// <summary>
+/// Service for loading the content of embedded resources.
+/// </summary>
+public class EmbeddedResourceService {
 
   private readonly Assembly _currentAssembly = Assembly.GetAssembly(typeof(Markdown2PdfConverter));
 

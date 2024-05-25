@@ -7,8 +7,18 @@ using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
 namespace Markdown2Pdf.Services;
-internal class InlineOptionsParser {
 
+/// <summary>
+/// Parser for YAML front matter blocks within markdown files.
+/// </summary>
+public class InlineOptionsParser {
+
+  /// <summary>
+  /// Parses the YAML front matter block at the beginning of the given markdown file.
+  /// </summary>
+  /// <param name="markdownFilePath">The path to the markdown file.</param>
+  /// <returns>The parsed <see cref="Markdown2PdfOptions"/> from the markdown file.</returns>
+  /// <exception cref="Exception"></exception>
   public static Markdown2PdfOptions ParseYamlFrontMatter(string markdownFilePath) {
     if (!_TryReadYamlFrontMatter(markdownFilePath, out var yamlContent))
       throw new Exception($"Could not find a YAML front matter block in '{markdownFilePath}'.");
