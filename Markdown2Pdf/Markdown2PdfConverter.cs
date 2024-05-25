@@ -53,22 +53,40 @@ public class Markdown2PdfConverter : IConvertionEvents {
   /// </summary>
   public string? OutputFileName { get; private set; }
 
-  private event EventHandler<MarkdownArgs>? _beforeHtmlConversion;
+  /// <summary>
+  /// The <see href="https://github.com/xoofx/markdig">Markdig</see> <see cref="MarkdownPipelineBuilder"/> used for the markdown to HTML conversion.
+  /// </summary>
+  /// <remarks>
+  /// This <see cref="MarkdownPipelineBuilder"/> has the following extensions enabled by default:
+  /// <br> * </br><see cref="MarkdownExtensions.UseAdvancedExtensions"/>
+  /// <br> * </br><see cref="MarkdownExtensions.UseYamlFrontMatter"/>
+  /// <br> * </br><see cref="MarkdownExtensions.UseEmojiAndSmiley(MarkdownPipelineBuilder, bool)"/>
+  /// <br> * </br><see cref="MarkdownExtensions.UseAutoIdentifiers"/> with <see cref="AutoIdentifierOptions.AutoLink"/>
+  /// </remarks>
+  public MarkdownPipelineBuilder PipelineBuilder { get; } = new MarkdownPipelineBuilder()
+    .UseAdvancedExtensions()
+    .UseYamlFrontMatter()
+    .UseEmojiAndSmiley();
+
+  /// <inheritdoc cref="IConvertionEvents.BeforeHtmlConversion"/>
+  public event EventHandler<MarkdownArgs>? BeforeHtmlConversion;
   event EventHandler<MarkdownArgs> IConvertionEvents.BeforeHtmlConversion {
-    add => _beforeHtmlConversion += value;
-    remove => _beforeHtmlConversion -= value;
+    add => BeforeHtmlConversion += value;
+    remove => BeforeHtmlConversion -= value;
   }
 
-  private event EventHandler<TemplateModelArgs>? _onTemplateModelCreating;
+  /// <inheritdoc cref="IConvertionEvents.OnTemplateModelCreating"/>
+  public event EventHandler<TemplateModelArgs>? OnTemplateModelCreating;
   event EventHandler<TemplateModelArgs>? IConvertionEvents.OnTemplateModelCreating {
-    add => _onTemplateModelCreating += value;
-    remove => _onTemplateModelCreating -= value;
+    add => OnTemplateModelCreating += value;
+    remove => OnTemplateModelCreating -= value;
   }
 
-  private event EventHandler<PdfArgs>? _onTempPdfCreatedEvent;
+  /// <inheritdoc cref="IConvertionEvents.OnTempPdfCreatedEvent"/>
+  public event EventHandler<PdfArgs>? OnTempPdfCreatedEvent;
   event EventHandler<PdfArgs>? IConvertionEvents.OnTempPdfCreatedEvent {
-    add => _onTempPdfCreatedEvent += value;
-    remove => _onTempPdfCreatedEvent -= value;
+    add => OnTempPdfCreatedEvent += value;
+    remove => OnTempPdfCreatedEvent -= value;
   }
 
   private readonly EmbeddedResourceService _embeddedResourceService = new();
@@ -90,6 +108,11 @@ public class Markdown2PdfConverter : IConvertionEvents {
   /// <param name="options">Optional options to specify how to convert the markdown.</param>
   public Markdown2PdfConverter(Markdown2PdfOptions? options = null) {
     this.Options = options ?? new Markdown2PdfOptions();
+
+    // Switch to AutoLink Option to allow non-ASCII characters
+    this.PipelineBuilder.Extensions.Remove(this.PipelineBuilder.Extensions.Find<AutoIdentifierExtension>()!);
+    this.PipelineBuilder.UseAutoIdentifiers(AutoIdentifierOptions.AutoLink);
+
     var moduleOptions = this.Options.ModuleOptions;
 
     var templateName = this.Options.ModuleOptions == ModuleOptions.None
@@ -244,7 +267,7 @@ public class Markdown2PdfConverter : IConvertionEvents {
     if (Options.TableOfContents?.PageNumberOptions != null) { // If PageNumbers enabled, PDF needs to be generated twice
       var tempPath = _CreateTempFilePath(outputFilePath);
       await this._ConvertInternal(tempPath, markdownContent, markdownFilePath);
-      this._onTempPdfCreatedEvent?.Invoke(this, new PdfArgs(tempPath)); // TODO: trigger at right time
+      this.OnTempPdfCreatedEvent?.Invoke(this, new PdfArgs(tempPath)); // TODO: trigger at right time
       File.Delete(tempPath);
     }
 
@@ -276,19 +299,10 @@ public class Markdown2PdfConverter : IConvertionEvents {
 
   internal string GenerateHtml(string markdownContent) {
     var markdownArgs = new MarkdownArgs(markdownContent);
-    this._beforeHtmlConversion?.Invoke(this, markdownArgs);
+    this.BeforeHtmlConversion?.Invoke(this, markdownArgs);
     markdownContent = markdownArgs.MarkdownContent;
 
-    var pipelineBuilder = new MarkdownPipelineBuilder()
-      .UseAdvancedExtensions()
-      .UseYamlFrontMatter()
-      .UseEmojiAndSmiley();
-
-    // Switch to AutoLink Option to allow non-ASCII characters
-    pipelineBuilder.Extensions.Remove(pipelineBuilder.Extensions.Find<AutoIdentifierExtension>()!);
-    pipelineBuilder.UseAutoIdentifiers(AutoIdentifierOptions.AutoLink);
-
-    var pipeline = pipelineBuilder.Build();
+    var pipeline = this.PipelineBuilder.Build();
 
     var htmlContent = Markdown.ToHtml(markdownContent, pipeline);
 
@@ -308,7 +322,7 @@ public class Markdown2PdfConverter : IConvertionEvents {
     templateModel.Add(_CUSTOM_HEAD_KEY, this.Options.CustomHeadContent ?? string.Empty);
     templateModel.Add(_BODY_KEY, htmlContent);
 
-    this._onTemplateModelCreating?.Invoke(this, new TemplateModelArgs(templateModel));
+    this.OnTemplateModelCreating?.Invoke(this, new TemplateModelArgs(templateModel));
 
     return templateModel;
   }
