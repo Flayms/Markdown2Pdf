@@ -243,7 +243,7 @@ internal class TableOfContentsCreator {
 
     for (var i = 0; i < difference; ++i)
       html += _nl + "</li>" + _nl + this._closeListElement;
-    
+
     return html + _nl + "<li>";
   }
 

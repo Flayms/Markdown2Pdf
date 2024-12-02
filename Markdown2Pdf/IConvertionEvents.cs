@@ -52,7 +52,7 @@ public class MarkdownArgs(string markdownContent) : EventArgs {
 /// </summary>
 /// <param name="templateModel">The model for the HMTml template.</param>
 public class TemplateModelArgs(Dictionary<string, string> templateModel) : EventArgs {
-  
+
   /// <summary>
   /// The model for the HTML template.
   /// </summary>
