@@ -23,7 +23,6 @@
 
 For a cross-platform cli-application using this package checkout [Markdown2Pdf.Console](https://github.com/Flayms/Markdown2Pdf.Console).
 
-
 <div align="center">
   <img src="./assets/screenshot.jpg" alt="demo" Width=450px/>
 </div>
@@ -44,7 +43,7 @@ Dim converter As New Markdown2PdfConverter()
 Dim resultPath As String = Await converter.Convert("README.md")
 ```
 
-> An enumeration of markdown files can also be passed to the converter, combining them into one PDF. 
+> An enumeration of markdown files can also be passed to the converter, combining them into one PDF.
 
 ## Wiki
 
@@ -138,7 +137,7 @@ The TOC gets generated within a `<nav class="table-of-contents">`. This can be u
 ## Modules
 
 This library uses *node_modules* packages.
-By default they're loaded over the CDN they're hosted on e.g. https://cdn.jsdelivr.net.
+By default they're loaded over the CDN they're hosted on e.g. <https://cdn.jsdelivr.net>.
 
 You can also use a local installation by installing the following packages and setting [Markdown2PdfOptions.ModuleOptions](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Options.Markdown2PdfOptions#-moduleoptions) to [ModuleOptions.FromLocalPath()](https://github.com/Flayms/Markdown2Pdf/wiki/Markdown2Pdf.Options.ModuleOptions#-fromlocalpathstring):
 
