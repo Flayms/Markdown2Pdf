@@ -131,8 +131,8 @@ internal class TableOfContentsCreator {
       var lines = _lineBreakRegex.Split(text);
       IEnumerable<Annotation> annotations = page.ExperimentalAccess.GetAnnotations();
 
-      // the invisible link rectanges in the TOC contains the link addresses and the desination page
-      // it is possible to extract both informations and link them to the TOC elements
+      // the invisible link rectangles in the TOC contains the link addresses and the destination page
+      // it is possible to extract both information and link them to the TOC elements
       foreach (Annotation annotation in annotations) {
         // check if it is a GoTo annotation and contains a link destination
         if (annotation.Action.Type != ActionType.GoTo
