@@ -9,6 +9,9 @@ using UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor;
 using UglyToad.PdfPig;
 using System.ComponentModel;
 using System.Reflection;
+using UglyToad.PdfPig.Annotations;
+using UglyToad.PdfPig.Tokens;
+using UglyToad.PdfPig.Actions;
 
 namespace Markdown2Pdf.Services;
 
@@ -126,19 +129,35 @@ internal class TableOfContentsCreator {
     foreach (var page in pdf.GetPages()) {
       var text = ContentOrderTextExtractor.GetText(page);
       var lines = _lineBreakRegex.Split(text);
+      IEnumerable<Annotation> annotations = page.ExperimentalAccess.GetAnnotations();
 
-      foreach (var line in lines)
+      // the invisible link rectanges in the TOC contains the link addresses and the desination page
+      // it is possible to extract both informations and link them to the TOC elements
+      foreach (Annotation annotation in annotations) {
+        // check if it is a GoTo annotation and contains a link destination
+        if (annotation.Action.Type != ActionType.GoTo
+          || !annotation.AnnotationDictionary.ContainsKey(NameToken.Dest))
+          continue;
+        // extract the destination form dictionary (instead of the # ther is a leading /)
+        annotation.AnnotationDictionary.TryGet(NameToken.Dest, out var linktoken);
+        string linkAddress = linktoken.ToString().Replace('/', '#');
+        // try to find the link adress in all links
         foreach (var link in linksToFind) {
-          if (link.Title != line)
+          if (link.LinkAddress != linkAddress)
             continue;
 
-          linkPages[Array.IndexOf(links, link)] = new(link, page.Number);
+          // get the page number from action destination
+          var pageNumber = ((GoToAction)annotation.Action).Destination.PageNumber;
+
+          // save in link pages and remove links from the links to find
+          linkPages[Array.IndexOf(links, link)] = new(link, pageNumber);
           linksToFind.Remove(link);
           if (linksToFind.Count() == 0)
             return linkPages; // All links found
 
           break; // Found link, continue with next line
         }
+      }
     }
 
     return linkPages;
@@ -147,6 +166,7 @@ internal class TableOfContentsCreator {
   private IEnumerable<Link> _CreateLinks(string markdownContent) {
     var matches = _headerReg.Matches(markdownContent);
     var links = new List<Link>(matches.Count);
+    var linkAddresses = new List<string>(matches.Count);
 
     foreach (Match match in matches) {
       var depth = match.Groups["hashes"].Value.Length - 1;
@@ -164,7 +184,20 @@ internal class TableOfContentsCreator {
       var linkAddress = LinkHelper.Urilize(title, false);
       linkAddress = "#" + linkAddress.ToLower();
 
-      links.Add(new Link(title, linkAddress, depth));
+      // ensure every linkAdress is unique
+      int conterVal = 2;
+      string linkAddressUnique = linkAddress;
+      while (linkAddresses.Contains(linkAddressUnique)) {
+        // add an increasing number at the end
+        linkAddressUnique = linkAddress + "-" + conterVal.ToString();
+        conterVal += 1;
+        if (conterVal > 99) {
+          break; // limit to 99 in case of error
+        }
+      }
+      linkAddresses.Add(linkAddressUnique);
+
+      links.Add(new Link(title, linkAddressUnique, depth));
     }
 
     return links;
