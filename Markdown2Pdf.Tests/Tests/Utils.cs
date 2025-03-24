@@ -26,7 +26,8 @@ internal partial class Utils {
 
   private static async Task<IBrowser> _CreateBrowserAsync() {
     var launchOptions = new LaunchOptions {
-      Headless = true
+      Headless = true,
+      Args = ["--no-sandbox"],
     };
 
     using var browserFetcher = new BrowserFetcher();
