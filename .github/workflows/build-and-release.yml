@@ -4,7 +4,7 @@ name: build-and-release
 on: [workflow_dispatch]
 env:
   # Specifies dotnet SDK Version
-  DOTNET_VERSION: '6.0.x'
+  DOTNET_VERSION: '8.0.x'
 
 jobs:
   ci:
