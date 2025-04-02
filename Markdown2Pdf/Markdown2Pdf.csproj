@@ -60,10 +60,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Markdig" Version="0.40.0" />
+		<PackageReference Include="Markdig" Version="0.36.2" />
 		<PackageReference Include="PdfPig" Version="0.1.8" />
 		<PackageReference Include="PuppeteerSharp" Version="18.0.0" />
-		<PackageReference Include="YamlDotNet" Version="16.3.0" />
+		<PackageReference Include="YamlDotNet" Version="15.1.2" />
 	</ItemGroup>
 
 </Project>
