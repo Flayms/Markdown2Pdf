@@ -417,7 +417,7 @@ public class Markdown2PdfConverter : IConvertionEvents {
       return await Puppeteer.LaunchAsync(launchOptions);
     }
 
-    using var browserFetcher = new BrowserFetcher();
+    var browserFetcher = new BrowserFetcher();
     var installed = browserFetcher.GetInstalledBrowsers();
 
     if (!installed.Any()) {
