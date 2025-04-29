@@ -1,0 +1,19 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Markdown2Pdf.Demo",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/Markdown2Pdf.Demo/bin/Debug/net8.0/Markdown2Pdf.Demo.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Markdown2Pdf.Demo",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        }
+    ]
+}
