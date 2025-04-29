@@ -30,7 +30,7 @@ internal partial class Utils {
       Args = ["--no-sandbox"],
     };
 
-    using var browserFetcher = new BrowserFetcher();
+    var browserFetcher = new BrowserFetcher();
     var installed = browserFetcher.GetInstalledBrowsers();
 
     if (!installed.Any()) {
