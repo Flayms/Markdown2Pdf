@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using PuppeteerSharp;
+using PuppeteerSharp.BrowserData;
 using UglyToad.PdfPig;
 using UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor;
 
@@ -27,15 +28,22 @@ internal partial class Utils {
   private static async Task<IBrowser> _CreateBrowserAsync() {
     var launchOptions = new LaunchOptions {
       Headless = true,
-      Args = ["--no-sandbox"],
+      Args = ["--no-sandbox"], // needed for running inside docker
     };
 
     var browserFetcher = new BrowserFetcher();
     var installed = browserFetcher.GetInstalledBrowsers();
+    var hasDefaultRevisionInstalled = installed.Any(installedBrowser => installedBrowser.BuildId == Chrome.DefaultBuildId);
 
-    if (!installed.Any()) {
-      Console.WriteLine("Downloading chromium...");
-      _ = await browserFetcher.DownloadAsync();
+    if (!hasDefaultRevisionInstalled) {
+      // Uninstall old revisions
+      foreach (var oldBrowser in installed) {
+        Console.WriteLine($"Uninstalling old Chrome version {oldBrowser.BuildId} from {browserFetcher.CacheDir}...");
+        browserFetcher.Uninstall(oldBrowser.BuildId);
+      }
+
+      Console.WriteLine($"Path to Chrome was not specified & default build is not installed. Downloading Chrome version {Chrome.DefaultBuildId} to {browserFetcher.CacheDir}...");
+      _ = await browserFetcher.DownloadAsync(Chrome.DefaultBuildId);
     }
 
     return await Puppeteer.LaunchAsync(launchOptions);
